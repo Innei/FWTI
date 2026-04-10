@@ -258,8 +258,8 @@ function QuizPage(props: {
                         <button
                           type="button"
                           class="quiz-opt"
-                          classList={{ 'is-selected': () => props.answers[q.id] === oi() }}
-                          aria-pressed={() => props.answers[q.id] === oi()}
+                          classList={{ 'is-selected': props.answers[q.id] === oi() }}
+                          aria-pressed={props.answers[q.id] === oi()}
                           aria-label={`选项 ${opt.label}`}
                           onClick={() => props.onSelect(q.id, oi())}
                         >
