@@ -1,4 +1,4 @@
-export type Family = 'gz' | 'gr' | 'dz' | 'dr';
+export type Family = 'gz' | 'gr' | 'dz' | 'dr' | 'limbo';
 
 export interface FamilyTheme {
   key: Family;
@@ -12,9 +12,11 @@ export const FAMILY_THEMES: Record<Family, FamilyTheme> = {
   gr: { key: 'gr', name: '冲动忍耐', color: '#E4AE3A', tint: 'rgba(228, 174, 58, 0.10)' },
   dz: { key: 'dz', name: '犹豫暴躁', color: '#88619A', tint: 'rgba(136, 97, 154, 0.08)' },
   dr: { key: 'dr', name: '犹豫忍耐', color: '#33A474', tint: 'rgba(51, 164, 116, 0.08)' },
+  limbo: { key: 'limbo', name: '骑墙 · 薛定谔', color: '#6B7280', tint: 'rgba(107, 114, 128, 0.10)' },
 };
 
 export function getFamily(code: string): Family {
+  if (code === 'LIMBO') return 'limbo';
   const g = code[0] === 'G' ? 'g' : 'd';
   const z = code[1] === 'Z' ? 'z' : 'r';
   return (g + z) as Family;

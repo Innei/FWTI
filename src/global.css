@@ -762,7 +762,7 @@ body {
 .preview-modal-advice {
   margin-top: 22px;
   padding: 14px 16px;
-  border-radius: 8px;
+  border-radius: 0 8px 8px 0;
   background: #fafafa;
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-left: 2px solid var(--tile-color);
@@ -1159,12 +1159,21 @@ body {
   color: var(--fwti-text-dark);
 }
 
-/* Hidden title */
+/* Hidden titles */
+.hidden-title-section {
+  margin: 48px 0;
+}
+.hidden-title-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
 .hidden-title-card {
   background: var(--fwti-accent-tint);
   border: 1px solid var(--fwti-accent);
   border-radius: 20px;
-  padding: 36px 40px;
+  padding: 28px 28px;
   text-align: center;
 }
 .hidden-badge {
@@ -1177,22 +1186,64 @@ body {
   background: var(--fwti-accent);
   padding: 6px 14px;
   border-radius: 999px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 .hidden-name {
   font-family: var(--fwti-font-title);
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--fwti-text-dark);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   line-height: 1.2;
 }
 .hidden-desc {
-  font-size: 15px;
+  font-size: 14px;
   color: var(--fwti-text-mid);
   line-height: 1.7;
   max-width: 440px;
   margin: 0 auto;
+}
+
+/* Quiz META 前置题样式 */
+.quiz-item-num-meta {
+  color: var(--fwti-green, #33a474);
+  background: var(--fwti-bg-tint);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.quiz-item-note {
+  font-size: 13px;
+  color: var(--fwti-text-soft);
+  line-height: 1.6;
+  max-width: 520px;
+  margin: -18px 0 26px;
+  font-style: italic;
+}
+
+/* cnSlang 中文网络梗小字 */
+.preview-modal-slang {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--fwti-text-soft);
+  background: var(--fwti-bg-soft, #f6f6f0);
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--fwti-border);
+}
+.result-slang {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fwti-text-soft);
+  letter-spacing: 0.06em;
+  margin: 6px 0 10px;
+}
+.result-tied-note {
+  font-size: 12px;
+  color: var(--fwti-text-soft);
+  margin-top: 8px;
+  font-style: italic;
 }
 
 /* Sections */

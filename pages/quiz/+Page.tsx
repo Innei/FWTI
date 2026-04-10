@@ -13,9 +13,19 @@ export default function Page() {
 
   function scrollToNextUnanswered(fromId: number) {
     const cur = answers()
+    // 找到当前题在数组中的位置，然后向后（按 array 顺序）找第一道未答题
+    const fromIdx = questions.findIndex((q) => q.id === fromId)
+    for (let i = fromIdx + 1; i < questions.length; i++) {
+      const q = questions[i]
+      if (cur[q.id] === undefined) {
+        const el = document.getElementById(`q-${q.id}`)
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        return
+      }
+    }
+    // 向后都答完了，再从头扫一遍兜底
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i]
-      if (q.id <= fromId) continue
       if (cur[q.id] === undefined) {
         const el = document.getElementById(`q-${q.id}`)
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })

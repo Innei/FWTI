@@ -1,17 +1,42 @@
+export type QuestionDimension = 'GD' | 'ZR' | 'NL' | 'YF' | 'META';
+
 export interface Question {
   id: number;
   text: string;
-  dimension: 'GD' | 'ZR' | 'NL' | 'YF';
-  tag?: string; // 补充题 / 彩蛋
+  dimension: QuestionDimension;
+  tag?: string; // 补充题 / 彩蛋 / 前置
+  note?: string; // 小字说明（可选）
   options: {
     label: string;
     text: string;
     score: number; // +2 = 极性A, 0 = 中立, -2 = 极性B; 对GD: G=+2, D=-2; 对ZR: Z=+2, R=-2; 对NL: N=+2, L=-2; 对YF: Y=+2, F=-2
     hidden?: number; // 隐藏纠结值
+    meta?: string;   // META 题选项携带的语义标签（有对象 / 暧昧 / 单身藏 / 纯单身）
   }[];
 }
 
+/**
+ * 题库中的第一题（id=32）为 META 前置题：不计入任何维度分数，
+ * 仅用于路由题目措辞与触发隐藏"空想家"标签。
+ *
+ * 其余题目中凡是提到"对象"的位置，均替换为"TA"——代表"你在意的那个人"：
+ * 有对象即对象，暧昧中即暧昧对象，单身即心里的那位 / 假想中的那位。
+ */
 export const questions: Question[] = [
+  // ===== 前置题：恋爱状态（META，不计分）=====
+  {
+    id: 32,
+    dimension: 'META',
+    tag: '前置',
+    text: '你目前的恋爱状态是？（这题不计分，只是让后面的题目更贴合你）',
+    note: '下文的"TA"会根据你的选择自动投射到你当下在意的那个人身上。',
+    options: [
+      { label: 'A', text: '有对象 / 正在恋爱 / 正在暧昧，总之脑子里有一个明确的 TA', score: 0, meta: 'active' },
+      { label: 'B', text: '单身，但心里藏着某个人 / 念念不忘的历任', score: 0, meta: 'crush' },
+      { label: 'C', text: '纯单身，古生物级别的自由人', score: 0, meta: 'solo' },
+    ],
+  },
+
   // ===== 维度一：G/D — 主动性（8 题）=====
   {
     id: 1,
@@ -19,8 +44,8 @@ export const questions: Question[] = [
     text: '你暗恋一个人时，你最可能怎么做？',
     options: [
       { label: 'A', text: '创造各种"偶遇"，拼命找话题聊', score: 2 },
-      { label: 'B', text: '默默关注 ta 的朋友圈，偶尔点个赞', score: 0 },
-      { label: 'C', text: '什么都不做，在心里跟 ta 谈了三年恋爱', score: -2 },
+      { label: 'B', text: '默默关注 TA 的朋友圈，偶尔点个赞', score: 0 },
+      { label: 'C', text: '什么都不做，在心里跟 TA 谈了三年恋爱', score: -2 },
     ],
   },
   {
@@ -36,11 +61,11 @@ export const questions: Question[] = [
   {
     id: 3,
     dimension: 'GD',
-    text: '你和对象吵架冷战了两天，你会？',
+    text: '你和 TA 吵架 / 冷战了两天，你会？',
     options: [
       { label: 'A', text: '忍不了了，先低头吧，冷战比吵架还难受', score: 2 },
       { label: 'B', text: '谁先受不了谁先开口，看缘分', score: 0 },
-      { label: 'C', text: 'ta 不找我，我能冷到地球毁灭', score: -2 },
+      { label: 'C', text: 'TA 不找我，我能冷到地球毁灭', score: -2 },
     ],
   },
   {
@@ -49,18 +74,18 @@ export const questions: Question[] = [
     text: '暧昧到一定阶段了，你会主动表白吗？',
     options: [
       { label: 'A', text: '会，我不想错过，时机到了就冲', score: 2 },
-      { label: 'B', text: '疯狂暗示，希望 ta 能领悟', score: 0 },
-      { label: 'C', text: '表什么白，ta 不说我就把这份爱带进坟墓', score: -2 },
+      { label: 'B', text: '疯狂暗示，希望 TA 能领悟', score: 0 },
+      { label: 'C', text: '表什么白，TA 不说我就把这份爱带进坟墓', score: -2 },
     ],
   },
   {
     id: 5,
     dimension: 'GD',
-    text: '你发消息给对象，对方 2 小时没回，你的操作是？',
+    text: '你发消息给 TA，对方 2 小时没回，你的操作是？',
     options: [
       { label: 'A', text: '再发一条，或者直接打电话过去', score: 2 },
       { label: 'B', text: '放下手机做别的，偶尔瞄一眼', score: 0 },
-      { label: 'C', text: '算了，ta 回不回都无所谓（其实有所谓）', score: -2 },
+      { label: 'C', text: '算了，TA 回不回都无所谓（其实有所谓）', score: -2 },
     ],
   },
   {
@@ -76,20 +101,20 @@ export const questions: Question[] = [
   {
     id: 7,
     dimension: 'GD',
-    text: '你发现对象最近好像有点冷淡了，你会？',
+    text: '你发现 TA 最近好像有点冷淡了，你会？',
     options: [
       { label: 'A', text: '直接问："你最近怎么了？是不是我哪里做得不好？"', score: 2 },
       { label: 'B', text: '旁敲侧击试探一下，看看什么情况', score: 0 },
-      { label: 'C', text: 'ta 冷我就冷回去，看谁先撑不住', score: -2 },
+      { label: 'C', text: 'TA 冷我就冷回去，看谁先撑不住', score: -2 },
     ],
   },
   {
     id: 8,
     dimension: 'GD',
-    text: '第一次约会结束后，你会主动发消息说"今天很开心"吗？',
+    text: '第一次见面 / 约会结束后，你会主动发消息说"今天很开心"吗？',
     options: [
       { label: 'A', text: '会！说不定还附带下次约会邀请', score: 2 },
-      { label: 'B', text: '看对方反应，ta 发我就回', score: 0 },
+      { label: 'B', text: '看对方反应，TA 发我就回', score: 0 },
       { label: 'C', text: '不会，万一显得我太上头呢', score: -2 },
     ],
   },
@@ -98,7 +123,7 @@ export const questions: Question[] = [
   {
     id: 9,
     dimension: 'ZR',
-    text: '对象做了让你不爽的事，你的第一反应是？',
+    text: 'TA 做了让你不爽的事，你的第一反应是？',
     options: [
       { label: 'A', text: '当场就说出来，我忍不了一秒钟', score: 2 },
       { label: 'B', text: '先消化一下，看严不严重再决定说不说', score: 0 },
@@ -110,7 +135,7 @@ export const questions: Question[] = [
     dimension: 'ZR',
     text: '你们因为小事吵架了，你的吵架风格是？',
     options: [
-      { label: 'A', text: '声音越来越大，新账旧账一起翻，恨不得写篇论文', score: 2 },
+      { label: 'A', text: '声音越来越大，新账旧账一起翻，恨不得写篇论文论证 TA 的过错', score: 2 },
       { label: 'B', text: '就事论事，吵完拉倒', score: 0 },
       { label: 'C', text: '沉默是金，你吵你的，我的嘴是缝上的', score: -2 },
     ],
@@ -118,7 +143,7 @@ export const questions: Question[] = [
   {
     id: 11,
     dimension: 'ZR',
-    text: '对象忘了你们的纪念日，你会？',
+    text: 'TA 忘了一个对你很重要的日子（生日 / 纪念日 / 你新裙子第一次穿给 TA 看），你会？',
     options: [
       { label: 'A', text: '当场兴师问罪："你心里还有没有我？！"', score: 2 },
       { label: 'B', text: '有点失望，找个机会委婉提醒', score: 0 },
@@ -128,7 +153,7 @@ export const questions: Question[] = [
   {
     id: 12,
     dimension: 'ZR',
-    text: '在恋爱里受了委屈，你通常会？',
+    text: '在恋爱 / 暧昧里受了委屈，你通常会？',
     options: [
       { label: 'A', text: '哭 / 发脾气 / 发朋友圈阴阳怪气', score: 2 },
       { label: 'B', text: '找朋友倾诉一下就好了', score: 0 },
@@ -138,17 +163,17 @@ export const questions: Question[] = [
   {
     id: 13,
     dimension: 'ZR',
-    text: '你有多久没在对象面前哭过了？',
+    text: '你有多久没在 TA 面前哭过了？（可回忆历任或暗恋场景）',
     options: [
       { label: 'A', text: '昨天就哭了，我的眼泪不值钱', score: 2 },
       { label: 'B', text: '偶尔会，看情况', score: 0 },
-      { label: 'C', text: '很久了，在 ta 面前哭会显得我很弱', score: -2 },
+      { label: 'C', text: '很久了 / 从来没有，在 TA 面前哭会显得我很弱', score: -2 },
     ],
   },
   {
     id: 14,
     dimension: 'ZR',
-    text: '分手的时候，你最可能说什么？',
+    text: '想象你们正在分手 / 或你正在跟心里那个人告别，你最可能说什么？',
     options: [
       { label: 'A', text: '"你对不起我！你知不知道我为你付出了多少！"', score: 2 },
       { label: 'B', text: '"好吧，我们都冷静想想。"', score: 0 },
@@ -158,11 +183,11 @@ export const questions: Question[] = [
   {
     id: 15,
     dimension: 'ZR',
-    text: '对象当着朋友的面说了让你没面子的话，你会？',
+    text: 'TA 当着朋友的面说了让你没面子的话，你会？',
     options: [
       { label: 'A', text: '当场怼回去，面子比天大', score: 2 },
       { label: 'B', text: '当时忍住，回家关起门来算账', score: 0 },
-      { label: 'C', text: '吞了，可能 ta 是无心的吧（但我记住了）', score: -2 },
+      { label: 'C', text: '吞了，可能 TA 是无心的吧（但我记住了）', score: -2 },
     ],
   },
 
@@ -180,7 +205,7 @@ export const questions: Question[] = [
   {
     id: 17,
     dimension: 'NL',
-    text: '对象说今晚要和朋友出去玩，你的反应是？',
+    text: 'TA 说今晚要和朋友出去玩，你的反应是？',
     options: [
       { label: 'A', text: '能不能带上我？我也想去嘛', score: 2 },
       { label: 'B', text: '好的，玩得开心，记得告诉我你到家了', score: 0 },
@@ -192,7 +217,7 @@ export const questions: Question[] = [
     dimension: 'NL',
     text: '你的理想周末是？',
     options: [
-      { label: 'A', text: '和对象从早腻到晚，做什么都行，只要在一起', score: 2 },
+      { label: 'A', text: '和 TA 从早腻到晚，做什么都行，只要在一起', score: 2 },
       { label: 'B', text: '一起待半天，各自安排半天', score: 0 },
       { label: 'C', text: '给我一整个下午独处，否则我会枯萎', score: -2 },
     ],
@@ -202,17 +227,17 @@ export const questions: Question[] = [
     dimension: 'NL',
     text: '你怎么看"恋爱后把对象介绍给所有朋友"这件事？',
     options: [
-      { label: 'A', text: '当然要！我想把 ta 融入我生活的每个角落', score: 2 },
+      { label: 'A', text: '当然要！我想把 TA 融入我生活的每个角落', score: 2 },
       { label: 'B', text: '关系好的朋友会介绍', score: 0 },
-      { label: 'C', text: '不太想，我的社交圈是我的，ta 的是 ta 的', score: -2 },
+      { label: 'C', text: '不太想，我的社交圈是我的，TA 的是 TA 的', score: -2 },
     ],
   },
   {
     id: 20,
     dimension: 'NL',
-    text: '对象出差一个礼拜，你会？',
+    text: 'TA 出差 / 离开你一个礼拜，你会？',
     options: [
-      { label: 'A', text: '天天视频，度日如年，数着秒等 ta 回来', score: 2 },
+      { label: 'A', text: '天天视频，度日如年，数着秒等 TA 回来', score: 2 },
       { label: 'B', text: '每天晚上通个电话就好', score: 0 },
       { label: 'C', text: '终于可以一个人看剧打游戏吃泡面了！', score: -2 },
     ],
@@ -230,7 +255,7 @@ export const questions: Question[] = [
   {
     id: 22,
     dimension: 'NL',
-    text: '你会和对象分享你的手机密码吗？',
+    text: '如果你和 TA 在一起，你会主动分享手机密码 / 社交账号密码吗？',
     options: [
       { label: 'A', text: '会，我俩不分你我', score: 2 },
       { label: 'B', text: '知道但不怎么看对方的', score: 0 },
@@ -252,7 +277,7 @@ export const questions: Question[] = [
   {
     id: 24,
     dimension: 'YF',
-    text: '对象和异性朋友吃饭，你的内心 OS 是？',
+    text: 'TA 和异性朋友吃饭，你的内心 OS 是？',
     options: [
       { label: 'A', text: '谁？照片发来看看。在哪吃？吃什么？几点回来？', score: 2 },
       { label: 'B', text: '嗯，别太晚回来就好', score: 0 },
@@ -262,7 +287,7 @@ export const questions: Question[] = [
   {
     id: 25,
     dimension: 'YF',
-    text: '对象突然对你特别好、送了你一个礼物，你会想什么？',
+    text: 'TA 突然对你特别好、送了你一个礼物，你会想什么？',
     options: [
       { label: 'A', text: '是不是做了什么亏心事？先查查再感动', score: 2 },
       { label: 'B', text: '开心但有一点点疑惑', score: 0 },
@@ -272,7 +297,7 @@ export const questions: Question[] = [
   {
     id: 26,
     dimension: 'YF',
-    text: '你有没有翻过对象的聊天记录？',
+    text: '你有没有翻过 TA 的聊天记录 / 朋友圈考古？',
     options: [
       { label: 'A', text: '翻过 / 想翻但没敢 / 正在翻', score: 2 },
       { label: 'B', text: '偶尔无意间看到会在意一下', score: 0 },
@@ -282,9 +307,9 @@ export const questions: Question[] = [
   {
     id: 27,
     dimension: 'YF',
-    text: '对象点赞了一个异性的自拍，你会？',
+    text: 'TA 点赞了一个异性的自拍，你会？',
     options: [
-      { label: 'A', text: '立刻去看那个人是谁，翻完 ta 最近三年的朋友圈', score: 2 },
+      { label: 'A', text: '立刻去看那个人是谁，翻完 TA 最近三年的朋友圈', score: 2 },
       { label: 'B', text: '注意到了，有点酸，但不至于太在意', score: 0 },
       { label: 'C', text: '点赞而已，你不也点吗', score: -2 },
     ],
@@ -292,7 +317,7 @@ export const questions: Question[] = [
   {
     id: 28,
     dimension: 'YF',
-    text: '对象说"我有个事想跟你说"，你的第一反应是？',
+    text: 'TA 说"我有个事想跟你说"，你的第一反应是？',
     options: [
       { label: 'A', text: '完了。要分手了。一定是出轨了。我的天。', score: 2 },
       { label: 'B', text: '怎么了？有点紧张', score: 0 },
@@ -302,7 +327,7 @@ export const questions: Question[] = [
   {
     id: 29,
     dimension: 'YF',
-    text: '恋爱中，你有没有脑补过"对方其实不爱我"的场景？',
+    text: '恋爱中（或暗恋中），你有没有脑补过"对方其实不爱我"的场景？',
     options: [
       { label: 'A', text: '经常，而且脑补得很详细，堪比八点档狗血剧', score: 2 },
       { label: 'B', text: '偶尔闪过念头，很快就打消了', score: 0 },
@@ -312,9 +337,9 @@ export const questions: Question[] = [
   {
     id: 30,
     dimension: 'YF',
-    text: '你对象夸别人好看，你的反应是？',
+    text: 'TA 夸别人好看，你的反应是？',
     options: [
-      { label: 'A', text: '行，那你找 ta 去啊！（已经在脑中上演被抛弃的完整剧情）', score: 2 },
+      { label: 'A', text: '行，那你找 TA 去啊！（已经在脑中上演被抛弃的完整剧情）', score: 2 },
       { label: 'B', text: '酸一下，然后自我调节', score: 0 },
       { label: 'C', text: '确实好看，我也觉得', score: -2 },
     ],
@@ -325,7 +350,7 @@ export const questions: Question[] = [
     id: 31,
     dimension: 'GD', // 不计入主维度
     tag: '彩蛋',
-    text: '你有没有做过这种事：给对象发了一条消息 → 立刻撤回 → 重新编辑 → 再发出去 → 再撤回 → 最后决定不发了？',
+    text: '你有没有做过这种事：给 TA 发了一条消息 → 立刻撤回 → 重新编辑 → 再发出去 → 再撤回 → 最后决定不发了？',
     options: [
       { label: 'A', text: '你在监控我？？？', score: 0, hidden: 2 },
       { label: 'B', text: '偶尔吧……', score: 0, hidden: 1 },

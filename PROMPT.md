@@ -48,12 +48,13 @@ watermark, distorted hands, extra fingers, low resolution
 
 ### 家族底色线索（Family color cue）
 
-| Family | 家族名          | cue 字段（接 base prompt 尾）              |
-| ------ | --------------- | ------------------------------------------ |
-| **GZ** | 激进家（冲·炸） | `, background tinted soft violet #88619a`  |
-| **GR** | 隐忍家（冲·忍） | `, background tinted warm mustard #e4ae3a` |
-| **DZ** | 内爆家（蹲·炸） | `, background tinted dusty blue #4298b4`   |
-| **DR** | 隐身家（蹲·忍） | `, background tinted sage green #33a474`   |
+| Family    | 家族名          | cue 字段（接 base prompt 尾）                                         |
+| --------- | --------------- | --------------------------------------------------------------------- |
+| **GZ**    | 激进家（冲·炸） | `, background tinted soft violet #88619a`                             |
+| **GR**    | 隐忍家（冲·忍） | `, background tinted warm mustard #e4ae3a`                            |
+| **DZ**    | 内爆家（蹲·炸） | `, background tinted dusty blue #4298b4`                              |
+| **DR**    | 隐身家（蹲·忍） | `, background tinted sage green #33a474`                              |
+| **LIMBO** | 骑墙家（隐藏）  | `, background tinted split neutral slate #6b7280` — 用左右对称分割构图 |
 
 ---
 
@@ -71,7 +72,7 @@ unread message thread, leaning forward in an unstable pose, torn paper scraps an
 a faint red blast cloud curling behind them
 ```
 
-#### GZNF — 恋爱脑 · SIMP
+#### GZNF — 恋爱脑 · DAZE
 
 > 脑子空了，全是你
 
@@ -93,21 +94,23 @@ a social media post with a flagged heart reaction, narrowed suspicious eyes with
 one raised eyebrow, tight smirk, a faint yellow citrus aura around the lemon
 ```
 
-#### GZLF — 浪子 · YOLO
+#### GZLF — 海王 / 浪子 · WILD
 
-> 爱得热烈，走得潇洒
+> 爱得热烈，走得潇洒，鱼塘永远在扩建
 
 ```
 A confident free-spirited person in a leather jacket over a graphic tee, balancing
 one foot on a skateboard, windswept hair, wide carefree grin, giving a two-finger
-salute goodbye, a trail of tiny faded hearts drifting behind them like exhaust
+salute goodbye, a trail of tiny faded hearts drifting behind them like exhaust,
+a few small chat bubbles from multiple conversations floating at different distances
+in the background to suggest many simultaneous flirtations
 ```
 
 ---
 
 ### 🟡 GR · 隐忍家
 
-#### GRNY — 卑微战士 · SOIL
+#### GRNY — 卑微战士 · DUST
 
 > 把自己低到尘埃里，还觉得尘埃嫌弃我
 
@@ -118,7 +121,7 @@ anxious apologetic half-smile, a single bead of sweat on the forehead, fine dust
 particles drifting around their knees
 ```
 
-#### GRNF — 舔狗 · WOOF
+#### GRNF — 舔狗 · SIMP
 
 > 你骂我我汪汪叫，你打我我摇尾巴
 
@@ -142,13 +145,14 @@ their knee, dim spotlight from above
 
 #### GRLF — 正常人 · SANE
 
-> 你为什么来做这个测试？
+> 理论上存在的生物
 
 ```
 A well-adjusted balanced person in neat casual clothes (cardigan over shirt),
 relaxed standing pose, holding a coffee cup in one hand and an open paperback in
 the other, warm genuine unforced smile, no drama props, clean minimal background,
-serene and composed
+serene and composed, with a very faint scientific-specimen-label style frame
+around the figure as if they were a rare documented species
 ```
 
 ---
@@ -157,7 +161,7 @@ serene and composed
 
 #### DZNY — 定时炸弹 · TICK
 
-> 表面风平浪静，内心已经核爆三次了
+> 表面风平浪静，内心已经核爆十七次了
 
 ```
 A quiet polite person in a neat button-up shirt sitting stiffly on a wooden stool,
@@ -166,7 +170,7 @@ with a visible countdown timer peeking from inside the shirt collar, faint red
 anger marks floating above the head, eye twitching slightly
 ```
 
-#### DZNF — 林黛玉 · TEAR
+#### DZNF — 林黛玉 · WILT
 
 > 风吹一下我就能哭半小时
 
@@ -174,12 +178,14 @@ anger marks floating above the head, eye twitching slightly
 A delicate melancholic person in layered soft-hued hanfu-inspired top, seated among
 falling cherry blossom petals, tears streaming down both cheeks, clutching a small
 embroidered handkerchief to their mouth, head tilted downward in sorrow, long hair
-gently wind-blown
+gently wind-blown, a single drooping wilting flower held loosely in their other
+hand with petals beginning to fall, the whole posture suggesting a body visibly
+wilting under the slightest emotional breeze
 ```
 
 #### DZLY — 刺猬 · OUCH
 
-> 别靠近我！……你怎么走了？
+> 别靠近我！……你怎么真走了？
 
 ```
 A prickly-looking person with spiky tousled hair in an oversized studded denim
@@ -203,7 +209,7 @@ afternoon light
 
 ### 🟢 DR · 隐身家
 
-#### DRNY — 透明人 · VOID
+#### DRNY — 透明人 · GHOST
 
 > 我的存在感和我的安全感一样低
 
@@ -238,7 +244,7 @@ background
 
 #### DRLF — 已读不回 · SEEN
 
-> 恋爱？那是能吃的东西吗？
+> 看到了。然后呢？
 
 ```
 An apathetic person slouching in a grey oversized hoodie, wearing large noise-
@@ -246,5 +252,24 @@ cancelling over-ear headphones, holding a phone loosely with a visible "Read"
 indicator and a double-checkmark on screen, completely blank unbothered expression,
 gaze drifting past the camera, hands-in-pocket energy
 ```
+
+---
+
+### ⚖️ Hidden · 骑墙家
+
+#### LIMBO — 骑墙党 · LIMBO
+
+> 每个维度都恰好一半，测完反而更迷茫
+
+```
+An indecisive ambiguous person in neutral grey-toned clothing (half cool, half warm),
+standing balanced on top of a narrow wall or fence that runs directly through the
+center of the composition, holding their arms out for balance, head turned halfway
+between two directions as if unable to commit, expression pleasantly uncertain with
+a slight shrug, four small floating question marks orbiting around their head in a
+perfect symmetric pattern, background split subtly into two mirrored halves
+```
+
+> Family color cue 替换为：`, background tinted split neutral slate #6b7280 with a soft dividing line through the middle`
 
 ---

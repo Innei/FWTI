@@ -9,7 +9,6 @@ import {
 import { questions } from './data/questions'
 import {
   personalities,
-  hiddenTitle,
   type Personality,
 } from './data/personalities'
 import { type Result } from './logic/scoring'
@@ -73,7 +72,7 @@ export function HomePage(props: { onStart: () => void }) {
           <p class="preview-hint">点击卡片查看类型释义</p>
         </div>
         <div class="preview-grid">
-          <For each={Object.values(personalities)}>
+          <For each={Object.values(personalities).filter((p) => p.code !== 'LIMBO')}>
             {(p) => {
               const theme = getFamilyTheme(p.code)
               return (
@@ -178,6 +177,9 @@ function PreviewModal() {
                 <div class="preview-modal-badges">
                   <span class="preview-modal-code">{person.code}</span>
                   <span class="preview-modal-eng">{person.engName}</span>
+                  <Show when={person.cnSlang}>
+                    <span class="preview-modal-slang">{person.cnSlang}</span>
+                  </Show>
                 </div>
                 <h3 id="preview-modal-heading" class="preview-modal-name">
                   {person.name}
@@ -314,14 +316,22 @@ export function QuizPage(props: {
           {(q, idx) => (
             <article id={`q-${q.id}`} class="quiz-item">
               <div class="quiz-item-head">
-                <span class="quiz-item-num">
-                  Q{String(q.id).padStart(2, '0')}
-                </span>
-                <Show when={q.tag}>
+                <Show
+                  when={q.dimension !== 'META'}
+                  fallback={<span class="quiz-item-num quiz-item-num-meta">前置</span>}
+                >
+                  <span class="quiz-item-num">
+                    Q{String(q.id).padStart(2, '0')}
+                  </span>
+                </Show>
+                <Show when={q.tag && q.dimension !== 'META'}>
                   <span class="quiz-item-tag">{q.tag}</span>
                 </Show>
               </div>
               <p class="quiz-item-text">{q.text}</p>
+              <Show when={q.note}>
+                <p class="quiz-item-note">{q.note}</p>
+              </Show>
 
               <div class="quiz-options" role="group" aria-label="选项">
                 <For each={q.options}>
@@ -415,11 +425,21 @@ export function ResultPage(props: { result: Result; onRestart: () => void }) {
       <div class="result-container">
         {/* Hero */}
         <section class="result-hero">
-          <div class="hero-eyebrow">测试完成 · 你的废物类型是</div>
+          <div class="hero-eyebrow">
+            {r().isLimbo ? '隐藏人格解锁 · 你的废物类型是' : '测试完成 · 你的废物类型是'}
+          </div>
           <div class="result-identity">
             <h1 class="result-name">{p().name}</h1>
             <ResultEngLine text={p().engName} />
+            <Show when={p().cnSlang}>
+              <p class="result-slang">{p().cnSlang}</p>
+            </Show>
             <ResultCodeLine text={p().code} />
+            <Show when={!r().isLimbo && r().tiedDimensions.length > 0}>
+              <p class="result-tied-note">
+                有 {r().tiedDimensions.length} 个维度打平（已取默认"废"方向，以 * 标记）
+              </p>
+            </Show>
           </div>
           <Portrait code={p().code} size={320} class="result-hero-portrait" />
           <p class="result-tagline">「{p().tagline}」</p>
@@ -438,12 +458,24 @@ export function ResultPage(props: { result: Result; onRestart: () => void }) {
           </div>
         </section>
 
-        {/* Hidden title */}
-        <Show when={r().hasHiddenTitle}>
-          <section class="hidden-title-card">
-            <span class="hidden-badge">隐藏成就</span>
-            <p class="hidden-name">「{hiddenTitle.name}」</p>
-            <p class="hidden-desc">{hiddenTitle.description}</p>
+        {/* Hidden titles */}
+        <Show when={r().unlockedHiddenTitles.length > 0}>
+          <section class="hidden-title-section">
+            <div class="section-eyebrow">隐藏成就 · Achievements</div>
+            <h2 class="section-title">
+              你额外解锁了 {r().unlockedHiddenTitles.length} 个隐藏标签
+            </h2>
+            <div class="hidden-title-list">
+              <For each={r().unlockedHiddenTitles}>
+                {(t) => (
+                  <div class="hidden-title-card">
+                    <span class="hidden-badge">隐藏</span>
+                    <p class="hidden-name">「{t.name}」</p>
+                    <p class="hidden-desc">{t.description}</p>
+                  </div>
+                )}
+              </For>
+            </div>
           </section>
         </Show>
 
