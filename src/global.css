@@ -885,7 +885,11 @@ body {
     var(--tile-color) 35%,
     var(--fwti-modal-match-border-mix)
   );
-  background: color-mix(in srgb, var(--tile-color) 5%, var(--fwti-modal-match-bg-mix));
+  background: color-mix(
+    in srgb,
+    var(--tile-color) 5%,
+    var(--fwti-modal-match-bg-mix)
+  );
 }
 .match-lbl {
   font-size: 10px;
@@ -1694,7 +1698,8 @@ body {
   position: relative;
   margin-bottom: 10px;
   color: var(--fwti-text-soft);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 .refs-list li::before {
   content: '–';
@@ -1712,7 +1717,6 @@ body {
   padding: 20px 24px;
   background: var(--fwti-bg-soft);
   border-left: 3px solid var(--fwti-border);
-  border-radius: 6px;
 }
 .refs-disclaimer p {
   font-size: 12.5px;
