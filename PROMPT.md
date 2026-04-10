@@ -370,3 +370,44 @@ their knees
 ```
 
 > Family color cue 替换为：`, background tinted dusty beige #cbb89a with a faint wooden bench silhouette`
+
+#### VOID — 电子断联户 · VOID（v0.4 新增 · 仅 solo 可解）
+
+> 已读不回是生活方式，上线即社死
+
+```
+A young person lying face-up on a bare mattress in a dim unfurnished room,
+phone placed screen-down on their chest, a hollow "OFFLINE" neon sign faintly
+glowing in the window behind them, their eyes open but unfocused staring at
+the ceiling, wires from dead chargers coiled loose on the floor, a tiny blue
+notification dot on the phone back that has clearly been ignored for days,
+a crumpled paper airplane made from an unsent confession letter near the
+pillow, one hand hanging off the bed holding a half-eaten instant noodle
+cup, expression utterly serene like they have stopped caring about the
+vibration they no longer feel
+```
+
+> Family color cue 替换为：`, background tinted muted slate grey #3b4252 with cold blue monitor-glow stripes across the walls and a faint "signal lost" grid pattern`
+
+> 命名注记：`VOID` 曾于 v0.2 为 DRNY（透明人）的英文梗名，后改为 `GHOST`。v0.4 重新起用此名指向全新人格（电子断联户），与 DRNY 无语义关系。请勿混用两者旧 prompt。
+
+#### LIMBO — 意难平学家 · LIMBO（v0.4 新增 · 仅 crush 可解）
+
+> 查岗已成考古学研究，博士后在读
+
+```
+A tired scholar-looking person hunched over a cluttered desk at night,
+wearing round glasses and a rumpled cardigan, surrounded by printed social
+media screenshots pinned to a corkboard like a detective's case wall with
+red strings connecting posts, timelines and profile photos of one specific
+person, a single candle burning low beside a mug of cold tea, one hand
+holding a magnifying glass over a faded Instagram story printout, the
+other hand scrolling an endless feed on a phone, the corkboard labelled
+"THESIS: WHY DID THEY POST THAT" in slightly crazed handwriting, faint
+dark circles under their eyes, a small dream bubble above the head showing
+a wedding scene that never happened
+```
+
+> Family color cue 替换为：`, background tinted dusky plum #5a3a5e with faint string-and-pushpin overlay and soft candlelight glow from the lower left`
+
+> 命名注记：`LIMBO` 曾于 v0.3 之前为"骑墙党"的旧代号，v0.3 更名为 `ALL · 我全都要` 后 `LIMBO.webp` 亦随 rename 到 `ALL.webp`。v0.4 重新起用此名指向全新人格（意难平学家），与旧"骑墙党"无语义关系——当年被简单标为"两端打平"的玩家现全部走 ALL，LIMBO 现在专门接"查岗博士后"一类。
