@@ -12,10 +12,7 @@ import {
   resolveQuestionText,
   resolveOptionText,
 } from './data/questions'
-import {
-  personalities,
-  type Personality,
-} from './data/personalities'
+import { personalities, type Personality } from './data/personalities'
 import {
   getRelationshipStatus,
   type Result,
@@ -99,7 +96,11 @@ export function HomePage(props: { onStart: () => void }) {
           <p class="preview-hint">点击卡片查看类型释义</p>
         </div>
         <div class="preview-grid">
-          <For each={Object.values(personalities).filter((p) => p.code !== 'LIMBO')}>
+          <For
+            each={Object.values(personalities).filter(
+              (p) => p.code !== 'LIMBO',
+            )}
+          >
             {(p) => {
               const theme = getFamilyTheme(p.code)
               return (
@@ -349,9 +350,7 @@ export function QuizPage(props: {
 
   return (
     <div class="page quiz-page">
-      <TopNav
-        meta={`进行中 · ${props.mainProgress} / ${props.mainTotal}`}
-      />
+      <TopNav meta={`进行中 · ${props.mainProgress} / ${props.mainTotal}`} />
 
       <section class="quiz-hero">
         <div class="quiz-hero-inner">
@@ -369,7 +368,9 @@ export function QuizPage(props: {
               <div class="quiz-item-head">
                 <Show
                   when={q.dimension !== 'META'}
-                  fallback={<span class="quiz-item-num quiz-item-num-meta">前置</span>}
+                  fallback={
+                    <span class="quiz-item-num quiz-item-num-meta">前置</span>
+                  }
                 >
                   <span class="quiz-item-num">
                     Q{String(mainIndexMap.get(q.id) ?? 0).padStart(2, '0')}
@@ -479,7 +480,9 @@ export function ResultPage(props: { result: Result; onRestart: () => void }) {
         {/* Hero */}
         <section class="result-hero">
           <div class="hero-eyebrow">
-            {r().isLimbo ? '隐藏人格解锁 · 你的废物类型是' : '测试完成 · 你的废物类型是'}
+            {r().isLimbo
+              ? '隐藏人格解锁 · 你的废物类型是'
+              : '测试完成 · 你的废物类型是'}
           </div>
           <div class="result-identity">
             <h1 class="result-name">{p().name}</h1>
@@ -495,7 +498,8 @@ export function ResultPage(props: { result: Result; onRestart: () => void }) {
             </Show>
             <Show when={r().isLimbo && r().closestPersonality}>
               <p class="result-tied-note">
-                共有 {r().tiedDimensions.length} 个维度打平；若硬要归类，你最接近
+                共有 {r().tiedDimensions.length}{' '}
+                个维度打平；若硬要归类，你最接近
                 <span class="result-tied-closest">
                   {' '}
                   {r().closestCode} · {r().closestPersonality.name}
@@ -699,14 +703,17 @@ export function ResultPage(props: { result: Result; onRestart: () => void }) {
             <ul class="refs-list">
               <li>
                 Brennan, K. A., Clark, C. L., &amp; Shaver, P. R. (1998).
-                Self-report measurement of adult romantic attachment: An integrative overview.
-                In J. A. Simpson &amp; W. S. Rholes (Eds.),{' '}
-                <em>Attachment theory and close relationships</em> (pp. 46–76). Guilford Press.
+                Self-report measurement of adult romantic attachment: An
+                integrative overview. In J. A. Simpson &amp; W. S. Rholes
+                (Eds.), <em>Attachment theory and close relationships</em> (pp.
+                46–76). Guilford Press.
               </li>
               <li>
-                Fraley, R. C., Waller, N. G., &amp; Brennan, K. A. (2000).
-                An item response theory analysis of self-report measures of adult attachment.{' '}
-                <em>Journal of Personality and Social Psychology, 78</em>(2), 350–365.
+                Fraley, R. C., Waller, N. G., &amp; Brennan, K. A. (2000). An
+                item response theory analysis of self-report measures of adult
+                attachment.{' '}
+                <em>Journal of Personality and Social Psychology, 78</em>(2),
+                350–365.
               </li>
             </ul>
           </div>
@@ -718,10 +725,11 @@ export function ResultPage(props: { result: Result; onRestart: () => void }) {
             </h3>
             <ul class="refs-list">
               <li>
-                Gross, J. J., &amp; John, O. P. (2003).
-                Individual differences in two emotion regulation processes:
-                Implications for affect, relationships, and well-being.{' '}
-                <em>Journal of Personality and Social Psychology, 85</em>(2), 348–362.
+                Gross, J. J., &amp; John, O. P. (2003). Individual differences
+                in two emotion regulation processes: Implications for affect,
+                relationships, and well-being.{' '}
+                <em>Journal of Personality and Social Psychology, 85</em>(2),
+                348–362.
               </li>
             </ul>
           </div>
@@ -733,26 +741,26 @@ export function ResultPage(props: { result: Result; onRestart: () => void }) {
             </h3>
             <ul class="refs-list">
               <li>
-                Carver, C. S., &amp; White, T. L. (1994).
-                Behavioral inhibition, behavioral activation, and affective responses
-                to impending reward and punishment: The BIS/BAS Scales.{' '}
-                <em>Journal of Personality and Social Psychology, 67</em>(2), 319–333.
+                Carver, C. S., &amp; White, T. L. (1994). Behavioral inhibition,
+                behavioral activation, and affective responses to impending
+                reward and punishment: The BIS/BAS Scales.{' '}
+                <em>Journal of Personality and Social Psychology, 67</em>(2),
+                319–333.
               </li>
               <li>
-                Gable, S. L. (2006). Approach and avoidance social motives and goals.{' '}
-                <em>Journal of Personality, 74</em>(1), 175–222.
+                Gable, S. L. (2006). Approach and avoidance social motives and
+                goals. <em>Journal of Personality, 74</em>(1), 175–222.
               </li>
             </ul>
           </div>
 
           <div class="refs-group">
-            <h3 class="refs-group-title">
-              中文量表 · Chinese Adaptation
-            </h3>
+            <h3 class="refs-group-title">中文量表 · Chinese Adaptation</h3>
             <ul class="refs-list">
               <li>
-                李同归, 加藤和生. (2006). 成人依恋的测量：亲密关系经历量表（ECR）中文版.{' '}
-                <em>心理学报, 38</em>(3), 399–406.
+                李同归，加藤和生。(2006).
+                成人依恋的测量：亲密关系经历量表（ECR）中文版.{' '}
+                <em>心理学报，38</em>(3), 399–406.
               </li>
             </ul>
           </div>
@@ -760,75 +768,20 @@ export function ResultPage(props: { result: Result; onRestart: () => void }) {
           <div class="refs-disclaimer">
             <p>
               <strong>本测试仅供参考。</strong>
-              FWTI 借用了上述理论的维度结构与部分题目灵感，
-              但<strong>并未经过心理测量学的信效度验证</strong>，
+              FWTI 借用了上述理论的维度结构与部分题目灵感， 但
+              <strong>并未经过心理测量学的信效度验证</strong>，
               不是诊断工具，不能替代 ECR-R，也不能用来给自己或别人贴标签。
             </p>
             <p>
               请勿将本结果用于相亲、挽回、分手、发律师函或自我攻击。
-              如果你真的对自己的依恋模式感到好奇，建议去做一份正规的 ECR-R 中文版，
-              或找靠谱的心理咨询师聊聊。
+              如果你真的对自己的依恋模式感到好奇，建议去做一份正规的 ECR-R
+              中文版， 或找靠谱的心理咨询师聊聊。
               被一个网络测试逗笑是好事，被它说服就不是了。
             </p>
           </div>
         </section>
       </div>
     </div>
-  )
-}
-
-function ThemeToggle() {
-  const [setting, setSetting] = createSignal<FwtiThemeSetting>(null)
-
-  onMount(() => {
-    setSetting(getStoredTheme())
-  })
-
-  function onClick() {
-    cycleThemeSetting()
-    setSetting(getStoredTheme())
-  }
-
-  const title = () => {
-    const s = setting()
-    if (s == null) return '切换外观（当前：跟随系统）'
-    if (s === 'light') return '切换外观（当前：浅色）'
-    return '切换外观（当前：深色）'
-  }
-
-  return (
-    <button
-      type="button"
-      class="theme-toggle"
-      onClick={onClick}
-      title={title()}
-      aria-label={title()}
-    >
-      <Show when={setting() === 'light'}>
-        <svg class="theme-toggle-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            fill="currentColor"
-            d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10ZM2 13h2a1 1 0 1 0 0-2H2a1 1 0 1 0 0 2Zm18 0h2a1 1 0 1 0 0-2h-2a1 1 0 1 0 0 2ZM11 2v2a1 1 0 1 0 2 0V2a1 1 0 1 0-2 0Zm0 18v2a1 1 0 1 0 2 0v-2a1 1 0 1 0-2 0ZM6.343 4.929 4.93 6.343 6.343 7.757 7.757 6.343 6.343 4.929Zm9.9 9.9-1.414 1.414 1.414 1.414 1.414-1.414-1.414-1.414Zm1.414-9.9 1.414 1.414-1.414 1.414-1.414-1.414 1.414-1.414ZM6.343 17.657l-1.414 1.414 1.414 1.414 1.414-1.414-1.414-1.414Z"
-          />
-        </svg>
-      </Show>
-      <Show when={setting() === 'dark'}>
-        <svg class="theme-toggle-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            fill="currentColor"
-            d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.6 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1Z"
-          />
-        </svg>
-      </Show>
-      <Show when={setting() == null}>
-        <svg class="theme-toggle-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            fill="currentColor"
-            d="M9 4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1h3a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3V4Zm2 1h2V4h-2v1ZM6 8v10h12V8H6Zm2 2h8v2H8v-2Zm0 4h5v2H8v-2Z"
-          />
-        </svg>
-      </Show>
-    </button>
   )
 }
 
@@ -864,7 +817,7 @@ function TopNav(props: { meta?: string }) {
           <Show when={props.meta}>
             <div class="nav-meta">{props.meta}</div>
           </Show>
-          <ThemeToggle />
+
           <GithubNavLink />
         </div>
       </div>
@@ -884,7 +837,7 @@ function ResultNav(props: { onRestart: () => void }) {
           <button class="nav-restart" type="button" onClick={props.onRestart}>
             重新测试
           </button>
-          <ThemeToggle />
+
           <GithubNavLink />
         </div>
       </div>

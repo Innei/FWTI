@@ -275,11 +275,7 @@ body {
   outline: 2px solid var(--fwti-green);
   outline-offset: 2px;
 }
-.theme-toggle-icon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-}
+
 .nav-github-icon {
   width: 18px;
   height: 18px;
