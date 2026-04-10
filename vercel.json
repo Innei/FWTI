@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/result/:hash*",
-      "destination": "/"
+      "destination": "/result-shell"
     }
   ]
 }
