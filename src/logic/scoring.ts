@@ -9,7 +9,7 @@ export interface Scores {
   hidden: number; // 撤回大师纠结值
 }
 
-export type RelationshipStatus = 'dating' | 'uncertain' | 'solo' | null;
+export type RelationshipStatus = 'dating' | 'ambiguous' | 'crush' | 'solo' | null;
 
 export interface Result {
   code: string;
@@ -30,9 +30,9 @@ export interface Result {
   dimensionLabels: { dim: string; labelA: string; labelB: string; valueA: number; valueB: number }[];
 }
 
-/** 每题答案为选项索引 0 = A，1 = B，2 = C */
+/** 每题答案为选项索引；主线题为 0..2，META 前置题允许 0..3。 */
 export function resolveOptionIndex(value: number): number | null {
-  if (!Number.isInteger(value) || value < 0 || value > 2) return null;
+  if (!Number.isInteger(value) || value < 0 || value > 3) return null;
   return value;
 }
 
