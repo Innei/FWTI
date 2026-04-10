@@ -273,3 +273,170 @@ perfect symmetric pattern, background split subtly into two mirrored halves
 > Family color cue 替换为：`, background tinted split neutral slate #6b7280 with a soft dividing line through the middle`
 
 ---
+
+## 6. 隐藏叠加标签贴纸 Prompts（Sticker）
+
+隐藏叠加标签（「撤回大师」「夜谈冠军」「朋友圈考古学家」「薛定谔的前任」「电子乙方」「空想家」「人形 ATM」）不是独立人格，**不生成完整四字母人格全身卡**；它们在结果页作为小徽章 / 贴纸出现，和主卡并列。因此 sticker 版 prompt 用的是**半身或道具聚焦**构图，风格仍沿用同一张 16personalities.com 风格参考图，只替换 subject 段和构图提示。
+
+一共 **7 张贴纸**，和 `src/data/personalities.ts → hiddenTitles` 里的七条一一对应。
+
+### Sticker Base Prompt（贴纸专用 base，替换 §2）
+
+```
+A small editorial character sticker in the style of 16personalities.com,
+flat vector art with faceted polygon shading, soft highlights and muted shadows,
+desaturated editorial palette, bust-up or prop-centered composition on a 1:1 square canvas,
+soft radial gradient background, clean geometric shading without harsh outlines,
+subtle die-cut sticker border, prop and expression carrying the full joke,
+editorial character sticker art
+```
+
+> Sticker 不用家族底色，统一走浅灰背景 `, background tinted neutral #f3f4f6`，以便叠在任意主卡旁边时不打架。
+
+---
+
+### 6.1 — 撤回大师 · retractMaster
+
+> 触发条件：Q31 选 A（发出去又撤回又重写又撤回，最后决定不发了）
+>
+> 画面思路：聚焦"撤回"这个动作本身——手指悬在屏幕上方，聊天气泡从对话框中被一只小手拽回来，外加一堆废弃草稿漂浮。
+
+```
+A sleepless young person hunched over a glowing smartphone in a dim blue-lit room,
+thumb hovering and trembling above a red "撤回 / Unsend" button, a tiny chat bubble
+being physically yanked back into the phone screen by a small cartoon hand emerging
+from the display, several crumpled draft message bubbles floating and fading around
+the head like discarded thoughts, dark circles under the eyes, slightly bitten lower
+lip, one eyebrow furrowed in second-guessing
+```
+
+> 文件名建议：`sticker-retract-master.webp`，存放于 `src/assets/portraits/`（与主卡同目录）
+
+---
+
+### 6.2 — 夜谈冠军 · nightTalkChamp
+
+> 触发条件：Q12 / Q13 / Q29 中至少两题选 A（极端 Z 或 Y）
+>
+> 画面思路：凌晨 3 点的独角戏——床头灯下抱着手机给 TA 写长信小作文，屏幕上字数计数器爆表。
+
+```
+A wide-awake young person sitting cross-legged on rumpled bedsheets in pajamas at
+3 AM, clutching a phone that displays an absurdly long unsent message draft with a
+"2847 字" character counter glowing red, a small bedside lamp throwing warm light on
+their intense focused face, tear tracks on cheeks, empty tissue box tipped over, a
+little cartoon trophy engraved "夜谈冠军" tucked behind the pillow, a digital clock
+in the background reading 03:17
+```
+
+> 文件名建议：`sticker-night-talk-champ.webp`，存放于 `src/assets/portraits/`
+
+---
+
+### 6.3 — 朋友圈考古学家 · momentsArchaeologist
+
+> 触发条件：Q26 + Q27 都选 A
+>
+> 画面思路：戴考古放大镜、手里握着"朋友圈"时间轴刷到三年前，桌上铺满"证据"截图。
+
+```
+A detective-like young person in a beige trench coat and round magnifying glasses,
+holding up a large magnifying glass to a phone screen showing a social feed scrolled
+"三年前" deep in the timeline, their other hand pinning down printed screenshots on
+a corkboard connected by red string, a tiny archaeology brush tucked behind one ear,
+eyes narrowed in obsessive concentration, a dust cloud rising from the phone as if
+from an excavation site
+```
+
+> 文件名建议：`sticker-moments-archaeologist.webp`，存放于 `src/assets/portraits/`
+
+---
+
+### 6.4 — 薛定谔的前任 · schrodingerEx
+
+> 触发条件：status === crush && Q14 A && Q28 A
+>
+> 画面思路：标签名直接走量子态双关——人物被"在 / 不在"两种半透明状态同时占据，前任剪影若隐若现。
+
+```
+A wistful young person standing in half-turned profile, their silhouette split into
+two overlapping translucent versions of themselves — one reaching forward, the other
+already walking away — a faint ghost-like outline of another person hovering just
+behind their shoulder like an unreleased memory, holding a single dried rose loosely
+in one hand, eyes half-closed in bittersweet remembrance, small Schrödinger-style
+box icon floating nearby with a question mark inside
+```
+
+> 文件名建议：`sticker-schrodinger-ex.webp`，存放于 `src/assets/portraits/`
+
+---
+
+### 6.5 — 电子乙方 · electronicVendor
+
+> 触发条件：Q2 = C && Q3 = A && Q5 = A
+>
+> 画面思路：把关系做成甲乙方合同——用户挂着"乙方"工牌，端茶倒水递合同，腰弓得像电商客服。
+
+```
+A diligent young person in a neat polo shirt with a lanyard badge that reads "乙方 /
+Vendor", bent slightly forward in a customer-service bow, one hand offering a steaming
+cup of coffee and the other holding out a clipboard labeled "甲方需求确认单", a small
+ID card clipped to the chest reading "24h 随叫随到", polite professional smile that
+doesn't quite reach the eyes, a tiny KPI chart floating behind them showing 100 percent
+completion
+```
+
+> 文件名建议：`sticker-electronic-vendor.webp`，存放于 `src/assets/portraits/`
+
+---
+
+### 6.6 — 空想家 · daydreamer
+
+> 触发条件：status === solo && 极端主线题 ≥ 12
+>
+> 画面思路：纯单身但脑子里已经演完 100 场恋爱——头顶一团粉色云朵，里面同时上演着好几幕不同的恋爱场景。
+
+```
+A dreamy solo young person lying on their back on a grassy patch, hands folded behind
+the head, eyes open and staring up at a fluffy pink cloud above them, the cloud
+containing several tiny vignette panels of imaginary romance scenes (a hand-holding
+moment, a shared umbrella, a candlelit dinner, a wedding silhouette), a single wilted
+rose resting on their chest, peaceful but slightly resigned half-smile, small floating
+heart particles drifting upward into the daydream cloud
+```
+
+> 文件名建议：`sticker-daydreamer.webp`，存放于 `src/assets/portraits/`
+
+---
+
+### 6.7 — 人形 ATM · humanATM
+
+> 触发条件：Q33 选 A（钱基本都我出） **或** Q34 选 A（凌晨情绪客服秒回）——任一即解锁
+>
+> 画面思路：把"人 + 提款机"做成拟人物——胸口嵌着一台银行 ATM 的出钞口与屏幕，一只手递钱、另一只手端咖啡兼做情绪客服，一次性覆盖"经济 ATM + 情绪 ATM"两层含义。
+
+```
+A well-meaning young person in a clean button-up shirt and knit vest, their torso
+seamlessly merging into a small silver bank ATM unit at chest level with a glowing
+green screen that reads "Welcome TA" and a cash slot dispensing a single crisp bill,
+one hand offering the bill outward in a willing "please take it" gesture and the
+other hand holding a steaming mug of coffee as if also on emotional-support duty, a
+faint operator-style headset resting around the neck, tired but earnest half-smile,
+small receipts trailing from the slot onto the floor
+```
+
+> 文件名建议：`sticker-human-atm.webp`，存放于 `src/assets/portraits/`
+
+---
+
+### Sticker 技术参数微调
+
+| 平台             | 微调建议                                                     |
+| ---------------- | ------------------------------------------------------------ |
+| Midjourney v6.1+ | 在主卡参数基础上追加 `--ar 1:1 --stylize 200`，`--sref` 沿用同一张 16p 参考图 |
+| DALL·E 3         | 提示词开头加 "A small sticker-sized editorial character illustration..." |
+| SDXL             | 构图提示 `"centered bust up, subtle die-cut sticker border, neutral background"` |
+
+> **命名建议**：资源文件统一放在 `src/assets/portraits/`，和四字母主卡（`GZNY.webp` / `LIMBO.webp` 等大写代号命名）同目录。贴纸文件名统一用 `sticker-<kebab-case>.webp` 前缀区分，既不需要新开目录也不会和主卡混淆。注意本项目历史上还存在一个 `src/assets/16p/` 目录，那是 MBTI 的 SVG 遗留物，**与 FWTI 贴纸无关，不要往里放任何东西**。
+
+---

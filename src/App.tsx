@@ -34,11 +34,12 @@ import './global.css'
 const GITHUB_REPO_URL = 'https://github.com/Innei/fwti'
 
 /**
- * 正题题库数量（排除 META 前置题，但**包含**彩蛋题 id=31）。
- * 对外文案与进度条统一以这个数字为准——DRAFT 里承诺的是"三十一道灵魂拷问"
- * （= 30 道主线题 + 1 道隐藏彩蛋题 = 31），前置题只是语境路由，不计入题目计数。
+ * 正题题库数量（排除 META 前置题，但**包含**所有彩蛋题）。
+ * 对外文案与进度条统一以这个数字为准——v0.3 之后 DRAFT 承诺"三十三道灵魂拷问"
+ * （= 30 道主线题 + 3 道隐藏彩蛋题 = 33；彩蛋题分别是撤回大师 Q31 + 人形 ATM Q33/Q34），
+ * 前置题只是语境路由，不计入题目计数。
  *
- * 注意：scoring.ts 里做"空想家"极端答题统计时，会再从这 31 题里剔除彩蛋得到 30，
+ * 注意：scoring.ts 里做"空想家"极端答题统计时，会再从这 33 题里剔除彩蛋得到 30，
  * 那是 DRAFT 中"主线题"的定义，跟这里的 mainQ 是两个不同口径，别弄混。
  */
 export const mainQ = questions.filter((q) => q.dimension !== 'META').length
@@ -68,7 +69,7 @@ export function HomePage(props: { onStart: () => void }) {
           <div class="eyebrow eyebrow-on-green">Fèiwù Type Indicator</div>
           <h1 class="home-title">恋爱废物人格测试</h1>
           <p class="home-lede">
-            三十一道灵魂拷问，四维交叉分析，
+            三十三道灵魂拷问，四维交叉分析，
             <br />
             为君精准定位此生爱情之废料品类。
           </p>

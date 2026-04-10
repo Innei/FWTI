@@ -126,6 +126,12 @@ export function detectHiddenTitles(
     unlocked.push(hiddenTitles.electronicVendor);
   }
 
+  // ⑥ 人形 ATM：Q33 = A（钱基本都我出）或 Q34 = A（凌晨情绪客服秒回）任一即解锁。
+  //    两题合并为同一条标签，不做 Pro 升级——一个标签已经足够刻画"被提款"这件事。
+  if (answers[33] === A || answers[34] === A) {
+    unlocked.push(hiddenTitles.humanATM);
+  }
+
   if (status === 'solo') {
     let extremeCount = 0;
     for (const q of questions) {

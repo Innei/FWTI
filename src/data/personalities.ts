@@ -417,6 +417,11 @@ export const hiddenTitles: Record<string, HiddenTitle> = {
     name: '空想家',
     description: '你纯单身，但这不妨碍你单方面地把恋爱的废全都演一遍。在心里，你已经谈了一百场。',
   },
+  humanATM: {
+    id: 'humanATM',
+    name: '人形 ATM',
+    description: '你的爱像余额宝：TA 点一下提现就到账，而你从来收不到一句"感谢转账"。钱你来花、情绪客服你来当——你不是在恋爱，你在免费开分行。',
+  },
 };
 
 // 旧 API 兼容：单一的隐藏称号（等价于「撤回大师」）

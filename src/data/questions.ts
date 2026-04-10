@@ -59,6 +59,13 @@ export function resolveOptionText(
  * 题库中的第一题（id=32）为 META 前置题：不计入任何维度分数，
  * 仅用于路由题目措辞与触发隐藏"空想家"标签。
  *
+ * 隐藏彩蛋题当前有三道：
+ *   - id=31：撤回大师纠结值触发器
+ *   - id=33：「人形 ATM · 经济型」触发器
+ *   - id=34：「人形 ATM · 情绪客服型」触发器
+ * 它们都用 tag='彩蛋'，dimension 占位写 'GD' 但实际会被 scoring 的彩蛋分支拦截，
+ * 不会进入维度累加。
+ *
  * 其余题目中凡是提到"对象"的位置，均替换为"TA"——代表"你在意的那个人"：
  * 有对象即对象，暧昧中即暧昧对象，单身但心里藏着谁即心里的那位，
  * 纯单身则代入假想中的那位。
@@ -545,7 +552,7 @@ export const questions: Question[] = [
   // ===== 隐藏彩蛋题 =====
   {
     id: 31,
-    dimension: 'GD', // 不计入主维度
+    dimension: 'GD', // 不计入主维度；tag === '彩蛋' 会被 scoring 跳过维度累加
     tag: '彩蛋',
     text: '你有没有做过这种事：给 TA 发了一条消息 → 立刻撤回 → 重新编辑 → 再发出去 → 再撤回 → 最后决定不发了？',
     options: [
@@ -553,6 +560,70 @@ export const questions: Question[] = [
       { label: 'B', text: '偶尔吧……', score: 0, hidden: 1 },
       { label: 'C', text: '没有，发了就发了', score: 0, hidden: 0 },
     ],
+  },
+  // id 33 / 34 ——「人形 ATM」隐藏叠加标签触发器。
+  // 与撤回大师一样 tag='彩蛋'，dimension 写成 'GD' 只是占位，实际会被 scoring 的
+  // `q.tag === '彩蛋'` 分支拦截，不会进入任何维度累加。两题的 option.hidden 都留空
+  // （undefined → 0），所以也不会污染"纠结值"这条通道。
+  //
+  // 对应 DRAFT §三「隐藏叠加标签」中的「人形 ATM」规则：
+  //   - Q33 选 A 或 Q34 选 A        → 解锁「人形 ATM」
+  //   - Q33 选 A 且 Q34 选 A        → 升级为「ATM Pro / 全自动提款机」
+  {
+    id: 33,
+    dimension: 'GD',
+    tag: '彩蛋',
+    text: '在这段关系里（或你脑补的那段关系里），钱这件事大概是——',
+    options: [
+      {
+        label: 'A',
+        text: '基本都是我买单 / 送礼 / 请客，账单到我这就停了；我不太好意思让 TA 花钱',
+        score: 0,
+      },
+      { label: 'B', text: 'AA 或者轮流请，挺公平的', score: 0 },
+      { label: 'C', text: '主要是 TA 花，我负责被宠就行', score: 0 },
+    ],
+    variants: {
+      ambiguous: {
+        text: '暧昧阶段到现在，花钱这件事大概是——',
+      },
+      crush: {
+        text: '如果你和心里藏着的那个人真的在一起了，花钱这件事你大概会——',
+      },
+      solo: {
+        text: '想象你谈恋爱了，花钱这件事你大概会——',
+      },
+    },
+  },
+  {
+    id: 34,
+    dimension: 'GD',
+    tag: '彩蛋',
+    text: 'TA 凌晨 2 点突然找你倾诉情绪垃圾 / 跟别人的烂摊子 / 工作崩溃，你的反应是？',
+    options: [
+      {
+        label: 'A',
+        text: '秒回，立刻上线，陪到 TA 睡着为止，哪怕我明天 8 点要开会',
+        score: 0,
+      },
+      {
+        label: 'B',
+        text: '回，但会说"我先睡了，我们明天详细聊"',
+        score: 0,
+      },
+      { label: 'C', text: '静音，明早再说（其实是后天）', score: 0 },
+    ],
+    variants: {
+      ambiguous: {
+        text: '暧昧中的 TA 凌晨 2 点找你倾诉情绪垃圾，你的反应是？',
+      },
+      crush: {
+        text: '想象心里藏着的那个人凌晨 2 点找你倾诉情绪垃圾，你的反应是？',
+      },
+      solo: {
+        text: '想象你有对象了，对象凌晨 2 点找你倾诉情绪垃圾，你的反应是？',
+      },
+    },
   },
 ];
 

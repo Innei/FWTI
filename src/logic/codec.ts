@@ -25,7 +25,13 @@ export function decodeAnswers(
   try {
     const b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
     const pad = b64.length % 4 === 0 ? '' : '='.repeat(4 - (b64.length % 4));
-    const s = atob(b64 + pad);
+    let s = atob(b64 + pad);
+    // 向后兼容：老版本分享链接（ATM 隐藏题 Q33/Q34 上线前）只有 32 位，
+    // 新版 ids 有 34 位。若长度小于当前 ids，右侧补 '-' 让旧链接依然可解码，
+    // 新增的彩蛋题会被识别为未作答，结果页能正常渲染主人格，只是不会解锁 ATM 标签。
+    if (s.length < ids.length) {
+      s = s + '-'.repeat(ids.length - s.length);
+    }
     if (s.length !== ids.length) return null;
     const out: Record<number, number> = {};
     for (let i = 0; i < ids.length; i++) {
