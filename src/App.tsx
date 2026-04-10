@@ -5,13 +5,14 @@ import {
   Navigate,
   useNavigate,
   useParams,
-  useSearchParams,
 } from '@solidjs/router';
 import { questions } from './data/questions';
 import { personalities, hiddenTitle } from './data/personalities';
 import { getResult, type Result } from './logic/scoring';
 import { encodeAnswers, decodeAnswers } from './logic/codec';
+import { getFamilyTheme, FAMILY_THEMES, getFamily } from './logic/family';
 import PersonalityIcon from './components/PersonalityIcon';
+import QuestionScale from './components/QuestionScale';
 
 const totalQ = questions.length;
 const [answers, setAnswers] = createSignal<Record<number, number>>({});
@@ -42,48 +43,39 @@ function HomeRoute() {
     <HomePage
       onStart={() => {
         setAnswers({});
-        navigate('/quiz?q=1');
+        navigate('/quiz');
       }}
     />
   );
 }
 
 function QuizRoute() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [fadeClass, setFadeClass] = createSignal('fade-in');
-
-  const requestedQ = () => {
-    const raw = searchParams.q;
-    const str = Array.isArray(raw) ? raw[0] : raw;
-    const n = str ? Number.parseInt(str, 10) : 1;
-    return Number.isFinite(n) && n > 0 ? n : 1;
-  };
-
-  const currentQ = () =>
-    Math.max(0, Math.min(totalQ - 1, requestedQ() - 1));
 
   const progress = () => Object.keys(answers()).length;
 
-  // 刷新入中段而无答案，重置至首题
-  const needsReset = () => requestedQ() > 1 && progress() === 0;
-
-  function goToQuestion(idx: number) {
-    navigate(`/quiz?q=${idx + 1}`);
+  function selectOption(qId: number, scaleIdx: number) {
+    setAnswers((prev) => ({ ...prev, [qId]: scaleIdx }));
+    // 滚动至下一未答题
+    queueMicrotask(() => scrollToNextUnanswered(qId));
   }
 
-  function selectOption(qId: number, optIdx: number) {
-    setAnswers((prev) => ({ ...prev, [qId]: optIdx }));
-    // 自动跳下一题
-    setTimeout(() => {
-      if (currentQ() < totalQ - 1) {
-        setFadeClass('fade-out');
-        setTimeout(() => {
-          goToQuestion(currentQ() + 1);
-          setFadeClass('fade-in');
-        }, 200);
+  function scrollToNextUnanswered(fromId: number) {
+    const cur = answers();
+    for (let i = 0; i < questions.length; i++) {
+      const q = questions[i];
+      if (q.id <= fromId) continue;
+      if (cur[q.id] === undefined) {
+        const el = document.getElementById(`q-${q.id}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
       }
-    }, 300);
+    }
+    // 全答：滚至底栏
+    const submit = document.getElementById('submit-bar');
+    if (submit) submit.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }
 
   function submitQuiz() {
@@ -92,36 +84,14 @@ function QuizRoute() {
   }
 
   return (
-    <Show when={!needsReset()} fallback={<Navigate href="/quiz?q=1" />}>
-      <QuizPage
-        currentQ={currentQ()}
-        totalQ={totalQ}
-        progress={progress()}
-        answers={answers()}
-        fadeClass={fadeClass()}
-        onSelect={selectOption}
-        onPrev={() => {
-          if (currentQ() > 0) {
-            setFadeClass('fade-out');
-            setTimeout(() => {
-              goToQuestion(currentQ() - 1);
-              setFadeClass('fade-in');
-            }, 200);
-          }
-        }}
-        onNext={() => {
-          if (currentQ() < totalQ - 1) {
-            setFadeClass('fade-out');
-            setTimeout(() => {
-              goToQuestion(currentQ() + 1);
-              setFadeClass('fade-in');
-            }, 200);
-          }
-        }}
-        onSubmit={submitQuiz}
-        canSubmit={progress() >= totalQ}
-      />
-    </Show>
+    <QuizPage
+      totalQ={totalQ}
+      progress={progress()}
+      answers={answers()}
+      onSelect={selectOption}
+      onSubmit={submitQuiz}
+      canSubmit={progress() >= totalQ}
+    />
   );
 }
 
@@ -157,50 +127,75 @@ function ResultRoute() {
 function HomePage(props: { onStart: () => void }) {
   return (
     <div class="page home-page">
-      <nav class="top-nav">
-        <div class="nav-inner">
-          <div class="nav-logo">
-            <span class="logo-mark" aria-hidden="true" />
-            <span class="logo-text">FWTI</span>
-          </div>
-          <div class="nav-meta">v1.0 · 娱乐测试</div>
-        </div>
-      </nav>
+      <TopNav meta="v1.0 · 娱乐测试" />
 
       <section class="home-hero">
-        <div class="home-content">
-          <div class="eyebrow">Fèiwù Type Indicator</div>
-          <h1 class="home-title">
-            <span class="serif">恋爱废物</span>
-            <span class="serif">人格测试</span>
-          </h1>
+        <div class="home-hero-inner">
+          <div class="eyebrow eyebrow-on-green">Fèiwù Type Indicator</div>
+          <h1 class="home-title">恋爱废物人格测试</h1>
           <p class="home-lede">
-            三十一道灵魂拷问，四维交叉分析，<br/>
+            三十一道灵魂拷问，四维交叉分析，<br />
             为君精准定位此生爱情之废料品类。
           </p>
           <div class="home-actions">
-            <button class="btn btn-brand" onClick={props.onStart}>
+            <button class="btn btn-white" onClick={props.onStart}>
               <span>开始测试</span>
               <span class="btn-arrow" aria-hidden="true">→</span>
             </button>
             <span class="home-time">约需 5 分钟</span>
           </div>
         </div>
+        <div class="home-hero-shape" aria-hidden="true" />
+      </section>
 
-        <div class="home-dimensions-card">
-          <div class="card-eyebrow">四维坐标</div>
-          <div class="home-dimensions">
-            <DimRow letter="G / D" labelA="冲动" labelB="犹豫" caption="行动力" />
-            <DimRow letter="Z / R" labelA="暴躁" labelB="忍耐" caption="情绪阈值" />
-            <DimRow letter="N / L" labelA="依附" labelB="抽离" caption="距离感" />
-            <DimRow letter="Y / F" labelA="怀疑" labelB="放空" caption="安全感" />
-          </div>
+      <section class="home-tips">
+        <Tip title="据实以答" desc="勿矫饰，废物亦有尊严。" />
+        <Tip title="勿钻牛角" desc="首觉即真，过虑反失真。" />
+        <Tip title="题必有选" desc="沉默非选项，爱情亦然。" />
+      </section>
+
+      <section class="home-preview">
+        <div class="preview-head">
+          <div class="preview-eyebrow">16 种废物 · The Waste Gallery</div>
+          <h2 class="preview-title">君之归宿，四族十六型</h2>
+        </div>
+        <div class="preview-grid">
+          <For each={Object.values(personalities)}>
+            {(p) => {
+              const theme = getFamilyTheme(p.code);
+              return (
+                <div
+                  class="preview-tile"
+                  style={{
+                    '--tile-color': theme.color,
+                    '--tile-tint': theme.tint,
+                  }}
+                >
+                  <div class="preview-tile-icon">
+                    <PersonalityIcon code={p.code} size={56} />
+                  </div>
+                  <div class="preview-tile-code">{p.code}</div>
+                  <div class="preview-tile-name">{p.name}</div>
+                </div>
+              );
+            }}
+          </For>
+        </div>
+        <div class="preview-legend">
+          <For each={Object.values(FAMILY_THEMES)}>
+            {(f) => (
+              <div class="legend-item">
+                <span class="legend-dot" style={{ background: f.color }} />
+                <span class="legend-label">{f.name}</span>
+              </div>
+            )}
+          </For>
         </div>
       </section>
 
       <footer class="home-footer">
         <p class="home-disclaimer">
-          本测试仅供娱乐，未经临床验证，<br class="mobile-only"/>
+          本测试仅供娱乐，未经临床验证，<br class="mobile-only" />
           请勿用于相亲、挽回、分手或发律师函。
         </p>
       </footer>
@@ -208,106 +203,106 @@ function HomePage(props: { onStart: () => void }) {
   );
 }
 
-function DimRow(props: { letter: string; labelA: string; labelB: string; caption: string }) {
+function Tip(props: { title: string; desc: string }) {
   return (
-    <div class="dim-row">
-      <div class="dim-row-letter">{props.letter}</div>
-      <div class="dim-row-body">
-        <div class="dim-row-pair">
-          <span>{props.labelA}</span>
-          <span class="dim-row-slash">／</span>
-          <span>{props.labelB}</span>
-        </div>
-        <div class="dim-row-caption">{props.caption}</div>
-      </div>
+    <div class="tip-card">
+      <div class="tip-title">{props.title}</div>
+      <div class="tip-desc">{props.desc}</div>
     </div>
   );
 }
 
 /* ===== QUIZ PAGE ===== */
 function QuizPage(props: {
-  currentQ: number;
   totalQ: number;
   progress: number;
   answers: Record<number, number>;
-  fadeClass: string;
-  onSelect: (qId: number, optIdx: number) => void;
-  onPrev: () => void;
-  onNext: () => void;
+  onSelect: (qId: number, scaleIdx: number) => void;
   onSubmit: () => void;
   canSubmit: boolean;
 }) {
-  const q = () => questions[props.currentQ];
-  const isLast = () => props.currentQ === props.totalQ - 1;
+  const pct = () => Math.round((props.progress / props.totalQ) * 100);
 
   return (
     <div class="page quiz-page">
-      <nav class="top-nav">
-        <div class="nav-inner">
-          <div class="nav-logo">
-            <span class="logo-mark" aria-hidden="true" />
-            <span class="logo-text">FWTI</span>
+      <TopNav meta={`进行中 · ${props.progress} / ${props.totalQ}`} />
+
+      <section class="quiz-hero">
+        <div class="quiz-hero-inner">
+          <h1 class="quiz-hero-title">恋爱废物人格测试</h1>
+          <p class="quiz-hero-sub">据实作答，勿过虑，题题必选</p>
+        </div>
+      </section>
+
+      <div class="quiz-list">
+        <For each={questions}>
+          {(q, idx) => {
+            const optA = q.options[0];
+            const optC = q.options[q.options.length - 1];
+            const optB = q.options.length === 3 ? q.options[1] : null;
+            return (
+              <article id={`q-${q.id}`} class="quiz-item">
+                <div class="quiz-item-head">
+                  <span class="quiz-item-num">Q{String(q.id).padStart(2, '0')}</span>
+                  <Show when={q.tag}>
+                    <span class="quiz-item-tag">{q.tag}</span>
+                  </Show>
+                </div>
+                <p class="quiz-item-text">{q.text}</p>
+
+                <div class="quiz-item-poles">
+                  <div class="pole pole-a">
+                    <div class="pole-badge" style={{ background: 'var(--fwti-green)' }}>A</div>
+                    <div class="pole-text">{optA?.text}</div>
+                  </div>
+                  <Show when={optB}>
+                    <div class="pole pole-b">
+                      <div class="pole-badge pole-badge-neutral">B</div>
+                      <div class="pole-text">{optB!.text}</div>
+                    </div>
+                  </Show>
+                  <div class="pole pole-c">
+                    <div class="pole-badge" style={{ background: '#576071' }}>C</div>
+                    <div class="pole-text">{optC?.text}</div>
+                  </div>
+                </div>
+
+                <QuestionScale
+                  value={props.answers[q.id]}
+                  onSelect={(v) => props.onSelect(q.id, v)}
+                  leftLabel="偏 A"
+                  rightLabel="偏 C"
+                />
+                <div class="quiz-item-meter">
+                  <span>{idx() + 1} / {props.totalQ}</span>
+                </div>
+              </article>
+            );
+          }}
+        </For>
+      </div>
+
+      <div id="submit-bar" class="submit-bar">
+        <div class="submit-bar-inner">
+          <div class="submit-bar-progress">
+            <div class="submit-progress-track">
+              <div
+                class="submit-progress-fill"
+                style={{ width: `${pct()}%` }}
+              />
+            </div>
+            <span class="submit-progress-pct">{pct()}%</span>
           </div>
-          <div class="nav-meta">进行中 · {props.progress} / {props.totalQ}</div>
-        </div>
-      </nav>
-
-      <div class="quiz-container">
-        <div class="progress-bar-wrap">
-          <div class="progress-bar" style={{ width: `${(props.progress / props.totalQ) * 100}%` }} />
-        </div>
-        <div class="progress-row">
-          <span class="progress-label">第 {q().id} 题 · 共 {props.totalQ} 题</span>
-          <Show when={q().tag}>
-            <span class="q-tag">{q().tag}</span>
-          </Show>
-        </div>
-
-        <article class={`question-card ${props.fadeClass}`}>
-          <div class="q-number-big">Q{String(q().id).padStart(2, '0')}</div>
-          <p class="q-text">{q().text}</p>
-          <div class="options">
-            <For each={q().options}>
-              {(opt, idx) => (
-                <button
-                  class={`option-btn ${props.answers[q().id] === idx() ? 'selected' : ''}`}
-                  onClick={() => props.onSelect(q().id, idx())}
-                >
-                  <span class="opt-label">{opt.label}</span>
-                  <span class="opt-text">{opt.text}</span>
-                  <span class="opt-check" aria-hidden="true">✓</span>
-                </button>
-              )}
-            </For>
-          </div>
-        </article>
-
-        <div class="quiz-nav">
           <button
-            class="btn btn-sand"
-            onClick={props.onPrev}
-            disabled={props.currentQ === 0}
+            class="btn btn-green"
+            onClick={props.onSubmit}
+            disabled={!props.canSubmit}
           >
-            ← 上一题
+            <span>{props.canSubmit ? '查看结果' : `还差 ${props.totalQ - props.progress} 题`}</span>
+            <Show when={props.canSubmit}>
+              <span class="btn-arrow" aria-hidden="true">→</span>
+            </Show>
           </button>
-          <Show when={!isLast()}>
-            <button
-              class="btn btn-dark"
-              onClick={props.onNext}
-              disabled={props.answers[q().id] === undefined}
-            >
-              下一题 →
-            </button>
-          </Show>
-          <Show when={isLast()}>
-            <button
-              class="btn btn-brand"
-              onClick={props.onSubmit}
-              disabled={!props.canSubmit}
-            >
-              查看结果 →
-            </button>
-          </Show>
         </div>
       </div>
     </div>
@@ -318,28 +313,29 @@ function QuizPage(props: {
 function ResultPage(props: { result: Result; onRestart: () => void }) {
   const r = () => props.result;
   const p = () => r().personality;
+  const family = () => getFamily(p().code);
+  const theme = () => getFamilyTheme(p().code);
 
   return (
-    <div class="page result-page">
-      <nav class="top-nav">
-        <div class="nav-inner">
-          <div class="nav-logo">
-            <span class="logo-mark" aria-hidden="true" />
-            <span class="logo-text">FWTI</span>
-          </div>
-          <button class="nav-restart" onClick={props.onRestart}>重新测试</button>
-        </div>
-      </nav>
+    <div
+      class="page result-page"
+      data-family={family()}
+      style={{ '--fwti-accent': theme().color, '--fwti-accent-tint': theme().tint }}
+    >
+      <ResultNav onRestart={props.onRestart} />
 
       <div class="result-container">
-        {/* Hero — light editorial */}
-        <section class="result-hero-section">
+        {/* Hero */}
+        <section class="result-hero">
           <div class="hero-eyebrow">测试完成 · 你的废物类型是</div>
-          <div class="personality-icon-wrap" aria-hidden="true">
-            <PersonalityIcon code={p().code} size={132} />
+          <div class="result-icon-wrap">
+            <div class="result-icon-glow" />
+            <div class="result-icon-inner">
+              <PersonalityIcon code={p().code} size={132} />
+            </div>
           </div>
           <div class="result-code">{p().code}</div>
-          <h1 class="result-name serif">{p().name}</h1>
+          <h1 class="result-name">{p().name}</h1>
           <p class="result-eng">{p().engName}</p>
           <p class="result-tagline">「{p().tagline}」</p>
           <div class="waste-meter">
@@ -359,15 +355,15 @@ function ResultPage(props: { result: Result; onRestart: () => void }) {
         <Show when={r().hasHiddenTitle}>
           <section class="hidden-title-card">
             <span class="hidden-badge">隐藏成就</span>
-            <p class="hidden-name serif">「{hiddenTitle.name}」</p>
+            <p class="hidden-name">「{hiddenTitle.name}」</p>
             <p class="hidden-desc">{hiddenTitle.description}</p>
           </section>
         </Show>
 
-        {/* Dimension — dark editorial */}
-        <section class="result-section dark-section">
+        {/* Dimensions */}
+        <section class="result-section">
           <div class="section-eyebrow">维度分析 · Dimensions</div>
-          <h2 class="section-title serif">四维坐标</h2>
+          <h2 class="section-title">四维坐标</h2>
           <div class="dim-list">
             <For each={r().dimensionLabels}>
               {(d) => (
@@ -394,14 +390,14 @@ function ResultPage(props: { result: Result; onRestart: () => void }) {
         {/* Description */}
         <section class="result-section">
           <div class="section-eyebrow">人格解读 · Profile</div>
-          <h2 class="section-title serif">这就是你</h2>
+          <h2 class="section-title">这就是你</h2>
           <p class="result-desc">{p().description}</p>
         </section>
 
         {/* Traits */}
         <section class="result-section">
           <div class="section-eyebrow">行为特征 · Traits</div>
-          <h2 class="section-title serif">恋爱中的你</h2>
+          <h2 class="section-title">恋爱中的你</h2>
           <ul class="trait-list">
             <For each={p().traits}>
               {(t, i) => (
@@ -417,10 +413,10 @@ function ResultPage(props: { result: Result; onRestart: () => void }) {
         {/* Catchphrases */}
         <section class="result-section">
           <div class="section-eyebrow">语录 · Catchphrases</div>
-          <h2 class="section-title serif">口头禅</h2>
+          <h2 class="section-title">口头禅</h2>
           <div class="catchphrases">
             <For each={p().catchphrases}>
-              {(c) => <blockquote class="catchphrase serif">{c}</blockquote>}
+              {(c) => <blockquote class="catchphrase">{c}</blockquote>}
             </For>
           </div>
         </section>
@@ -428,18 +424,18 @@ function ResultPage(props: { result: Result; onRestart: () => void }) {
         {/* Matches */}
         <section class="result-section">
           <div class="section-eyebrow">配对 · Compatibility</div>
-          <h2 class="section-title serif">缘分图谱</h2>
+          <h2 class="section-title">缘分图谱</h2>
           <div class="match-grid">
             <div class="match-card best">
               <div class="match-label">最佳拍档</div>
               <div class="match-code">{p().bestMatch}</div>
-              <div class="match-name serif">{personalities[p().bestMatch]?.name}</div>
+              <div class="match-name">{personalities[p().bestMatch]?.name}</div>
               <div class="match-hint">天造地设，惺惺相惜</div>
             </div>
             <div class="match-card worst">
               <div class="match-label">最怕遇到</div>
               <div class="match-code">{p().worstMatch}</div>
-              <div class="match-name serif">{personalities[p().worstMatch]?.name}</div>
+              <div class="match-name">{personalities[p().worstMatch]?.name}</div>
               <div class="match-hint">相爱相杀，避之则吉</div>
             </div>
           </div>
@@ -448,11 +444,11 @@ function ResultPage(props: { result: Result; onRestart: () => void }) {
         {/* Advice */}
         <section class="result-section advice-section">
           <div class="section-eyebrow">一句忠告 · Advice</div>
-          <p class="advice-text serif">"{p().advice}"</p>
+          <p class="advice-text">"{p().advice}"</p>
         </section>
 
         <div class="result-footer">
-          <button class="btn btn-brand" onClick={props.onRestart}>
+          <button class="btn btn-accent" onClick={props.onRestart}>
             再测一次 →
           </button>
           <p class="footer-text">FWTI v1.0 · 恋爱废物人格测试 · 仅供娱乐</p>
@@ -462,49 +458,79 @@ function ResultPage(props: { result: Result; onRestart: () => void }) {
   );
 }
 
-/* ===== GLOBAL STYLES — Claude Design System ===== */
+function TopNav(props: { meta?: string }) {
+  return (
+    <nav class="top-nav">
+      <div class="nav-inner">
+        <div class="nav-logo">
+          <span class="logo-mark" aria-hidden="true" />
+          <span class="logo-text">FWTI</span>
+        </div>
+        <Show when={props.meta}>
+          <div class="nav-meta">{props.meta}</div>
+        </Show>
+      </div>
+    </nav>
+  );
+}
+
+function ResultNav(props: { onRestart: () => void }) {
+  return (
+    <nav class="top-nav">
+      <div class="nav-inner">
+        <div class="nav-logo">
+          <span class="logo-mark" aria-hidden="true" />
+          <span class="logo-text">FWTI</span>
+        </div>
+        <button class="nav-restart" onClick={props.onRestart}>重新测试</button>
+      </div>
+    </nav>
+  );
+}
+
+/* ===== GLOBAL STYLES — 16p Design ===== */
 const globalStyles = `
   :root {
-    /* Brand */
-    --terracotta: #c96442;
-    --coral: #d97757;
-    /* Surfaces */
-    --parchment: #f5f4ed;
-    --ivory: #faf9f5;
-    --white: #ffffff;
-    --warm-sand: #e8e6dc;
-    --dark-surface: #30302e;
-    --deep-dark: #141413;
-    /* Text */
-    --near-black: #141413;
-    --charcoal: #4d4c48;
-    --olive: #5e5d59;
-    --stone: #87867f;
-    --dark-warm: #3d3d3a;
-    --warm-silver: #b0aea5;
-    /* Borders */
-    --border-cream: #f0eee6;
-    --border-warm: #e8e6dc;
-    --border-dark: #30302e;
-    /* Rings */
-    --ring-warm: #d1cfc5;
-    --ring-deep: #c2c0b6;
+    /* Brand (default) */
+    --fwti-green: #33a474;
+    --fwti-green-dark: #278a60;
 
-    --serif: 'Source Serif 4', 'Noto Serif SC', Georgia, 'Times New Roman', serif;
-    --sans: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    /* Surfaces */
+    --fwti-bg: #ffffff;
+    --fwti-bg-soft: #f9f9f9;
+    --fwti-bg-tint: #eff8f3;
+
+    /* Text */
+    --fwti-text-dark: #343c4b;
+    --fwti-text-mid: #576071;
+    --fwti-text-soft: #8a95a7;
+
+    /* Borders */
+    --fwti-border: #eeeff1;
+    --fwti-border-strong: #dddfe2;
+
+    /* Family accents */
+    --fwti-gz: #F25E62;
+    --fwti-gr: #E4AE3A;
+    --fwti-dz: #88619A;
+    --fwti-dr: #33A474;
+
+    /* Accent (overridden on Result via data-family) */
+    --fwti-accent: var(--fwti-green);
+    --fwti-accent-tint: rgba(51, 164, 116, 0.08);
+
+    --fwti-font-title: 'Red Hat Display', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --fwti-font-body: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html {
-    font-size: 16px;
-    scroll-behavior: smooth;
-  }
+  html { font-size: 16px; scroll-behavior: smooth; }
 
   body {
-    font-family: var(--sans);
-    background: var(--parchment);
-    color: var(--near-black);
+    font-family: var(--fwti-font-body);
+    background: var(--fwti-bg);
+    color: var(--fwti-text-dark);
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -513,21 +539,15 @@ const globalStyles = `
 
   .app { min-height: 100vh; }
 
-  .serif {
-    font-family: var(--serif);
-    font-weight: 500;
-    font-style: normal;
-  }
-
   /* ===== TOP NAV ===== */
   .top-nav {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(245, 244, 237, 0.85);
-    backdrop-filter: saturate(160%) blur(12px);
-    -webkit-backdrop-filter: saturate(160%) blur(12px);
-    border-bottom: 1px solid var(--border-cream);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: saturate(160%) blur(10px);
+    -webkit-backdrop-filter: saturate(160%) blur(10px);
+    border-bottom: 1px solid var(--fwti-border);
   }
   .nav-inner {
     max-width: 1120px;
@@ -547,8 +567,7 @@ const globalStyles = `
     width: 22px;
     height: 22px;
     border-radius: 6px;
-    background: var(--terracotta);
-    box-shadow: inset 0 0 0 2px var(--parchment), 0 0 0 1px var(--terracotta);
+    background: var(--fwti-green);
     position: relative;
   }
   .logo-mark::after {
@@ -556,35 +575,35 @@ const globalStyles = `
     position: absolute;
     inset: 6px;
     border-radius: 2px;
-    background: var(--parchment);
+    background: #fff;
   }
   .logo-text {
-    font-family: var(--serif);
-    font-size: 19px;
-    font-weight: 500;
-    color: var(--near-black);
+    font-family: var(--fwti-font-title);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--fwti-text-dark);
     letter-spacing: 0.02em;
   }
   .nav-meta {
     font-size: 13px;
-    color: var(--olive);
+    color: var(--fwti-text-mid);
     letter-spacing: 0.02em;
   }
   .nav-restart {
-    font-family: var(--sans);
+    font-family: var(--fwti-font-body);
     font-size: 14px;
-    color: var(--charcoal);
-    background: var(--warm-sand);
-    border: none;
+    font-weight: 500;
+    color: var(--fwti-text-dark);
+    background: var(--fwti-bg-soft);
+    border: 1px solid var(--fwti-border);
     padding: 8px 14px;
     border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 0 0 1px var(--ring-warm);
-    transition: box-shadow 0.15s ease, background 0.15s ease;
+    transition: all 0.15s ease;
   }
   .nav-restart:hover {
-    background: #dedbcd;
-    box-shadow: 0 0 0 1px var(--ring-deep);
+    background: #f0f2f5;
+    border-color: var(--fwti-border-strong);
   }
 
   /* ===== BUTTONS ===== */
@@ -593,191 +612,267 @@ const globalStyles = `
     align-items: center;
     justify-content: center;
     gap: 10px;
-    font-family: var(--sans);
+    font-family: var(--fwti-font-body);
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     border: none;
-    transition: box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    transition: all 0.15s ease;
     text-decoration: none;
     line-height: 1;
+    border-radius: 30px;
+    padding: 16px 32px;
   }
   .btn:disabled {
-    opacity: 0.4;
+    opacity: 0.45;
     cursor: not-allowed;
   }
-  .btn-brand {
-    background: var(--terracotta);
-    color: var(--ivory);
-    padding: 14px 24px;
-    border-radius: 12px;
-    box-shadow: 0 0 0 1px var(--terracotta), 0 1px 0 0 rgba(0,0,0,0.02);
-  }
-  .btn-brand:hover:not(:disabled) {
-    background: #b85a3c;
-    box-shadow: 0 0 0 1px #b85a3c, 0 4px 20px rgba(201, 100, 66, 0.25);
-  }
-  .btn-brand:active:not(:disabled) { transform: translateY(1px); }
-
-  .btn-sand {
-    background: var(--warm-sand);
-    color: var(--charcoal);
-    padding: 12px 18px;
-    border-radius: 10px;
-    box-shadow: 0 0 0 1px var(--ring-warm);
-  }
-  .btn-sand:hover:not(:disabled) {
-    background: #dedbcd;
-    box-shadow: 0 0 0 1px var(--ring-deep);
-  }
-
-  .btn-dark {
-    background: var(--near-black);
-    color: var(--warm-silver);
-    padding: 12px 18px;
-    border-radius: 10px;
-    box-shadow: 0 0 0 1px var(--near-black);
-  }
-  .btn-dark:hover:not(:disabled) {
-    background: var(--dark-surface);
-    color: var(--ivory);
-    box-shadow: 0 0 0 1px var(--dark-surface);
-  }
-
   .btn-arrow {
-    font-family: var(--serif);
     font-size: 18px;
     transition: transform 0.2s ease;
   }
-  .btn:hover .btn-arrow { transform: translateX(3px); }
+  .btn:hover:not(:disabled) .btn-arrow { transform: translateX(3px); }
+
+  .btn-green {
+    background: var(--fwti-green);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(51, 164, 116, 0.25);
+  }
+  .btn-green:hover:not(:disabled) {
+    background: var(--fwti-green-dark);
+    box-shadow: 0 6px 20px rgba(51, 164, 116, 0.35);
+  }
+
+  .btn-white {
+    background: #fff;
+    color: var(--fwti-green);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+  .btn-white:hover {
+    background: #f6fcf9;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.12);
+  }
+
+  .btn-accent {
+    background: var(--fwti-accent);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+  .btn-accent:hover {
+    filter: brightness(0.93);
+  }
 
   /* ===== HOME ===== */
   .home-page {
     min-height: 100vh;
-    background: var(--parchment);
+    background: var(--fwti-bg);
     display: flex;
     flex-direction: column;
   }
-  .home-hero {
-    flex: 1;
-    max-width: 1120px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 96px 32px 80px;
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: 64px;
-    align-items: center;
-  }
-  .home-content {
-    max-width: 560px;
-  }
+
   .eyebrow {
     display: inline-block;
-    font-family: var(--sans);
+    font-family: var(--fwti-font-body);
     font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
+    font-weight: 600;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--olive);
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: var(--ivory);
-    box-shadow: 0 0 0 1px var(--border-warm);
-    margin-bottom: 28px;
+    color: var(--fwti-text-mid);
+    margin-bottom: 18px;
+  }
+  .eyebrow-on-green {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .home-hero {
+    position: relative;
+    background: var(--fwti-green);
+    color: #fff;
+    overflow: hidden;
+    padding: 72px 32px 120px;
+  }
+  .home-hero-inner {
+    max-width: 820px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+  .home-hero-shape {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255,255,255,0.12) 0, transparent 35%),
+      radial-gradient(circle at 85% 80%, rgba(255,255,255,0.08) 0, transparent 40%);
+    pointer-events: none;
   }
   .home-title {
-    font-family: var(--serif);
-    font-weight: 500;
-    font-size: 72px;
-    line-height: 1.08;
-    color: var(--near-black);
-    margin-bottom: 28px;
+    font-family: var(--fwti-font-title);
+    font-weight: 700;
+    font-size: 56px;
+    line-height: 1.12;
+    color: #fff;
+    margin-bottom: 22px;
     letter-spacing: -0.01em;
   }
-  .home-title span { display: block; }
   .home-lede {
-    font-family: var(--sans);
-    font-size: 19px;
+    font-size: 18px;
     line-height: 1.65;
-    color: var(--olive);
-    margin-bottom: 40px;
-    max-width: 500px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 36px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
   }
   .home-actions {
     display: flex;
     align-items: center;
-    gap: 20px;
+    justify-content: center;
+    gap: 24px;
     flex-wrap: wrap;
   }
   .home-time {
     font-size: 14px;
-    color: var(--stone);
+    color: rgba(255, 255, 255, 0.75);
   }
 
-  /* Dimensions card */
-  .home-dimensions-card {
-    background: var(--ivory);
-    border-radius: 24px;
-    padding: 36px 32px;
-    box-shadow: 0 0 0 1px var(--border-cream), 0 4px 32px rgba(20, 20, 19, 0.04);
+  /* ===== TIPS ===== */
+  .home-tips {
+    max-width: 1000px;
+    margin: -60px auto 0;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    position: relative;
+    z-index: 3;
   }
-  .card-eyebrow {
-    font-family: var(--sans);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
+  .tip-card {
+    background: #fff;
+    border: 1px solid var(--fwti-border);
+    border-radius: 16px;
+    padding: 28px 24px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  }
+  .tip-title {
+    font-family: var(--fwti-font-title);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--fwti-text-dark);
+    margin-bottom: 8px;
+  }
+  .tip-desc {
+    font-size: 14px;
+    color: var(--fwti-text-mid);
+    line-height: 1.6;
+  }
+
+  /* ===== PREVIEW GRID ===== */
+  .home-preview {
+    max-width: 1120px;
+    margin: 80px auto 0;
+    padding: 0 32px;
+  }
+  .preview-head {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .preview-eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--stone);
-    margin-bottom: 24px;
+    color: var(--fwti-text-soft);
+    margin-bottom: 12px;
   }
-  .home-dimensions {
+  .preview-title {
+    font-family: var(--fwti-font-title);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--fwti-text-dark);
+    letter-spacing: -0.01em;
+  }
+  .preview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .preview-tile {
+    background: var(--fwti-bg);
+    border: 1px solid var(--fwti-border);
+    border-radius: 14px;
+    padding: 22px 16px 18px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+  .preview-tile::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--tile-tint);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .preview-tile:hover {
+    transform: translateY(-3px);
+    border-color: var(--tile-color);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+  }
+  .preview-tile-icon {
+    color: var(--tile-color);
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 10px;
+    position: relative;
   }
-  .dim-row {
+  .preview-tile-code {
+    font-family: var(--fwti-font-title);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--tile-color);
+    margin-bottom: 4px;
+    position: relative;
+  }
+  .preview-tile-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fwti-text-dark);
+    position: relative;
+  }
+  .preview-legend {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
     display: flex;
     align-items: center;
-    gap: 20px;
-    padding: 18px 0;
-    border-top: 1px solid var(--border-warm);
+    gap: 8px;
+    font-size: 13px;
+    color: var(--fwti-text-mid);
   }
-  .dim-row:first-child { border-top: none; padding-top: 0; }
-  .dim-row:last-child { padding-bottom: 0; }
-  .dim-row-letter {
-    font-family: var(--serif);
-    font-size: 22px;
-    font-weight: 500;
-    color: var(--terracotta);
-    min-width: 64px;
-    letter-spacing: 0.02em;
-  }
-  .dim-row-body { flex: 1; }
-  .dim-row-pair {
-    font-family: var(--serif);
-    font-size: 20px;
-    color: var(--near-black);
-    line-height: 1.3;
-  }
-  .dim-row-slash {
-    color: var(--stone);
-    margin: 0 4px;
-  }
-  .dim-row-caption {
-    font-size: 12px;
-    color: var(--stone);
-    margin-top: 3px;
-    letter-spacing: 0.04em;
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
   }
 
+  /* ===== HOME FOOTER ===== */
   .home-footer {
-    border-top: 1px solid var(--border-cream);
-    padding: 24px 32px 32px;
+    margin-top: 96px;
+    border-top: 1px solid var(--fwti-border);
+    padding: 32px;
     text-align: center;
   }
   .home-disclaimer {
     font-size: 13px;
-    color: var(--stone);
+    color: var(--fwti-text-soft);
     line-height: 1.7;
   }
   .mobile-only { display: none; }
@@ -785,269 +880,324 @@ const globalStyles = `
   /* ===== QUIZ ===== */
   .quiz-page {
     min-height: 100vh;
-    background: var(--parchment);
+    background: var(--fwti-bg);
+    padding-bottom: 120px;
   }
-  .quiz-container {
-    max-width: 720px;
-    width: 100%;
+  .quiz-hero {
+    background: var(--fwti-green);
+    color: #fff;
+    padding: 40px 24px 44px;
+    text-align: center;
+  }
+  .quiz-hero-inner {
+    max-width: 700px;
     margin: 0 auto;
-    padding: 56px 32px 80px;
   }
-  .progress-bar-wrap {
-    width: 100%;
-    height: 4px;
-    background: var(--border-warm);
-    border-radius: 2px;
-    overflow: hidden;
+  .quiz-hero-title {
+    font-family: var(--fwti-font-title);
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
   }
-  .progress-bar {
-    height: 100%;
-    background: var(--terracotta);
-    border-radius: 2px;
-    transition: width 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+  .quiz-hero-sub {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.85);
   }
-  .progress-row {
+
+  .quiz-list {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 24px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 64px;
+  }
+  .quiz-item {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    margin-top: 14px;
-    margin-bottom: 40px;
+    text-align: center;
+    padding: 28px 8px;
+    scroll-margin: 100px;
   }
-  .progress-label {
-    font-family: var(--sans);
-    font-size: 13px;
-    color: var(--olive);
-    letter-spacing: 0.04em;
+  .quiz-item-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
   }
-  .q-tag {
+  .quiz-item-num {
+    font-family: var(--fwti-font-title);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--fwti-text-soft);
+  }
+  .quiz-item-tag {
     font-size: 11px;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--terracotta);
-    background: var(--ivory);
-    padding: 5px 12px;
+    color: var(--fwti-green);
+    background: var(--fwti-bg-tint);
+    padding: 4px 10px;
     border-radius: 999px;
-    box-shadow: 0 0 0 1px var(--border-warm);
   }
-
-  .question-card {
-    background: var(--ivory);
-    border-radius: 24px;
-    padding: 48px 44px;
-    box-shadow: 0 0 0 1px var(--border-cream), 0 4px 32px rgba(20, 20, 19, 0.04);
-    transition: opacity 0.2s ease, transform 0.2s ease;
-  }
-  .question-card.fade-in { opacity: 1; transform: translateY(0); }
-  .question-card.fade-out { opacity: 0; transform: translateY(8px); }
-
-  .q-number-big {
-    font-family: var(--serif);
-    font-size: 14px;
+  .quiz-item-text {
+    font-family: var(--fwti-font-title);
+    font-size: 26px;
     font-weight: 500;
-    color: var(--terracotta);
-    letter-spacing: 0.15em;
-    margin-bottom: 16px;
-  }
-  .q-text {
-    font-family: var(--serif);
-    font-size: 28px;
-    font-weight: 500;
-    line-height: 1.35;
-    color: var(--near-black);
+    line-height: 1.4;
+    color: var(--fwti-text-dark);
     margin-bottom: 32px;
-    letter-spacing: -0.005em;
+    max-width: 560px;
   }
-
-  .options {
+  .quiz-item-poles {
+    width: 100%;
+    max-width: 620px;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    margin-bottom: 28px;
+    text-align: left;
   }
-  .option-btn {
+  .pole {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
-    background: var(--parchment);
-    border: none;
-    border-radius: 14px;
-    padding: 18px 22px;
-    cursor: pointer;
-    text-align: left;
-    font-family: var(--sans);
-    color: var(--charcoal);
-    box-shadow: 0 0 0 1px var(--border-warm);
-    transition: box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
-    position: relative;
-  }
-  .option-btn:hover {
-    background: #efede3;
-    box-shadow: 0 0 0 1px var(--ring-warm);
-  }
-  .option-btn.selected {
-    background: var(--ivory);
-    color: var(--near-black);
-    box-shadow: 0 0 0 2px var(--terracotta);
-  }
-  .opt-label {
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: var(--warm-sand);
-    color: var(--charcoal);
-    font-family: var(--serif);
-    font-weight: 500;
-    font-size: 14px;
-    box-shadow: 0 0 0 1px var(--ring-warm);
-    transition: all 0.15s ease;
-  }
-  .option-btn.selected .opt-label {
-    background: var(--terracotta);
-    color: var(--ivory);
-    box-shadow: 0 0 0 1px var(--terracotta);
-  }
-  .opt-text {
-    flex: 1;
-    font-size: 16px;
-    line-height: 1.6;
-    padding-top: 4px;
-  }
-  .opt-check {
-    flex-shrink: 0;
-    width: 22px;
-    height: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--terracotta);
-    font-size: 16px;
-    font-weight: 600;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-    margin-top: 4px;
-  }
-  .option-btn.selected .opt-check { opacity: 1; }
-
-  .quiz-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 28px;
     gap: 12px;
+    padding: 12px 16px;
+    background: var(--fwti-bg-soft);
+    border: 1px solid var(--fwti-border);
+    border-radius: 12px;
+  }
+  .pole-badge {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: var(--fwti-font-title);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  .pole-badge-neutral {
+    background: var(--fwti-text-soft) !important;
+  }
+  .pole-text {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--fwti-text-dark);
+    padding-top: 3px;
+  }
+  .quiz-item-meter {
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--fwti-text-soft);
+    letter-spacing: 0.08em;
+  }
+
+  /* ===== QUESTION SCALE ===== */
+  .qs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: nowrap;
+    width: 100%;
+    max-width: 620px;
+  }
+  .qs-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    min-width: 42px;
+    text-transform: uppercase;
+  }
+  .qs-label-left { text-align: right; }
+  .qs-label-right { text-align: left; }
+  .qs-dots {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .qs-dot {
+    border-radius: 50%;
+    background: transparent;
+    border: 2.5px solid var(--qs-color);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    flex-shrink: 0;
+  }
+  .qs-dot:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 6px rgba(51, 164, 116, 0.08);
+  }
+  .qs-dot.is-selected {
+    background: var(--qs-color);
+    box-shadow: 0 0 0 6px rgba(51, 164, 116, 0.12);
+  }
+  .qs-dot-center {
+    border-width: 2px;
+  }
+
+  /* ===== SUBMIT BAR ===== */
+  .submit-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: saturate(160%) blur(10px);
+    -webkit-backdrop-filter: saturate(160%) blur(10px);
+    border-top: 1px solid var(--fwti-border);
+    z-index: 40;
+    padding: 14px 24px;
+  }
+  .submit-bar-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .submit-bar-progress {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .submit-progress-track {
+    flex: 1;
+    height: 6px;
+    background: var(--fwti-border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .submit-progress-fill {
+    height: 100%;
+    background: var(--fwti-green);
+    border-radius: 999px;
+    transition: width 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .submit-progress-pct {
+    font-family: var(--fwti-font-title);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--fwti-text-dark);
+    min-width: 40px;
+    text-align: right;
+  }
+  .submit-bar .btn {
+    padding: 13px 26px;
+    font-size: 14px;
+    border-radius: 999px;
   }
 
   /* ===== RESULT ===== */
   .result-page {
     min-height: 100vh;
-    background: var(--parchment);
+    background: var(--fwti-bg);
   }
   .result-container {
     max-width: 760px;
     width: 100%;
     margin: 0 auto;
-    padding: 64px 32px 80px;
+    padding: 56px 32px 80px;
     display: flex;
     flex-direction: column;
-    gap: 56px;
+    gap: 72px;
   }
 
-  .result-hero-section {
+  .result-hero {
     text-align: center;
-    padding: 0 20px;
+    padding: 20px 0 0;
   }
-  .personality-icon-wrap {
-    width: 168px;
-    height: 168px;
+  .result-icon-wrap {
+    position: relative;
+    width: 180px;
+    height: 180px;
     margin: 0 auto 28px;
-    border-radius: 50%;
-    background: var(--ivory);
-    border: 1px solid var(--border-warm);
-    box-shadow: 0 2px 24px rgba(201, 100, 66, 0.06),
-                inset 0 0 0 6px var(--ivory),
-                inset 0 0 0 7px var(--border-cream);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--terracotta);
   }
-  .personality-icon-wrap svg {
-    display: block;
+  .result-icon-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, var(--fwti-accent-tint) 0%, transparent 70%);
+  }
+  .result-icon-inner {
+    position: relative;
+    width: 148px;
+    height: 148px;
+    border-radius: 50%;
+    background: var(--fwti-accent-tint);
+    border: 2px solid var(--fwti-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--fwti-accent);
   }
   .hero-eyebrow {
-    font-family: var(--sans);
     font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
+    font-weight: 600;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--olive);
+    color: var(--fwti-text-mid);
     margin-bottom: 28px;
   }
-  .personality-icon-wrap {
-    width: 168px;
-    height: 168px;
-    margin: 0 auto 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--ivory);
-    color: var(--terracotta);
-    box-shadow:
-      0 0 0 1px var(--border-warm) inset,
-      0 0 0 6px var(--parchment),
-      0 0 0 7px var(--border-warm);
-  }
-  .personality-icon-wrap svg {
-    display: block;
-  }
   .result-code {
-    font-family: var(--serif);
-    font-size: 18px;
-    font-weight: 500;
-    letter-spacing: 0.35em;
-    color: var(--terracotta);
+    font-family: var(--fwti-font-title);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    color: var(--fwti-accent);
     margin-bottom: 14px;
   }
   .result-name {
-    font-size: 72px;
-    line-height: 1.08;
-    color: var(--near-black);
-    margin-bottom: 18px;
-    letter-spacing: -0.01em;
+    font-family: var(--fwti-font-title);
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--fwti-text-dark);
+    margin-bottom: 14px;
+    letter-spacing: -0.015em;
   }
   .result-eng {
-    font-family: var(--sans);
-    font-size: 14px;
-    color: var(--stone);
-    letter-spacing: 0.18em;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fwti-text-soft);
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    margin-bottom: 22px;
+    margin-bottom: 24px;
   }
   .result-tagline {
-    font-family: var(--serif);
-    font-size: 22px;
-    line-height: 1.5;
-    color: var(--olive);
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--fwti-text-mid);
     max-width: 520px;
-    margin: 0 auto 36px;
-    font-style: italic;
+    margin: 0 auto 32px;
   }
   .waste-meter {
     display: inline-flex;
     align-items: center;
     gap: 16px;
-    background: var(--ivory);
-    padding: 14px 22px;
+    background: var(--fwti-bg-soft);
+    padding: 12px 22px;
     border-radius: 999px;
-    box-shadow: 0 0 0 1px var(--border-warm);
+    border: 1px solid var(--fwti-border);
   }
   .waste-meter-label {
     font-size: 13px;
-    color: var(--olive);
+    color: var(--fwti-text-mid);
     letter-spacing: 0.04em;
   }
   .waste-meter-bar {
@@ -1055,107 +1205,89 @@ const globalStyles = `
     gap: 6px;
   }
   .waste-dot {
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
-    background: var(--border-warm);
-    box-shadow: inset 0 0 0 1px var(--ring-warm);
+    background: var(--fwti-border-strong);
   }
   .waste-dot.filled {
-    background: var(--terracotta);
-    box-shadow: inset 0 0 0 1px var(--terracotta);
+    background: var(--fwti-accent);
   }
   .waste-meter-num {
-    font-family: var(--serif);
+    font-family: var(--fwti-font-title);
     font-size: 14px;
-    color: var(--near-black);
+    font-weight: 700;
+    color: var(--fwti-text-dark);
   }
 
   /* Hidden title */
   .hidden-title-card {
-    background: var(--ivory);
+    background: var(--fwti-accent-tint);
+    border: 1px solid var(--fwti-accent);
     border-radius: 20px;
     padding: 36px 40px;
     text-align: center;
-    box-shadow: 0 0 0 1px var(--border-warm), 0 4px 24px rgba(201, 100, 66, 0.06);
-    position: relative;
   }
   .hidden-badge {
     display: inline-block;
     font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--ivory);
-    background: var(--terracotta);
+    color: #fff;
+    background: var(--fwti-accent);
     padding: 6px 14px;
     border-radius: 999px;
-    box-shadow: 0 0 0 1px var(--terracotta);
     margin-bottom: 20px;
   }
   .hidden-name {
-    font-size: 36px;
-    color: var(--near-black);
-    margin-bottom: 12px;
+    font-family: var(--fwti-font-title);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--fwti-text-dark);
+    margin-bottom: 10px;
     line-height: 1.2;
   }
   .hidden-desc {
     font-size: 15px;
-    color: var(--olive);
+    color: var(--fwti-text-mid);
     line-height: 1.7;
     max-width: 440px;
     margin: 0 auto;
   }
 
   /* Sections */
-  .result-section {
-    padding: 0;
-  }
   .section-eyebrow {
-    font-family: var(--sans);
     font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.14em;
+    font-weight: 600;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--stone);
+    color: var(--fwti-text-soft);
     margin-bottom: 12px;
   }
   .section-title {
-    font-family: var(--serif);
-    font-size: 40px;
+    font-family: var(--fwti-font-title);
+    font-size: 34px;
+    font-weight: 700;
     line-height: 1.15;
-    font-weight: 500;
-    color: var(--near-black);
+    color: var(--fwti-text-dark);
     margin-bottom: 28px;
-    letter-spacing: -0.005em;
+    letter-spacing: -0.01em;
   }
-
-  /* Dark section */
-  .dark-section {
-    background: var(--deep-dark);
-    color: var(--warm-silver);
-    margin-left: -32px;
-    margin-right: -32px;
-    padding: 72px 56px;
-    border-radius: 24px;
-  }
-  .dark-section .section-eyebrow { color: var(--warm-silver); opacity: 0.7; }
-  .dark-section .section-title { color: var(--ivory); }
 
   .dim-list {
     display: flex;
     flex-direction: column;
     gap: 24px;
   }
-  .dim-bar-row {}
   .dim-bar-head {
     margin-bottom: 10px;
   }
   .dim-bar-label {
-    font-family: var(--serif);
-    font-size: 18px;
-    color: var(--ivory);
-    font-weight: 500;
+    font-family: var(--fwti-font-title);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--fwti-text-dark);
   }
   .dim-bar-container {
     display: flex;
@@ -1164,34 +1296,34 @@ const globalStyles = `
   }
   .dim-bar-side {
     font-size: 13px;
-    color: var(--warm-silver);
+    color: var(--fwti-text-mid);
     white-space: nowrap;
     min-width: 72px;
     letter-spacing: 0.02em;
+    font-weight: 500;
   }
-  .dim-bar-side.left { text-align: right; }
-  .dim-bar-side.right { text-align: left; color: var(--stone); }
+  .dim-bar-side.left { text-align: right; color: var(--fwti-accent); }
+  .dim-bar-side.right { text-align: left; }
   .dim-bar-track {
     flex: 1;
-    height: 6px;
-    background: var(--dark-surface);
-    border-radius: 3px;
+    height: 8px;
+    background: var(--fwti-border);
+    border-radius: 999px;
     position: relative;
     overflow: hidden;
   }
   .dim-bar-fill {
     height: 100%;
-    background: var(--coral);
-    border-radius: 3px;
+    background: var(--fwti-accent);
+    border-radius: 999px;
     transition: width 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
 
   /* Description */
   .result-desc {
-    font-family: var(--serif);
-    font-size: 19px;
-    line-height: 1.7;
-    color: var(--charcoal);
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--fwti-text-dark);
     max-width: 620px;
   }
 
@@ -1204,23 +1336,24 @@ const globalStyles = `
     display: flex;
     gap: 20px;
     padding: 20px 0;
-    border-top: 1px solid var(--border-warm);
+    border-top: 1px solid var(--fwti-border);
     align-items: baseline;
   }
   .trait-item:last-child {
-    border-bottom: 1px solid var(--border-warm);
+    border-bottom: 1px solid var(--fwti-border);
   }
   .trait-num {
-    font-family: var(--serif);
-    font-size: 14px;
-    color: var(--terracotta);
-    letter-spacing: 0.08em;
-    min-width: 32px;
+    font-family: var(--fwti-font-title);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--fwti-accent);
+    letter-spacing: 0.1em;
+    min-width: 36px;
   }
   .trait-text {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.7;
-    color: var(--charcoal);
+    color: var(--fwti-text-dark);
     flex: 1;
   }
 
@@ -1228,29 +1361,18 @@ const globalStyles = `
   .catchphrases {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
   }
   .catchphrase {
-    font-family: var(--serif);
-    font-size: 22px;
+    font-family: var(--fwti-font-title);
+    font-size: 20px;
+    font-weight: 500;
     line-height: 1.55;
-    color: var(--near-black);
+    color: var(--fwti-text-dark);
     padding: 24px 28px;
-    background: var(--ivory);
-    border-radius: 16px;
-    box-shadow: 0 0 0 1px var(--border-warm);
-    position: relative;
-    font-style: italic;
-  }
-  .catchphrase::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 24px;
-    bottom: 24px;
-    width: 3px;
-    background: var(--terracotta);
-    border-radius: 0 3px 3px 0;
+    background: var(--fwti-bg-soft);
+    border-radius: 14px;
+    border-left: 4px solid var(--fwti-accent);
   }
 
   /* Matches */
@@ -1260,77 +1382,73 @@ const globalStyles = `
     gap: 20px;
   }
   .match-card {
-    background: var(--ivory);
-    border-radius: 20px;
-    padding: 32px 28px;
-    box-shadow: 0 0 0 1px var(--border-warm);
+    background: var(--fwti-bg);
+    border: 1px solid var(--fwti-border);
+    border-radius: 16px;
+    padding: 28px 26px;
     text-align: left;
   }
   .match-card.best {
-    background: var(--ivory);
+    background: var(--fwti-accent-tint);
+    border-color: var(--fwti-accent);
   }
   .match-card.worst {
-    background: var(--parchment);
+    background: var(--fwti-bg-soft);
   }
   .match-label {
-    font-family: var(--sans);
     font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--stone);
+    color: var(--fwti-text-soft);
     margin-bottom: 14px;
   }
-  .match-card.best .match-label { color: var(--terracotta); }
+  .match-card.best .match-label { color: var(--fwti-accent); }
   .match-code {
-    font-family: var(--serif);
-    font-size: 14px;
+    font-family: var(--fwti-font-title);
+    font-size: 13px;
+    font-weight: 700;
     letter-spacing: 0.25em;
-    color: var(--olive);
+    color: var(--fwti-text-mid);
     margin-bottom: 6px;
   }
   .match-name {
-    font-size: 24px;
-    font-weight: 500;
-    color: var(--near-black);
+    font-family: var(--fwti-font-title);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--fwti-text-dark);
     margin-bottom: 10px;
     line-height: 1.2;
   }
   .match-hint {
     font-size: 13px;
-    color: var(--stone);
+    color: var(--fwti-text-mid);
     line-height: 1.6;
   }
 
   /* Advice */
   .advice-section {
-    background: var(--deep-dark);
-    color: var(--ivory);
-    margin-left: -32px;
-    margin-right: -32px;
-    padding: 72px 56px;
+    background: var(--fwti-bg-soft);
     border-radius: 24px;
+    padding: 56px 44px;
     text-align: center;
-  }
-  .advice-section .section-eyebrow {
-    color: var(--warm-silver);
-    opacity: 0.7;
+    border: 1px solid var(--fwti-border);
   }
   .advice-text {
-    font-size: 32px;
-    line-height: 1.4;
-    color: var(--ivory);
-    max-width: 620px;
-    margin: 0 auto;
+    font-family: var(--fwti-font-title);
+    font-size: 26px;
     font-weight: 500;
-    font-style: italic;
+    line-height: 1.5;
+    color: var(--fwti-text-dark);
+    max-width: 580px;
+    margin: 0 auto;
   }
 
   /* Footer */
   .result-footer {
     text-align: center;
-    padding-top: 24px;
-    border-top: 1px solid var(--border-warm);
+    padding-top: 32px;
+    border-top: 1px solid var(--fwti-border);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1338,57 +1456,52 @@ const globalStyles = `
   }
   .footer-text {
     font-size: 12px;
-    color: var(--stone);
+    color: var(--fwti-text-soft);
     letter-spacing: 0.04em;
   }
 
   /* ===== RESPONSIVE ===== */
   @media (max-width: 900px) {
-    .home-hero {
-      grid-template-columns: 1fr;
-      gap: 48px;
-      padding: 64px 24px 56px;
-    }
-    .home-title { font-size: 56px; }
-  }
-  @media (max-width: 640px) {
-    .nav-inner { padding: 12px 20px; }
-    .home-hero { padding: 48px 20px; gap: 36px; }
+    .preview-grid { grid-template-columns: repeat(3, 1fr); }
     .home-title { font-size: 44px; }
-    .home-lede { font-size: 17px; }
-    .home-dimensions-card { padding: 28px 24px; }
-    .dim-row-letter { font-size: 18px; min-width: 54px; }
-    .dim-row-pair { font-size: 17px; }
+  }
+  @media (max-width: 720px) {
+    .nav-inner { padding: 12px 20px; }
+    .home-hero { padding: 56px 20px 100px; }
+    .home-title { font-size: 36px; }
+    .home-lede { font-size: 16px; }
+    .home-tips { grid-template-columns: 1fr; margin-top: -50px; }
+    .preview-grid { grid-template-columns: repeat(2, 1fr); }
+    .preview-title { font-size: 28px; }
     .mobile-only { display: block; }
 
-    .quiz-container { padding: 36px 20px 56px; }
-    .question-card { padding: 32px 24px; border-radius: 20px; }
-    .q-text { font-size: 22px; }
-    .option-btn { padding: 16px 18px; }
-    .opt-text { font-size: 15px; }
-    .quiz-nav { flex-wrap: wrap; gap: 10px; }
-    .quiz-nav .btn { flex: 1; min-width: 0; padding: 12px 14px; font-size: 14px; }
+    .quiz-hero-title { font-size: 24px; }
+    .quiz-list { padding: 28px 20px; gap: 56px; }
+    .quiz-item-text { font-size: 21px; }
+    .qs { gap: 8px; }
+    .qs-dots { gap: 6px; }
+    .qs-label { min-width: 36px; font-size: 11px; }
+    .submit-bar { padding: 10px 16px; }
+    .submit-bar-inner { gap: 14px; }
+    .submit-bar .btn { padding: 11px 18px; font-size: 13px; }
 
-    .result-container { padding: 40px 20px 56px; gap: 44px; }
-    .result-name { font-size: 48px; }
-    .result-tagline { font-size: 18px; }
-    .personality-icon-wrap { width: 140px; height: 140px; margin-bottom: 22px; }
-    .personality-icon-wrap svg { width: 108px; height: 108px; }
-    .section-title { font-size: 30px; }
-    .dark-section, .advice-section {
-      margin-left: -20px;
-      margin-right: -20px;
-      padding: 52px 28px;
-      border-radius: 20px;
-    }
-    .hidden-name { font-size: 28px; }
+    .result-container { padding: 40px 20px 64px; gap: 56px; }
+    .result-name { font-size: 40px; }
+    .result-tagline { font-size: 17px; }
+    .result-icon-wrap { width: 156px; height: 156px; margin-bottom: 22px; }
+    .result-icon-inner { width: 128px; height: 128px; }
+    .result-icon-inner svg { width: 108px; height: 108px; }
+    .section-title { font-size: 26px; }
+    .advice-section { padding: 40px 28px; border-radius: 20px; }
+    .advice-text { font-size: 20px; }
+    .hidden-name { font-size: 24px; }
     .match-grid { grid-template-columns: 1fr; }
-    .catchphrase { font-size: 18px; padding: 20px 24px; }
-    .advice-text { font-size: 24px; }
+    .catchphrase { font-size: 17px; padding: 20px 22px; }
   }
-  @media (max-width: 420px) {
-    .home-title { font-size: 38px; }
-    .result-name { font-size: 38px; }
-    .q-text { font-size: 19px; }
+  @media (max-width: 460px) {
+    .home-title { font-size: 30px; }
+    .result-name { font-size: 32px; }
+    .quiz-item-text { font-size: 19px; }
+    .preview-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   }
 `;

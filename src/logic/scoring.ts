@@ -17,26 +17,45 @@ export interface Result {
   dimensionLabels: { dim: string; labelA: string; labelB: string; valueA: number; valueB: number }[];
 }
 
+// 七点双极尺映射 (value 0-6) → 三选项索引 0/1/2 及权重
+// 0 → A 满强；1 → A 六成；2 → A 三成；3 → B（中立）；4 → C 三成；5 → C 六成；6 → C 满强
+const SCALE_MAP: { idx: number; weight: number }[] = [
+  { idx: 0, weight: 1 },
+  { idx: 0, weight: 0.66 },
+  { idx: 0, weight: 0.33 },
+  { idx: 1, weight: 1 },
+  { idx: 2, weight: 0.33 },
+  { idx: 2, weight: 0.66 },
+  { idx: 2, weight: 1 },
+];
+
+export function resolveScale(value: number): { idx: number; weight: number } | null {
+  if (!Number.isInteger(value) || value < 0 || value > 6) return null;
+  return SCALE_MAP[value];
+}
+
 export function calculateScores(answers: Record<number, number>): Scores {
   const scores: Scores = { GD: 0, ZR: 0, NL: 0, YF: 0, hidden: 0 };
 
   for (const q of questions) {
-    const answerIdx = answers[q.id];
-    if (answerIdx === undefined) continue;
-    const option = q.options[answerIdx];
+    const raw = answers[q.id];
+    if (raw === undefined) continue;
+    const resolved = resolveScale(raw);
+    if (!resolved) continue;
+    const option = q.options[resolved.idx];
     if (!option) continue;
 
-    // 彩蛋题不计入维度
     if (q.tag === '彩蛋') {
-      scores.hidden += option.hidden ?? 0;
+      scores.hidden += (option.hidden ?? 0) * resolved.weight;
       continue;
     }
 
+    const delta = option.score * resolved.weight;
     switch (q.dimension) {
-      case 'GD': scores.GD += option.score; break;
-      case 'ZR': scores.ZR += option.score; break;
-      case 'NL': scores.NL += option.score; break;
-      case 'YF': scores.YF += option.score; break;
+      case 'GD': scores.GD += delta; break;
+      case 'ZR': scores.ZR += delta; break;
+      case 'NL': scores.NL += delta; break;
+      case 'YF': scores.YF += delta; break;
     }
   }
 
