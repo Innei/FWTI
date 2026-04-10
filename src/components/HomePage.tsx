@@ -37,7 +37,7 @@ export function HomePage(props: { onStart: () => void }) {
         <div class="home-hero-inner">
           <div class="eyebrow eyebrow-on-green">Fèiwù Type Indicator</div>
           <h1 class="home-title">
-            MBTI 已经过时了
+            MBTI 已经旧了
             <br />
             FWTI 已经来了
           </h1>
