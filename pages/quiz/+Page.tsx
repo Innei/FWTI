@@ -1,5 +1,11 @@
 import { navigate } from 'vike/client/router'
-import { QuizPage, answers, setAnswers, mainQ } from '../../src/App'
+import {
+  QuizPage,
+  answers,
+  setAnswers,
+  setRetreatCount,
+  mainQ,
+} from '../../src/App'
 import { questions, questionIds } from '../../src/data/questions'
 import { metaQuestionId, applyAnswerSelection } from '../../src/logic/answers'
 import { encodeAnswers } from '../../src/logic/codec'
@@ -17,7 +23,18 @@ export default function Page() {
   }
 
   function selectOption(qId: number, optionIdx: number) {
-    setAnswers((prev) => applyAnswerSelection(prev, qId, optionIdx))
+    // v0.3 · 「退退退」触发计数：只统计主线题的"改答"——即已经选过一次、现在换成另一个
+    // 选项。META 前置题的改动会走 applyAnswerSelection 的语境清空路径，不算在内；
+    // 重复点击同一选项也不增加计数。
+    const prev = answers()
+    const isRetreat =
+      qId !== metaQuestionId &&
+      prev[qId] !== undefined &&
+      prev[qId] !== optionIdx
+    if (isRetreat) {
+      setRetreatCount((n) => n + 1)
+    }
+    setAnswers((p) => applyAnswerSelection(p, qId, optionIdx))
     queueMicrotask(() => scrollToNextUnanswered(qId))
   }
 

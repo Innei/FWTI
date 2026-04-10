@@ -366,6 +366,18 @@ a.nav-logo:focus-visible {
   filter: brightness(0.93);
 }
 
+/** 与 .btn 同尺寸的描边按钮（顶栏 nav-restart 不同，勿混用） */
+.btn-outline {
+  background: transparent;
+  color: var(--fwti-text-dark);
+  border: 2px solid var(--fwti-border-strong);
+  box-shadow: none;
+}
+.btn-outline:hover:not(:disabled) {
+  background: var(--fwti-bg-soft);
+  border-color: var(--fwti-text-soft);
+}
+
 /* ===== HOME ===== */
 .home-page {
   min-height: 100vh;
@@ -941,6 +953,355 @@ a.nav-logo:focus-visible {
   line-height: 1.6;
   color: var(--fwti-modal-body);
   margin: 0;
+}
+
+/* ===== SHARE IMAGE (result) ===== */
+.share-image-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(16px, env(safe-area-inset-top)) 16px
+    max(16px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--fwti-overlay);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: preview-modal-in 0.18s ease-out;
+}
+.share-image-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  /* flex 子项默认 min-height:auto 会按内容撑开，超出 max-height 时裁掉底部；强制列 flex + 中部滚动 */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: min(92dvh, 92vh, 720px);
+  overflow: hidden;
+  margin: auto;
+  background: var(--fwti-modal-bg);
+  border-radius: 12px;
+  padding: 26px 22px 18px;
+  border: 1px solid var(--fwti-modal-border);
+  box-shadow: var(--fwti-modal-box-shadow);
+  animation: preview-modal-pop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.share-image-dialog-header {
+  flex: 0 0 auto;
+  min-width: 0;
+  padding-bottom: 14px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--fwti-modal-border);
+}
+.share-image-dialog-header-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.share-image-dialog-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 14px 4px 4px 0;
+}
+.share-image-dialog-footer {
+  flex: 0 0 auto;
+  padding-top: 14px;
+  margin-top: 4px;
+  border-top: 1px solid var(--fwti-modal-border);
+}
+.share-image-close {
+  position: static;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--fwti-modal-muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.share-image-close:hover {
+  background: var(--fwti-modal-close-hover-bg);
+  color: var(--fwti-modal-close-hover-fg);
+}
+.share-image-title {
+  flex: 1 1 auto;
+  font-family: var(--fwti-font-title);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--fwti-modal-name);
+  margin: 0;
+  padding: 2px 0;
+  letter-spacing: -0.02em;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.25;
+}
+.share-image-lede {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--fwti-modal-muted);
+  margin: 10px 0 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.share-image-preview-wrap {
+  position: relative;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--fwti-bg-soft);
+  border: 1px solid var(--fwti-modal-border);
+  padding: 12px;
+  margin-bottom: 14px;
+}
+.share-image-loading {
+  font-size: 14px;
+  color: var(--fwti-modal-muted);
+}
+.share-image-preview {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  max-height: min(48dvh, 48vh, 420px);
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+}
+.share-image-hint {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--fwti-text-soft);
+  margin: 0 0 12px;
+  text-align: center;
+}
+.share-image-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.share-image-btn {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 15px;
+  border-radius: 999px;
+}
+/* 分享弹窗内两颗实心按钮统一投影力度，避免绿键单独「发眩光」 */
+.share-image-actions > .btn-green,
+.share-image-actions > .btn-accent {
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+}
+.share-image-actions > .btn-green:hover:not(:disabled) {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.share-image-capture-mount {
+  position: fixed;
+  left: -12000px;
+  top: 0;
+  width: 360px;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+
+.share-image-card {
+  box-sizing: border-box;
+  width: 360px;
+  /* 导出 PNG（SVG foreignObject）时顶部易裁掉字形上半截，多留一截安全边 */
+  padding: 40px 22px 22px;
+  border-radius: 16px;
+  background: var(--fwti-bg);
+  color: var(--fwti-text-dark);
+  text-align: center;
+  border: 1px solid var(--fwti-border);
+  font-family: var(--fwti-font-body);
+  overflow: visible;
+}
+.share-image-card-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fwti-text-mid);
+  margin: 0 0 18px;
+  line-height: 1.45;
+  padding-top: 1px;
+}
+.share-image-card .share-image-card-portrait {
+  position: relative;
+  width: 200px;
+  margin: 0 auto 18px;
+}
+.share-image-card .share-image-card-portrait::before {
+  content: '';
+  position: absolute;
+  inset: -12%;
+  background: radial-gradient(
+    circle at 50% 45%,
+    var(--fwti-accent-tint) 0%,
+    transparent 62%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+.share-image-card-name {
+  font-family: var(--fwti-font-title);
+  font-size: 38px;
+  font-weight: 700;
+  /* 过紧的 line-height 在栅格化时易顶到裁剪框 */
+  line-height: 1.35;
+  margin: 0 0 8px;
+  padding: 4px 0 2px;
+  letter-spacing: -0.02em;
+  color: var(--fwti-text-dark);
+}
+.share-image-card-eng {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fwti-accent);
+  margin: 0 0 6px;
+  line-height: 1.45;
+  padding: 2px 0;
+}
+.share-image-card-slang {
+  font-size: 13px;
+  color: var(--fwti-text-mid);
+  margin: 0 0 6px;
+}
+.share-image-card-code {
+  font-family: var(--fwti-font-title);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fwti-text-soft);
+  margin: 0 0 10px;
+}
+.share-image-card-tagline {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--fwti-text-mid);
+  margin: 0 0 20px;
+  font-style: italic;
+}
+.share-image-card-waste {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--fwti-bg-soft);
+  border: 1px solid var(--fwti-border);
+}
+.share-image-card-waste-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--fwti-text-mid);
+}
+.share-image-card-waste-dots {
+  display: flex;
+  gap: 5px;
+}
+.share-waste-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--fwti-border-strong);
+}
+.share-waste-dot.filled {
+  background: var(--fwti-accent);
+}
+.share-image-card-waste-num {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fwti-text-mid);
+  font-variant-numeric: tabular-nums;
+}
+.share-image-card-achv {
+  margin-bottom: 18px;
+  text-align: left;
+}
+.share-image-card-achv-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fwti-accent);
+  margin-bottom: 8px;
+}
+.share-image-card-achv-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 6px;
+}
+/* inline 元素多行时背景会按行碎片绘制，导出 PNG 易「挤出」药丸；用 inline-block 整块包裹。 */
+.share-image-chip {
+  display: inline-block;
+  /* flex 子项默认可被压窄，窄盒 + break-word 会在 CJK 词中间乱断（如 学|家）；保持宽度贴内容 */
+  flex: 0 0 auto;
+  max-width: 100%;
+  box-sizing: border-box;
+  font-size: 12px;
+  line-height: 1.45;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: var(--fwti-bg-soft);
+  border: 1px solid var(--fwti-border);
+  color: var(--fwti-text-mid);
+  /* 隐藏标签文案一般一行放得下；与 keep-all 搭配避免任意字符处断开 */
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  vertical-align: top;
+}
+.share-image-card-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--fwti-border);
+}
+.share-image-card-footer img {
+  display: block;
+  border-radius: 6px;
+}
+.share-image-card-url {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--fwti-text-soft);
 }
 
 .preview-legend {

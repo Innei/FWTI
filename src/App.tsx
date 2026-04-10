@@ -21,6 +21,7 @@ import {
 import { navigate } from 'vike/client/router'
 import { getFamilyTheme, FAMILY_THEMES, getFamily } from './logic/family'
 import Portrait from './components/Portrait'
+import { ShareImageModal } from './components/ShareImageModal'
 import {
   cycleThemeSetting,
   getStoredTheme,
@@ -43,6 +44,16 @@ const FWTI_SITE_URL = 'https://fwti.innei.dev'
  */
 export const mainQ = questions.filter((q) => q.dimension !== 'META').length
 export const [answers, setAnswers] = createSignal<Record<number, number>>({})
+
+/**
+ * v0.3 · 答题过程中的"改答次数"。用户把一道已答主线题的答案换到另一个选项时递增一次。
+ * 用于触发「退退退」隐藏标签（≥3 次即解锁）。
+ *
+ * 只在当前会话内有效：刷新页面或通过分享链接进入 /result/<hash> 时都会回落到 0——这就是
+ * 故意的，因为「退退退」是一个描述答题过程的 meta 标签，不该跟着分享链接传给观众。
+ */
+export const [retreatCount, setRetreatCount] = createSignal(0)
+
 const [previewDetail, setPreviewDetail] = createSignal<Personality | null>(null)
 
 export function Layout(props: { children?: JSX.Element }) {
@@ -100,7 +111,9 @@ export function HomePage(props: { onStart: () => void }) {
         <div class="preview-grid">
           <For
             each={Object.values(personalities).filter(
-              (p) => p.code !== 'ALL',
+              // 首页预览网格只展示 16 格主卡；v0.3 新增的 8 个隐藏人格（ALL + RAT/PURE/MAD/E-DOG/CHAOS/CPU/BENCH）
+              // 只能通过做测试触发，不在这里列出，以保持"四族十六型"的视觉一致。
+              (p) => !['ALL', 'RAT', 'PURE', 'MAD', 'E-DOG', 'CHAOS', 'CPU', 'BENCH'].includes(p.code),
             )}
           >
             {(p) => {
@@ -462,6 +475,7 @@ export function QuizPage(props: {
 
 /* ===== RESULT PAGE ===== */
 export function ResultPage(props: { result: Result; onRestart: () => void }) {
+  const [shareOpen, setShareOpen] = createSignal(false)
   const r = () => props.result
   const p = () => r().personality
   const family = () => getFamily(p().code)
@@ -476,13 +490,21 @@ export function ResultPage(props: { result: Result; onRestart: () => void }) {
         '--fwti-accent-tint': theme().tint,
       }}
     >
-      <ResultNav onRestart={props.onRestart} />
+      <ShareImageModal
+        open={shareOpen()}
+        onClose={() => setShareOpen(false)}
+        result={props.result}
+      />
+      <ResultNav
+        onRestart={props.onRestart}
+        onShareImage={() => setShareOpen(true)}
+      />
 
       <div class="result-container">
         {/* Hero */}
         <section class="result-hero">
           <div class="hero-eyebrow">
-            {r().isAll
+            {r().isHidden
               ? '隐藏人格解锁 · 你的恋爱人格是'
               : '测试完成 · 你的恋爱人格是'}
           </div>
@@ -493,11 +515,6 @@ export function ResultPage(props: { result: Result; onRestart: () => void }) {
               <p class="result-slang">{p().cnSlang}</p>
             </Show>
             <ResultCodeLine text={r().displayCode} />
-            <Show when={!r().isAll && r().tiedDimensions.length === 1}>
-              <p class="result-tied-note">
-                有一个维度恰好打平，已按默认方向归类并在该维度以 * 标记
-              </p>
-            </Show>
             <Show when={r().isAll && r().closestPersonality}>
               <p class="result-tied-note">
                 共有 {r().tiedDimensions.length}{' '}
@@ -861,12 +878,22 @@ function TopNav(props: { meta?: string }) {
   )
 }
 
-function ResultNav(props: { onRestart: () => void }) {
+function ResultNav(props: {
+  onRestart: () => void
+  onShareImage: () => void
+}) {
   return (
     <nav class="top-nav">
       <div class="nav-inner">
         <NavLogo />
         <div class="nav-right">
+          <button
+            class="nav-restart"
+            type="button"
+            onClick={props.onShareImage}
+          >
+            分享图片
+          </button>
           <button class="nav-restart" type="button" onClick={props.onRestart}>
             重新测试
           </button>

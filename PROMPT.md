@@ -21,23 +21,6 @@ busy cluttered background, multiple characters, text, typography, logo,
 watermark, distorted hands, extra fingers, low resolution
 ```
 
-## 4. 技术参数
-
-
-| 平台               | 建议参数                                                                            |
-| ---------------- | ------------------------------------------------------------------------------- |
-| Midjourney v6.1+ | `--ar 1:1 --style raw --stylize 250 --v 6.1`                                    |
-| DALL·E 3         | aspect `1:1`, 尺寸 `1024×1024`，前加 `Create a stylized flat vector illustration...` |
-| SDXL             | steps 35, CFG 6, sampler DPM++ 2M Karras；若有 16p-style LoRA 更佳                   |
-
-
-### 一致性关键（极重要）
-
-1. **用风格参考图**：下载一张官方 16p SVG 转 PNG（如 intj-architect-male），Midjourney 加 `--sref <url>`，DALL·E 以 "in the same illustration style as this reference" 附图。十六张全程用**同一张**参考图。
-2. **同一 base prompt**：只替换 subject 段，其余字面不变。
-3. **固定风格权重**：MJ `--sw 100–200`；SDXL 用 ControlNet reference-only。
-4. **分两轮**：先生四家族各一张（GZNY/GRNY/DZNY/DRNY）校准风格；定调后再批量生剩下十二张。
-
 ---
 
 ## 5. 十六型 Subject Prompts
@@ -387,20 +370,3 @@ their knees
 ```
 
 > Family color cue 替换为：`, background tinted dusty beige #cbb89a with a faint wooden bench silhouette`
-
----
-
-### Sticker 技术参数微调
-
-
-| 平台               | 微调建议                                                                         |
-| ---------------- | ---------------------------------------------------------------------------- |
-| Midjourney v6.1+ | 在主卡参数基础上追加 `--ar 1:1 --stylize 200`，`--sref` 沿用同一张 16p 参考图                   |
-| DALL·E 3         | 提示词开头加 "A small sticker-sized editorial character illustration..."           |
-| SDXL             | 构图提示 `"centered bust up, subtle die-cut sticker border, neutral background"` |
-
-
-> **命名建议**：资源文件统一放在 `src/assets/portraits/`，和四字母主卡（`GZNY.webp` / `ALL.webp` 等大写代号命名）同目录。贴纸文件名统一用 `sticker-<kebab-case>.webp` 前缀区分，既不需要新开目录也不会和主卡混淆。注意本项目历史上还存在一个 `src/assets/16p/` 目录，那是 MBTI 的 SVG 遗留物，**与 FWTI 贴纸无关，不要往里放任何东西**。
-
----
-

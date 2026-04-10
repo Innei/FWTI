@@ -1,7 +1,7 @@
 import { createMemo, Show } from 'solid-js'
 import { navigate } from 'vike/client/router'
 import { usePageContext } from 'vike-solid/usePageContext'
-import { ResultPage, setAnswers } from '../../src/App'
+import { ResultPage, retreatCount, setAnswers, setRetreatCount } from '../../src/App'
 import { questionIds } from '../../src/data/questions'
 import { decodeAnswers } from '../../src/logic/codec'
 import { getResult, type Result } from '../../src/logic/scoring'
@@ -17,7 +17,9 @@ export default function Page() {
     for (const id of questionIds) {
       if (decoded[id] === undefined) return null
     }
-    return getResult(decoded)
+    // 分享链接解码进来时 retreatCount 恒为 0（当前 session 未答题），故「退退退」标签
+    // 不会在观众端触发；只有从 /quiz 亲自提交过来的 session 才会带上非零的回退计数。
+    return getResult(decoded, retreatCount())
   })
 
   return (
@@ -26,6 +28,7 @@ export default function Page() {
         result={result()!}
         onRestart={() => {
           setAnswers({})
+          setRetreatCount(0)
           void navigate('/')
         }}
       />
