@@ -1,7 +1,6 @@
-import { questions } from '../data/questions';
+import { metaQuestion } from '../data/questions';
 
-export const metaQuestionId =
-  questions.find((q) => q.dimension === 'META')?.id ?? -1;
+export const metaQuestionId = metaQuestion.id;
 
 /**
  * 前置题决定整套题的语境。若语境切换，则丢弃旧语境下的作答，

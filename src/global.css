@@ -436,7 +436,17 @@ a.nav-logo:focus-visible {
   font-size: 56px;
   line-height: 1.12;
   color: #fff;
-  margin-bottom: 22px;
+  margin-bottom: 14px;
+  letter-spacing: -0.01em;
+}
+.home-subtitle {
+  font-family: var(--fwti-font-title);
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0 auto 20px;
+  max-width: 640px;
   letter-spacing: -0.01em;
 }
 .home-lede {
@@ -1268,7 +1278,7 @@ a.nav-logo:focus-visible {
 /* inline 元素多行时背景会按行碎片绘制，导出 PNG 易「挤出」药丸；用 inline-block 整块包裹。 */
 .share-image-chip {
   display: inline-block;
-  /* flex 子项默认可被压窄，窄盒 + break-word 会在 CJK 词中间乱断（如 学|家）；保持宽度贴内容 */
+  /* flex 子项默认可被压窄，窄盒 + break-word 会在 CJK 词中间乱断（如 学 | 家）；保持宽度贴内容 */
   flex: 0 0 auto;
   max-width: 100%;
   box-sizing: border-box;
@@ -1461,20 +1471,16 @@ a.nav-logo:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--fwti-text-mid);
   color: #fff;
   font-family: var(--fwti-font-title);
   font-weight: 700;
   font-size: 12px;
   letter-spacing: 0.02em;
+  transition: background 0.15s ease;
 }
-.quiz-opt-badge-a {
+.quiz-opt.is-selected .quiz-opt-badge {
   background: var(--fwti-green);
-}
-.quiz-opt-badge-b {
-  background: var(--fwti-text-soft);
-}
-.quiz-opt-badge-c {
-  background: #52525b;
 }
 .quiz-opt-text {
   flex: 1;
@@ -1547,6 +1553,51 @@ a.nav-logo:focus-visible {
 .result-page {
   min-height: 100vh;
   background: var(--fwti-bg);
+}
+.legacy-banner {
+  background: #fdf3e0;
+  border-bottom: 1px solid #e6c68a;
+  color: #5a3f0b;
+  padding: 14px 20px;
+}
+.legacy-banner-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.legacy-banner-badge {
+  background: #5a3f0b;
+  color: #fdf3e0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.legacy-banner-text {
+  flex: 1 1 280px;
+}
+.legacy-banner-cta {
+  background: #5a3f0b;
+  color: #fdf3e0;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
+}
+.legacy-banner-cta:hover {
+  background: #3e2c07;
+  transform: translateY(-1px);
 }
 .result-container {
   max-width: 760px;
@@ -2082,6 +2133,15 @@ a.nav-logo:focus-visible {
 .refs-list li em {
   font-style: italic;
 }
+.refs-note {
+  display: block;
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--fwti-text-soft);
+  opacity: 0.75;
+  font-family:
+    'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+}
 .refs-disclaimer {
   margin-top: 32px;
   padding: 20px 24px;
@@ -2201,6 +2261,9 @@ a.nav-logo:focus-visible {
   .home-title {
     font-size: 44px;
   }
+  .home-subtitle {
+    font-size: 19px;
+  }
 }
 @media (max-width: 720px) {
   .nav-inner {
@@ -2211,6 +2274,9 @@ a.nav-logo:focus-visible {
   }
   .home-title {
     font-size: 36px;
+  }
+  .home-subtitle {
+    font-size: 17px;
   }
   .home-lede {
     font-size: 16px;
@@ -2339,6 +2405,9 @@ a.nav-logo:focus-visible {
 @media (max-width: 460px) {
   .home-title {
     font-size: 30px;
+  }
+  .home-subtitle {
+    font-size: 15px;
   }
   .result-name {
     font-size: 36px;
