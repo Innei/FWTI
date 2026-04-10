@@ -1,0 +1,151 @@
+<style>
+  .bg-parch { background: #f5f4ed; color: #141413; }
+  .bg-white { background: #ffffff; color: #343c4b; }
+  .bg-green { background: #33a474; color: #fff; }
+  .preview {
+    border-radius: 12px;
+    padding: 22px 20px;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    font-family: -apple-system, sans-serif;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  .preview .q {
+    font-size: 19px;
+    line-height: 1.35;
+    font-weight: 500;
+    text-align: center;
+  }
+  .preview .scale {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+  .preview .scale .dot {
+    border-radius: 999px;
+    border: 2px solid currentColor;
+    opacity: .75;
+  }
+  .preview .scale .lbl { font-size: 11px; opacity: .7; }
+  .preview .ab {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .preview .opt {
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 1px solid rgba(0,0,0,.12);
+    background: rgba(255,255,255,.6);
+  }
+  .preview .progress {
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(0,0,0,.1);
+    position: relative;
+    margin-top: auto;
+  }
+  .preview .progress::before {
+    content:"";
+    position:absolute; inset: 0 70% 0 0;
+    border-radius: 999px;
+    background: currentColor;
+  }
+  .preview .eyebrow {
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    opacity: .65;
+    text-align: center;
+  }
+  .preview .title-serif {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 500;
+  }
+  .ring-terracotta { box-shadow: 0 0 0 1px #c96442 inset; color: #c96442; }
+  .fill-terracotta { background: #c96442 !important; color: #faf9f5 !important; }
+  .fill-green { background: #33a474 !important; color: #fff !important; }
+  .redhat { font-family: 'Red Hat Display', system-ui, sans-serif; font-weight: 700; }
+</style>
+
+<h2>三途何从 · 择其一</h2>
+<p class="subtitle">参 16personalities 之形意，与今 Claude 暖调之底，三案可议</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px;">
+      <div class="preview bg-white">
+        <div class="eyebrow" style="color:#576071;">Question 14 / 31</div>
+        <div class="q redhat" style="color:#343c4b;">朋友邀聚，你宁在家独坐。</div>
+        <div class="scale" style="color:#33a474;">
+          <span class="lbl" style="color:#343c4b;">同意</span>
+          <span class="dot" style="width:32px;height:32px;background:#33a474;border-color:#33a474;"></span>
+          <span class="dot" style="width:24px;height:24px;"></span>
+          <span class="dot" style="width:18px;height:18px;"></span>
+          <span class="dot" style="width:14px;height:14px;border-color:#8a95a7;"></span>
+          <span class="dot" style="width:18px;height:18px;border-color:#88619A;"></span>
+          <span class="dot" style="width:24px;height:24px;border-color:#88619A;"></span>
+          <span class="dot" style="width:32px;height:32px;border-color:#88619A;"></span>
+          <span class="lbl" style="color:#343c4b;">不同意</span>
+        </div>
+        <div class="progress" style="color:#33a474;"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A · 刻其形（彻底 16p 化）</h3>
+      <p>白底、#33a474 绿、Red Hat Display 标题、七点双极评分尺。彻底弃暖调，换 clean SaaS 感。改动最大。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px;">
+      <div class="preview bg-parch">
+        <div class="eyebrow" style="color:#87867f;">第 14 题 · 共 31</div>
+        <div class="q title-serif" style="color:#141413;">朋友邀聚，你宁在家独坐。</div>
+        <div class="scale" style="color:#c96442;">
+          <span class="lbl" style="color:#5e5d59;">同意</span>
+          <span class="dot fill-terracotta" style="width:32px;height:32px;border:0;"></span>
+          <span class="dot ring-terracotta" style="width:24px;height:24px;"></span>
+          <span class="dot ring-terracotta" style="width:18px;height:18px;"></span>
+          <span class="dot" style="width:14px;height:14px;border-color:#b0aea5;"></span>
+          <span class="dot" style="width:18px;height:18px;border-color:#3d3d3a;"></span>
+          <span class="dot" style="width:24px;height:24px;border-color:#3d3d3a;"></span>
+          <span class="dot" style="width:32px;height:32px;border-color:#3d3d3a;"></span>
+          <span class="lbl" style="color:#5e5d59;">不同意</span>
+        </div>
+        <div class="progress" style="color:#c96442; background:#e8e6dc;"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B · 师其意（暖调 + 七点尺）</h3>
+      <p>留 parchment 底与 terracotta，易 A/B 双钮为七点双极评分尺，题文居中大号衬线。结构师 16p，气韵仍 Claude。推荐。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px;">
+      <div class="preview bg-parch">
+        <div class="eyebrow" style="color:#87867f;">第 14 题</div>
+        <div class="q title-serif" style="color:#141413; font-size:22px;">朋友邀聚，你宁在家独坐。</div>
+        <div class="ab">
+          <div class="opt" style="border-color:#e8e6dc; background:#faf9f5;">A · 确系如此，聚则累</div>
+          <div class="opt" style="border-color:#c96442; background:#faf9f5; box-shadow:0 0 0 1px #c96442;">B · 偶赴，然多半勉强</div>
+        </div>
+        <div class="progress" style="color:#c96442; background:#e8e6dc;"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C · 取其韵（仅细调）</h3>
+      <p>保原双选结构，仅改间距、字阶、卡片节奏、进度条。动土最少，视觉 lift 有限。</p>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top: 24px;">
+  <strong>吾之荐：B</strong>。既保 Claude 之独特暖调（与 16p 显异），又采其大题居中 + 七点评分之良构。C 动土少而效寡，A 尽弃暖调则失本。<br>
+  题外：16p 色系尚有紫 #88619A、蓝 #4298B4、黄 #E4AE3A、红 #F25E62 — 可映 16 人格分族，resultpage 可借之。
+</p>
