@@ -13,6 +13,8 @@ import { encodeAnswers, decodeAnswers } from './logic/codec';
 import { getFamilyTheme, FAMILY_THEMES, getFamily } from './logic/family';
 import PersonalityIcon from './components/PersonalityIcon';
 
+const GITHUB_REPO_URL = 'https://github.com/Innei/fwti';
+
 const totalQ = questions.length;
 const [answers, setAnswers] = createSignal<Record<number, number>>({});
 
@@ -455,6 +457,26 @@ function ResultPage(props: { result: Result; onRestart: () => void }) {
   );
 }
 
+function GithubNavLink() {
+  return (
+    <a
+      class="nav-github"
+      href={GITHUB_REPO_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="在 GitHub 上查看源码"
+    >
+      <svg class="nav-github-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
+        />
+      </svg>
+      <span>GitHub</span>
+    </a>
+  );
+}
+
 function TopNav(props: { meta?: string }) {
   return (
     <nav class="top-nav">
@@ -463,9 +485,12 @@ function TopNav(props: { meta?: string }) {
           <span class="logo-mark" aria-hidden="true" />
           <span class="logo-text">FWTI</span>
         </div>
-        <Show when={props.meta}>
-          <div class="nav-meta">{props.meta}</div>
-        </Show>
+        <div class="nav-right">
+          <Show when={props.meta}>
+            <div class="nav-meta">{props.meta}</div>
+          </Show>
+          <GithubNavLink />
+        </div>
       </div>
     </nav>
   );
@@ -479,7 +504,12 @@ function ResultNav(props: { onRestart: () => void }) {
           <span class="logo-mark" aria-hidden="true" />
           <span class="logo-text">FWTI</span>
         </div>
-        <button class="nav-restart" onClick={props.onRestart}>重新测试</button>
+        <div class="nav-right">
+          <button class="nav-restart" type="button" onClick={props.onRestart}>
+            重新测试
+          </button>
+          <GithubNavLink />
+        </div>
       </div>
     </nav>
   );
@@ -555,6 +585,13 @@ const globalStyles = `
     justify-content: space-between;
     gap: 16px;
   }
+  .nav-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    flex-shrink: 0;
+  }
   .nav-logo {
     display: flex;
     align-items: center;
@@ -585,6 +622,25 @@ const globalStyles = `
     font-size: 13px;
     color: var(--fwti-text-mid);
     letter-spacing: 0.02em;
+  }
+  .nav-github {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--fwti-font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fwti-text-mid);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .nav-github:hover {
+    color: var(--fwti-text-dark);
+  }
+  .nav-github-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
   }
   .nav-restart {
     font-family: var(--fwti-font-body);
