@@ -941,6 +941,12 @@ a.nav-logo:focus-visible {
   font-size: 12px;
   color: var(--fwti-modal-muted);
 }
+.preview-modal-match-summary {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--fwti-modal-body);
+}
 
 .preview-modal-advice {
   margin-top: 22px;
@@ -2043,6 +2049,25 @@ a.nav-logo:focus-visible {
   font-size: 13px;
   color: var(--fwti-text-mid);
   line-height: 1.6;
+}
+.match-rationale {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--fwti-text-dark);
+}
+.match-reasons {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--fwti-text-mid);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.match-reasons li {
+  margin: 0;
 }
 
 /* Advice */

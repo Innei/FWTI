@@ -10,8 +10,6 @@ export interface Personality {
   description: string;
   traits: string[];
   catchphrases: string[];
-  bestMatch: string;
-  worstMatch: string;
   advice: string;
 }
 
@@ -33,8 +31,6 @@ export const personalities: Record<string, Personality> = {
       'TA 回消息晚了 5 分钟就开始编排分手剧情',
     ],
     catchphrases: ['"你是不是不爱我了？！"', '"我为你付出了这么多你看到了吗！"', '"好我不闹了……你先说你爱我"'],
-    bestMatch: 'GRNF',
-    worstMatch: 'DRLY',
     advice: '你的热情是珍贵的，但别把它变成对方的负担。试试在怀疑的念头升起时，先深呼吸十秒再行动。',
   },
   GZNF: {
@@ -54,8 +50,6 @@ export const personalities: Record<string, Personality> = {
       '为 TA 可以取消任何计划，包括但不限于家里人的生日',
     ],
     catchphrases: ['"你开心就好！"', '"宝宝今天想吃什么？我去买！"', '"我没有朋友了？有你就够了啊"'],
-    bestMatch: 'DZLF',
-    worstMatch: 'DRLF',
     advice: '爱一个人没错，但别把自己爱没了。维持恋爱之外的社交和爱好，才能让感情更长久。',
   },
   GZLY: {
@@ -75,8 +69,6 @@ export const personalities: Record<string, Personality> = {
       '吃醋的时候特别能说，平时倒话不多',
     ],
     catchphrases: ['"你和 TA 什么关系？"', '"哦，随便你（转身偷偷查对方主页）"', '"我没生气，我只是在想一些事情"'],
-    bestMatch: 'GRNF',
-    worstMatch: 'GRLF',
     advice: '醋意的本质是不安全感。与其盯着对方的社交动态，不如想想你自己值得被爱的理由——很多的。',
   },
   GZLF: {
@@ -96,8 +88,6 @@ export const personalities: Record<string, Personality> = {
       '前任 + 暧昧对象数量可能需要用两只手来数',
     ],
     catchphrases: ['"来嘛，有什么不敢的"', '"算了，不开心就换一个"', '"人生苦短，不要在一棵树上吊死"'],
-    bestMatch: 'DZNF',
-    worstMatch: 'DRNY',
     advice: '潇洒是你的魅力，但偶尔也试试为一段关系多停留一会儿。深度的幸福，值得你放慢脚步。',
   },
   GRNY: {
@@ -117,8 +107,6 @@ export const personalities: Record<string, Personality> = {
       '付出了 99 分却因为那 1 分没做好而自责一整天',
     ],
     catchphrases: ['"没事没事，是我不好"', '"你要是觉得我烦就说，我可以改"', '"（内心 OS）TA 是不是已经不爱我了…"'],
-    bestMatch: 'GZLF',
-    worstMatch: 'DZLY',
     advice: '你的温柔和付出值得被珍惜，而不是被消耗。学会把对自己的善意至少调到和对别人一样的音量。',
   },
   GRNF: {
@@ -138,8 +126,6 @@ export const personalities: Record<string, Personality> = {
       '朋友都劝你清醒点，你：汪',
     ],
     catchphrases: ['"没关系！你忙你的！"', '"我等你，多久都行"', '"你开心就好，真的"'],
-    bestMatch: 'GZLY',
-    worstMatch: 'GZNY',
     advice: '善良是你最大的优点，但善良不等于没有底线。记住：你值得被同等对待。',
   },
   GRLY: {
@@ -159,8 +145,6 @@ export const personalities: Record<string, Personality> = {
       '对方越上头你越冷静，但对方一冷你就慌了',
     ],
     catchphrases: ['"嗯"（意思是我很在意但我不说）', '"忙"（在刷手机）', '"随你吧"（其实有标准答案）'],
-    bestMatch: 'DZNF',
-    worstMatch: 'GRNY',
     advice: '博弈也许能赢得一时，但真诚才能赢得一个人。试着把内心的柔软展示出来，天不会塌。',
   },
   GRLF: {
@@ -180,8 +164,6 @@ export const personalities: Record<string, Personality> = {
       '能跟 TA 好好沟通，不用猜，不用作',
     ],
     catchphrases: ['"有什么事我们聊聊？"', '"我需要一些自己的时间，不是不爱你"', '"我也会生气，但咱们不靠猜。"'],
-    bestMatch: 'DRNF',
-    worstMatch: 'GZNY',
     advice: '你已经很好了。唯一的建议是偶尔允许自己犯一点傻，恋爱嘛，太理性了也少了点味道。',
   },
 
@@ -202,8 +184,6 @@ export const personalities: Record<string, Personality> = {
       '炸完又后悔，后悔完又憋着，开始下一轮充能',
     ],
     catchphrases: ['"没事。"（第 47 次说没事）', '"你自己想想你做了什么。"', '"我不是今天才生气的！！！"'],
-    bestMatch: 'GRLF',
-    worstMatch: 'DRLF',
     advice: '情绪不是洪水猛兽，小水流比决堤好控制得多。试试每周设一个"坦白时间"，把小事在它还小的时候说出来。',
   },
   DZNF: {
@@ -223,8 +203,6 @@ export const personalities: Record<string, Personality> = {
       '虽然总是哭，但不记仇，哭完就翻篇',
     ],
     catchphrases: ['"我没哭……是风吹的……"', '"你怎么对我这么好（哭）"', '"我也不知道为什么就哭了……"'],
-    bestMatch: 'GRLF',
-    worstMatch: 'DRLY',
     advice: '你的感受力是一种天赋。但别让眼泪代替了语言——比起哭，说出"我需要什么"更有力量。',
   },
   DZLY: {
@@ -244,8 +222,6 @@ export const personalities: Record<string, Personality> = {
       '受伤了不会示弱，而是发脾气把人推开',
     ],
     catchphrases: ['"随便你"（求你别随便）', '"我不需要任何人"（需要，很需要）', '"你走啊"（别走别走别走）'],
-    bestMatch: 'GRNF',
-    worstMatch: 'DRLY',
     advice: '那些被你推开的人，不一定都会转身离开。但他们需要你告诉他们："我其实很害怕。"',
   },
   DZLF: {
@@ -265,8 +241,6 @@ export const personalities: Record<string, Personality> = {
       '别人说你高冷，其实你只是懒得热情',
     ],
     catchphrases: ['"别烦我"（过 10 分钟来找我）', '"随便"（我有标准答案但懒得说）', '"哼"（其实被哄了很开心）'],
-    bestMatch: 'GZNF',
-    worstMatch: 'GZNY',
     advice: '猫的魅力在于偶尔的亲近让人加倍珍惜。但别让"高冷"变成"冷漠"，TA 需要确认你爱 TA。',
   },
 
@@ -287,8 +261,6 @@ export const personalities: Record<string, Personality> = {
       '默默为对方做了很多事，但从来不提',
     ],
     catchphrases: ['"嗯。"', '"都行。"', '"（已经想了三百字但最后发出去的只有一个表情包）"'],
-    bestMatch: 'GZNY',
-    worstMatch: 'DRLF',
     advice: '爱不说出口，对方就收不到。你不需要变成另一个人，但请至少让 TA 知道：你在。',
   },
   DRNF: {
@@ -308,8 +280,6 @@ export const personalities: Record<string, Personality> = {
       '对方急死了你还在说"慢慢来嘛"',
     ],
     catchphrases: ['"不着急……"', '"慢慢来嘛"', '"（已读，三小时后回复）嗯嗯好"'],
-    bestMatch: 'GRLF',
-    worstMatch: 'GZNY',
     advice: '慢节奏没有错，但要确认对方也 OK。不是每个人都能等——适时给一个明确的信号，是对 TA 的尊重。',
   },
   DRLY: {
@@ -329,8 +299,6 @@ export const personalities: Record<string, Personality> = {
       '偶尔怀疑对方的动机，但懒得去求证',
     ],
     catchphrases: ['"我一个人挺好的"', '"你去忙你的"', '"……（三天后）你说什么？"'],
-    bestMatch: 'GZNF',
-    worstMatch: 'GZNY',
     advice: '你的独立令人敬佩，但恋爱的意义就在于让另一个人走进来。偶尔拔掉一根刺，让 TA 碰碰你。',
   },
   DRLF: {
@@ -350,8 +318,6 @@ export const personalities: Record<string, Personality> = {
       '分手了可能也要过两周才有实感',
     ],
     catchphrases: ['"嗯。"', '"哦。"', '"好（句号）"'],
-    bestMatch: 'GZNY',
-    worstMatch: 'DRNY',
     advice: '你的超然是一种能力，但偶尔也值得为一个人心动一下。人生已经够硬核了，软一次不丢人。',
   },
 
@@ -373,8 +339,6 @@ export const personalities: Record<string, Personality> = {
       '既不热烈也不冷漠，活成一张 B 选项合集',
     ],
     catchphrases: ['"小孩子才做选择，我全都要"', '"其实……都行？"', '"你说得对，但你说得也对"'],
-    bestMatch: 'GRLF',
-    worstMatch: 'GZNY',
     advice: '中立不是缺点，但如果所有维度都中立，往往意味着你还没真正允许自己想要什么。试着对一件小事说出"我就是想这样"，不解释、不平衡。全都要的代价，是全都得不到。',
   },
 
@@ -395,8 +359,6 @@ export const personalities: Record<string, Personality> = {
       '已经不在乎 TA 怎么看你了，因为你自己先把自己判了死刑',
     ],
     catchphrases: ['"鼠鼠我啊，不配"', '"算了算了，TA 肯定不会在意的"', '"我这种人活该单身一辈子"'],
-    bestMatch: 'GRLF',
-    worstMatch: 'GZNY',
     advice: '自我否定不是谦虚，是一种自我攻击。你不需要"配得上"谁才被允许喜欢一个人——喜欢本身就是最低门槛的事。从今天起，试着把"我不配"改成"我值得试一次"。鼠鼠也有出洞的权利。',
   },
 
@@ -417,8 +379,6 @@ export const personalities: Record<string, Personality> = {
       '被证伪过很多次，但依然相信真心能换真心',
     ],
     catchphrases: ['"只要是真爱，委屈一点没关系"', '"我不求回报，真的"', '"我相信 TA 总有一天会明白的"'],
-    bestMatch: 'DRNF',
-    worstMatch: 'GZLF',
     advice: '纯爱不是错，但纯爱不该是单向燃烧。真正的爱是两个完整的人互相选择，而不是你一个人端着火炬照亮黑夜。允许自己在付出之前先问一句"TA 在吗？"——这不是势利，这是基本自尊。',
   },
 
@@ -439,8 +399,6 @@ export const personalities: Record<string, Personality> = {
       '清晰地知道自己在发疯，但完全停不下来',
     ],
     catchphrases: ['"我真的要疯了，不是比喻"', '"你再这样我真的要做出不理智的事了"', '"对不起我又破防了，这是今天的第七次"'],
-    bestMatch: 'DRLF',
-    worstMatch: 'DRLF',
     advice: '发疯文学之所以好笑，是因为它本身就是一种情绪调节方式。但把发疯当日常模式，真正受伤的是你自己。下一次想发小作文前，先把它打在备忘录里，睡一觉再看——你会发现 80% 的话不需要发出去。',
   },
 
@@ -461,8 +419,6 @@ export const personalities: Record<string, Personality> = {
       '可以凌晨两点发 500 字的关心，第二天见到本人当什么都没发生',
     ],
     catchphrases: ['"线上我是你亲爹，线下我连你眼睛都不敢看"', '"我打字比说话温柔一百倍"', '"只要你在屏幕那头，我就能爱你一万年"'],
-    bestMatch: 'DZLF',
-    worstMatch: 'GZNY',
     advice: '线上人格不是假的，那也是你的一部分。但如果你永远只能隔着屏幕才能表达，关系就永远停在"很近但从未真正开始"的状态。下次见面时，试着把微信里最想说的那句话原样念出来——声音小一点也无妨。',
   },
 
@@ -483,8 +439,6 @@ export const personalities: Record<string, Personality> = {
       '做完这个测试，你自己都不确定你选的是不是你真正想的',
     ],
     catchphrases: ['"已读，然后我回了一堆颠话"', '"我也不知道我在说什么，但是你懂的吧？"', '"上次我是这样想的，但现在我又不这样想了"'],
-    bestMatch: 'GRLF',
-    worstMatch: 'GZNY',
     advice: '不稳定本身不是问题——你只是还没学会在做决定前先和自己对一次话。下次想回复 TA 之前，先问自己："我现在真正想说的是什么？" 把答案写下来再发。三十秒就够。',
   },
 
@@ -505,8 +459,6 @@ export const personalities: Record<string, Personality> = {
       '每次情绪爆发都是被自己脑补出来的场景气到的',
     ],
     catchphrases: ['"你一句话能让我 CPU 三天三夜"', '"我知道我在脑补，但我停不下来"', '"TA 刚才那个表情是什么意思？"'],
-    bestMatch: 'DRLF',
-    worstMatch: 'GZNY',
     advice: 'CPU 过热不是因为你想太多，是因为你在用想象力补偿信任的缺失。下一次脑内剧场开演之前，试着把脑补的内容直接问 TA——99% 的概率你会发现剧本是错的，而且问出口反而更轻松。',
   },
 
@@ -527,8 +479,6 @@ export const personalities: Record<string, Personality> = {
       '表面云淡风轻，内心默默数着上一次被回应是多久以前',
     ],
     catchphrases: ['"我不着急，你有空再说"', '"我就在这里，等你想清楚"', '"没事的，我习惯了"'],
-    bestMatch: 'GZLF',
-    worstMatch: 'DRLF',
     advice: '等待本身没有错，但如果等待的前提是"我不值得被优先选择"，那你等到的永远不会是爱。离开鱼塘不是输——离开鱼塘才是你真正开始被看见的那一刻。',
   },
 
@@ -558,8 +508,6 @@ export const personalities: Record<string, Personality> = {
       '"上线让我累"',
       '"一个人挺好的（诚恳）"',
     ],
-    bestMatch: 'DRNF',
-    worstMatch: 'GRNF',
     advice:
       '你对社交的低代谢率是真实的，不必为此羞愧。但关系是双向的——偶尔回一条不会要命，回错了更不会。让对方知道"我在但我慢"，比彻底消失要温柔得多。',
   },
@@ -584,8 +532,6 @@ export const personalities: Record<string, Personality> = {
       '"万一呢"',
       '"我没在意，真的"（说第四遍时自己都不信）',
     ],
-    bestMatch: 'CPU',
-    worstMatch: 'DRLF',
     advice:
       '意难平是一种消化系统问题，不是真爱。等 TA 回头的时间，够你学完一门新语言、把自己养胖五斤、或者再遇到一个也许更合适的人。把玻璃罩打开，TA 自己也会挥发掉。',
   },

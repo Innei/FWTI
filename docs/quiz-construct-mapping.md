@@ -81,6 +81,20 @@ This document defines the construct model behind the v0.4 quiz engine. Its purpo
 | Four continuous dimensions | Theory-anchored and defensible as a humorous adaptation of established constructs. |
 | 16-grid labels | Entertainment-oriented discretization of continuous dimensions. |
 | Hidden personalities and titles | Narrative overlays inspired by theory; not standard psychological categories. |
+| Compatibility | Theory-informed heuristic over the same four-dimensional space; not a validated partner-matching instrument. |
+
+## Compatibility Heuristic
+
+| Principle | Use in scoring |
+|---|---|
+| lower pair-level insecurity is better | pair midpoint is rewarded when `YF` is lower and calmer |
+| moderate equilibrium beats dual extremes | pair midpoint is nudged toward mild initiative, moderated expression, modest closeness, and low vigilance |
+| mismatch creates friction | large gaps on `NL`, `YF`, `GD`, and `ZR` are penalized |
+| pursue-withdraw is risky | one partner high-approach/high-closeness paired with the other low-approach/high-distance is explicitly penalized |
+| double hyperactivation is risky | two highly vigilant partners are penalized |
+| expressive style mismatch matters | strong `Z` versus strong `R` pairings are mildly penalized |
+
+| Implementation note | Current UI no longer reads a handwritten `bestMatch/worstMatch` table. It computes pairings from the shared four-dimensional model and surfaces the top explanatory factors as result-page rationale. |
 
 ## Literature Anchors
 

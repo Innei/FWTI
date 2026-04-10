@@ -1,6 +1,7 @@
 import { createEffect, onCleanup, For, Show } from 'solid-js';
 import { personalities } from '../data/personalities';
 import { getFamilyTheme } from '../logic/family';
+import { getCompatibilityOutcome } from '../logic/compatibility';
 import Portrait from './Portrait';
 import { previewDetail, setPreviewDetail } from '../state';
 
@@ -24,6 +25,7 @@ export function PreviewModal() {
     <Show when={previewDetail()} keyed>
       {(person) => {
         const modalTheme = getFamilyTheme(person.code);
+        const matches = getCompatibilityOutcome(person.code);
         return (
           <div
             class="preview-modal-backdrop"
@@ -105,17 +107,23 @@ export function PreviewModal() {
                 <div class="preview-modal-matches">
                   <div class="preview-modal-match best">
                     <span class="match-lbl">最佳</span>
-                    <span class="match-code">{person.bestMatch}</span>
+                    <span class="match-code">{matches.best.code}</span>
                     <span class="match-name">
-                      {personalities[person.bestMatch]?.name}
+                      {personalities[matches.best.code]?.name}
                     </span>
+                    <p class="preview-modal-match-summary">
+                      {matches.best.summary}
+                    </p>
                   </div>
                   <div class="preview-modal-match worst">
                     <span class="match-lbl">最糟</span>
-                    <span class="match-code">{person.worstMatch}</span>
+                    <span class="match-code">{matches.worst.code}</span>
                     <span class="match-name">
-                      {personalities[person.worstMatch]?.name}
+                      {personalities[matches.worst.code]?.name}
                     </span>
+                    <p class="preview-modal-match-summary">
+                      {matches.worst.summary}
+                    </p>
                   </div>
                 </div>
               </div>

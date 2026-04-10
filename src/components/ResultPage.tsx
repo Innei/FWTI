@@ -2,6 +2,7 @@ import { createSignal, For, Show } from 'solid-js';
 import { personalities } from '../data/personalities';
 import type { Result } from '../logic/scoring';
 import { getFamilyTheme, getFamily } from '../logic/family';
+import { getCompatibilityOutcome } from '../logic/compatibility';
 import Portrait from './Portrait';
 import { ShareImageModal } from './ShareImageModal';
 import { ResultNav } from './Nav';
@@ -42,6 +43,7 @@ export function ResultPage(props: {
   const [shareOpen, setShareOpen] = createSignal(false);
   const r = () => props.result;
   const p = () => r().personality;
+  const matches = () => getCompatibilityOutcome(p().code);
   const family = () => getFamily(p().code);
   const theme = () => getFamilyTheme(p().code);
 
@@ -225,44 +227,56 @@ export function ResultPage(props: {
               type="button"
               class="match-card best"
               onClick={() =>
-                setPreviewDetail(personalities[p().bestMatch] ?? null)
+                setPreviewDetail(personalities[matches().best.code] ?? null)
               }
-              aria-label={`查看 ${personalities[p().bestMatch]?.name} 详情`}
+              aria-label={`查看 ${personalities[matches().best.code]?.name} 详情`}
             >
               <Portrait
-                code={p().bestMatch}
+                code={matches().best.code}
                 size={120}
                 class="match-card-portrait"
               />
               <div class="match-card-body">
                 <div class="match-label">最佳拍档</div>
-                <div class="match-code">{p().bestMatch}</div>
+                <div class="match-code">{matches().best.code}</div>
                 <div class="match-name">
-                  {personalities[p().bestMatch]?.name}
+                  {personalities[matches().best.code]?.name}
                 </div>
                 <div class="match-hint">天造地设，惺惺相惜</div>
+                <p class="match-rationale">{matches().best.summary}</p>
+                <ul class="match-reasons">
+                  <For each={matches().best.reasons.slice(0, 2)}>
+                    {(reason) => <li>{reason}</li>}
+                  </For>
+                </ul>
               </div>
             </button>
             <button
               type="button"
               class="match-card worst"
               onClick={() =>
-                setPreviewDetail(personalities[p().worstMatch] ?? null)
+                setPreviewDetail(personalities[matches().worst.code] ?? null)
               }
-              aria-label={`查看 ${personalities[p().worstMatch]?.name} 详情`}
+              aria-label={`查看 ${personalities[matches().worst.code]?.name} 详情`}
             >
               <Portrait
-                code={p().worstMatch}
+                code={matches().worst.code}
                 size={120}
                 class="match-card-portrait"
               />
               <div class="match-card-body">
                 <div class="match-label">最怕遇到</div>
-                <div class="match-code">{p().worstMatch}</div>
+                <div class="match-code">{matches().worst.code}</div>
                 <div class="match-name">
-                  {personalities[p().worstMatch]?.name}
+                  {personalities[matches().worst.code]?.name}
                 </div>
                 <div class="match-hint">相爱相杀，避之则吉</div>
+                <p class="match-rationale">{matches().worst.summary}</p>
+                <ul class="match-reasons">
+                  <For each={matches().worst.reasons.slice(0, 2)}>
+                    {(reason) => <li>{reason}</li>}
+                  </For>
+                </ul>
               </div>
             </button>
           </div>
