@@ -17,21 +17,10 @@ export interface Result {
   dimensionLabels: { dim: string; labelA: string; labelB: string; valueA: number; valueB: number }[];
 }
 
-// 七点双极尺映射 (value 0-6) → 三选项索引 0/1/2 及权重
-// 0 → A 满强；1 → A 六成；2 → A 三成；3 → B（中立）；4 → C 三成；5 → C 六成；6 → C 满强
-const SCALE_MAP: { idx: number; weight: number }[] = [
-  { idx: 0, weight: 1 },
-  { idx: 0, weight: 0.66 },
-  { idx: 0, weight: 0.33 },
-  { idx: 1, weight: 1 },
-  { idx: 2, weight: 0.33 },
-  { idx: 2, weight: 0.66 },
-  { idx: 2, weight: 1 },
-];
-
-export function resolveScale(value: number): { idx: number; weight: number } | null {
-  if (!Number.isInteger(value) || value < 0 || value > 6) return null;
-  return SCALE_MAP[value];
+/** 每题答案为选项索引 0 = A，1 = B，2 = C */
+export function resolveOptionIndex(value: number): number | null {
+  if (!Number.isInteger(value) || value < 0 || value > 2) return null;
+  return value;
 }
 
 export function calculateScores(answers: Record<number, number>): Scores {
@@ -40,17 +29,17 @@ export function calculateScores(answers: Record<number, number>): Scores {
   for (const q of questions) {
     const raw = answers[q.id];
     if (raw === undefined) continue;
-    const resolved = resolveScale(raw);
-    if (!resolved) continue;
-    const option = q.options[resolved.idx];
+    const idx = resolveOptionIndex(raw);
+    if (idx === null) continue;
+    const option = q.options[idx];
     if (!option) continue;
 
     if (q.tag === '彩蛋') {
-      scores.hidden += (option.hidden ?? 0) * resolved.weight;
+      scores.hidden += option.hidden ?? 0;
       continue;
     }
 
-    const delta = option.score * resolved.weight;
+    const delta = option.score;
     switch (q.dimension) {
       case 'GD': scores.GD += delta; break;
       case 'ZR': scores.ZR += delta; break;

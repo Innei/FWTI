@@ -12,7 +12,6 @@ import { getResult, type Result } from './logic/scoring';
 import { encodeAnswers, decodeAnswers } from './logic/codec';
 import { getFamilyTheme, FAMILY_THEMES, getFamily } from './logic/family';
 import PersonalityIcon from './components/PersonalityIcon';
-import QuestionScale from './components/QuestionScale';
 
 const totalQ = questions.length;
 const [answers, setAnswers] = createSignal<Record<number, number>>({});
@@ -54,8 +53,8 @@ function QuizRoute() {
 
   const progress = () => Object.keys(answers()).length;
 
-  function selectOption(qId: number, scaleIdx: number) {
-    setAnswers((prev) => ({ ...prev, [qId]: scaleIdx }));
+  function selectOption(qId: number, optionIdx: number) {
+    setAnswers((prev) => ({ ...prev, [qId]: optionIdx }));
     // 滚动至下一未答题
     queueMicrotask(() => scrollToNextUnanswered(qId));
   }
@@ -217,7 +216,7 @@ function QuizPage(props: {
   totalQ: number;
   progress: number;
   answers: Record<number, number>;
-  onSelect: (qId: number, scaleIdx: number) => void;
+  onSelect: (qId: number, optionIdx: number) => void;
   onSubmit: () => void;
   canSubmit: boolean;
 }) {
@@ -236,11 +235,7 @@ function QuizPage(props: {
 
       <div class="quiz-list">
         <For each={questions}>
-          {(q, idx) => {
-            const optA = q.options[0];
-            const optC = q.options[q.options.length - 1];
-            const optB = q.options.length === 3 ? q.options[1] : null;
-            return (
+          {(q, idx) => (
               <article id={`q-${q.id}`} class="quiz-item">
                 <div class="quiz-item-head">
                   <span class="quiz-item-num">Q{String(q.id).padStart(2, '0')}</span>
@@ -250,35 +245,37 @@ function QuizPage(props: {
                 </div>
                 <p class="quiz-item-text">{q.text}</p>
 
-                <div class="quiz-item-poles">
-                  <div class="pole pole-a">
-                    <div class="pole-badge" style={{ background: 'var(--fwti-green)' }}>A</div>
-                    <div class="pole-text">{optA?.text}</div>
-                  </div>
-                  <Show when={optB}>
-                    <div class="pole pole-b">
-                      <div class="pole-badge pole-badge-neutral">B</div>
-                      <div class="pole-text">{optB!.text}</div>
-                    </div>
-                  </Show>
-                  <div class="pole pole-c">
-                    <div class="pole-badge" style={{ background: '#576071' }}>C</div>
-                    <div class="pole-text">{optC?.text}</div>
-                  </div>
+                <div class="quiz-options" role="group" aria-label="选项">
+                  <For each={q.options}>
+                    {(opt, oi) => {
+                      const badgeClass = () => {
+                        const L = opt.label;
+                        if (L === 'A') return 'quiz-opt-badge quiz-opt-badge-a';
+                        if (L === 'B') return 'quiz-opt-badge quiz-opt-badge-b';
+                        return 'quiz-opt-badge quiz-opt-badge-c';
+                      };
+                      return (
+                        <button
+                          type="button"
+                          class="quiz-opt"
+                          classList={{ 'is-selected': () => props.answers[q.id] === oi() }}
+                          aria-pressed={() => props.answers[q.id] === oi()}
+                          aria-label={`选项 ${opt.label}`}
+                          onClick={() => props.onSelect(q.id, oi())}
+                        >
+                          <span class={badgeClass()}>{opt.label}</span>
+                          <span class="quiz-opt-text">{opt.text}</span>
+                        </button>
+                      );
+                    }}
+                  </For>
                 </div>
 
-                <QuestionScale
-                  value={props.answers[q.id]}
-                  onSelect={(v) => props.onSelect(q.id, v)}
-                  leftLabel="偏 A"
-                  rightLabel="偏 C"
-                />
                 <div class="quiz-item-meter">
                   <span>{idx() + 1} / {props.totalQ}</span>
                 </div>
               </article>
-            );
-          }}
+          )}
         </For>
       </div>
 
@@ -953,25 +950,40 @@ const globalStyles = `
     margin-bottom: 32px;
     max-width: 560px;
   }
-  .quiz-item-poles {
+  .quiz-options {
     width: 100%;
     max-width: 620px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-bottom: 28px;
+    margin-bottom: 8px;
     text-align: left;
   }
-  .pole {
+  .quiz-opt {
     display: flex;
     align-items: flex-start;
     gap: 12px;
+    width: 100%;
     padding: 12px 16px;
     background: var(--fwti-bg-soft);
-    border: 1px solid var(--fwti-border);
+    border: 2px solid var(--fwti-border);
     border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
   }
-  .pole-badge {
+  .quiz-opt:hover {
+    border-color: rgba(51, 164, 116, 0.35);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  }
+  .quiz-opt.is-selected {
+    border-color: var(--fwti-green);
+    background: var(--fwti-bg-tint);
+    box-shadow: 0 0 0 1px rgba(51, 164, 116, 0.2);
+  }
+  .quiz-opt-badge {
     flex-shrink: 0;
     width: 26px;
     height: 26px;
@@ -985,10 +997,10 @@ const globalStyles = `
     font-size: 12px;
     letter-spacing: 0.02em;
   }
-  .pole-badge-neutral {
-    background: var(--fwti-text-soft) !important;
-  }
-  .pole-text {
+  .quiz-opt-badge-a { background: var(--fwti-green); }
+  .quiz-opt-badge-b { background: var(--fwti-text-soft); }
+  .quiz-opt-badge-c { background: #576071; }
+  .quiz-opt-text {
     flex: 1;
     font-size: 14px;
     line-height: 1.55;
@@ -1000,51 +1012,6 @@ const globalStyles = `
     font-size: 12px;
     color: var(--fwti-text-soft);
     letter-spacing: 0.08em;
-  }
-
-  /* ===== QUESTION SCALE ===== */
-  .qs {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    flex-wrap: nowrap;
-    width: 100%;
-    max-width: 620px;
-  }
-  .qs-label {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    min-width: 42px;
-    text-transform: uppercase;
-  }
-  .qs-label-left { text-align: right; }
-  .qs-label-right { text-align: left; }
-  .qs-dots {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .qs-dot {
-    border-radius: 50%;
-    background: transparent;
-    border: 2.5px solid var(--qs-color);
-    cursor: pointer;
-    padding: 0;
-    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
-    flex-shrink: 0;
-  }
-  .qs-dot:hover {
-    transform: scale(1.08);
-    box-shadow: 0 0 0 6px rgba(51, 164, 116, 0.08);
-  }
-  .qs-dot.is-selected {
-    background: var(--qs-color);
-    box-shadow: 0 0 0 6px rgba(51, 164, 116, 0.12);
-  }
-  .qs-dot-center {
-    border-width: 2px;
   }
 
   /* ===== SUBMIT BAR ===== */
@@ -1478,9 +1445,6 @@ const globalStyles = `
     .quiz-hero-title { font-size: 24px; }
     .quiz-list { padding: 28px 20px; gap: 56px; }
     .quiz-item-text { font-size: 21px; }
-    .qs { gap: 8px; }
-    .qs-dots { gap: 6px; }
-    .qs-label { min-width: 36px; font-size: 11px; }
     .submit-bar { padding: 10px 16px; }
     .submit-bar-inner { gap: 14px; }
     .submit-bar .btn { padding: 11px 18px; font-size: 13px; }
