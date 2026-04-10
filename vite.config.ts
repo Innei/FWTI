@@ -1,15 +1,12 @@
 import { defineConfig } from 'vite'
 import solidPlugin from 'vite-plugin-solid'
+import vike from 'vike/plugin'
 
 export default defineConfig({
-  plugins: [solidPlugin()],
+  plugins: [vike(), solidPlugin({ ssr: true })],
   server: {
     port: 3000,
   },
-  resolve: {
-    tsconfigPaths: true,
-  },
-
   build: {
     target: 'esnext',
   },

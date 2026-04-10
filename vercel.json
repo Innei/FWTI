@@ -1,7 +1,9 @@
 {
+  "outputDirectory": "dist/client",
+  "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/((?!assets/).*)",
+      "source": "/result/(.*)",
       "destination": "/index.html"
     }
   ]

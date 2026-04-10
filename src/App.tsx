@@ -1,162 +1,39 @@
 import {
   createSignal,
-  createMemo,
   createEffect,
   onCleanup,
   Show,
   For,
   type JSX,
 } from 'solid-js';
-import {
-  Router,
-  Route,
-  Navigate,
-  useNavigate,
-  useParams,
-} from '@solidjs/router';
 import { questions } from './data/questions';
 import {
   personalities,
   hiddenTitle,
   type Personality,
 } from './data/personalities';
-import { getResult, type Result } from './logic/scoring';
-import { encodeAnswers, decodeAnswers } from './logic/codec';
+import { type Result } from './logic/scoring';
 import { getFamilyTheme, FAMILY_THEMES, getFamily } from './logic/family';
 import Portrait from './components/Portrait';
 
 const GITHUB_REPO_URL = 'https://github.com/Innei/fwti';
 
-const totalQ = questions.length;
-const [answers, setAnswers] = createSignal<Record<number, number>>({});
+export const totalQ = questions.length;
+export const [answers, setAnswers] = createSignal<Record<number, number>>({});
+const [previewDetail, setPreviewDetail] = createSignal<Personality | null>(null);
 
-export default function App() {
-  return (
-    <Router root={Layout}>
-      <Route path="/" component={HomeRoute} />
-      <Route path="/quiz" component={QuizRoute} />
-      <Route path="/result/:hash" component={ResultRoute} />
-      <Route path="*" component={() => <Navigate href="/" />} />
-    </Router>
-  );
-}
-
-function Layout(props: { children?: JSX.Element }) {
+export function Layout(props: { children?: JSX.Element }) {
   return (
     <>
       <style>{globalStyles}</style>
       <div class="app">{props.children}</div>
+      <PreviewModal />
     </>
   );
 }
 
-function HomeRoute() {
-  const navigate = useNavigate();
-  return (
-    <HomePage
-      onStart={() => {
-        setAnswers({});
-        navigate('/quiz');
-      }}
-    />
-  );
-}
-
-function QuizRoute() {
-  const navigate = useNavigate();
-
-  const progress = () => Object.keys(answers()).length;
-
-  function selectOption(qId: number, optionIdx: number) {
-    setAnswers((prev) => ({ ...prev, [qId]: optionIdx }));
-    // 滚动至下一未答题
-    queueMicrotask(() => scrollToNextUnanswered(qId));
-  }
-
-  function scrollToNextUnanswered(fromId: number) {
-    const cur = answers();
-    for (let i = 0; i < questions.length; i++) {
-      const q = questions[i];
-      if (q.id <= fromId) continue;
-      if (cur[q.id] === undefined) {
-        const el = document.getElementById(`q-${q.id}`);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        return;
-      }
-    }
-    // 全答：滚至底栏
-    const submit = document.getElementById('submit-bar');
-    if (submit) submit.scrollIntoView({ behavior: 'smooth', block: 'end' });
-  }
-
-  function submitQuiz() {
-    const encoded = encodeAnswers(answers(), totalQ);
-    navigate(`/result/${encoded}`);
-  }
-
-  return (
-    <QuizPage
-      totalQ={totalQ}
-      progress={progress()}
-      answers={answers()}
-      onSelect={selectOption}
-      onSubmit={submitQuiz}
-      canSubmit={progress() >= totalQ}
-    />
-  );
-}
-
-function ResultRoute() {
-  const params = useParams();
-  const navigate = useNavigate();
-
-  const result = createMemo<Result | null>(() => {
-    const hash = params.hash;
-    if (!hash) return null;
-    const decoded = decodeAnswers(hash, totalQ);
-    if (!decoded) return null;
-    for (let i = 1; i <= totalQ; i++) {
-      if (decoded[i] === undefined) return null;
-    }
-    return getResult(decoded);
-  });
-
-  return (
-    <Show when={result()} fallback={<Navigate href="/" />}>
-      <ResultPage
-        result={result()!}
-        onRestart={() => {
-          setAnswers({});
-          navigate('/');
-        }}
-      />
-    </Show>
-  );
-}
-
 /* ===== HOME PAGE ===== */
-function HomePage(props: { onStart: () => void }) {
-  const [previewDetail, setPreviewDetail] = createSignal<Personality | null>(
-    null,
-  );
-
-  createEffect(() => {
-    const p = previewDetail();
-    if (p) {
-      document.body.style.overflow = 'hidden';
-      const onKey = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') setPreviewDetail(null);
-      };
-      window.addEventListener('keydown', onKey);
-      onCleanup(() => {
-        document.body.style.overflow = '';
-        window.removeEventListener('keydown', onKey);
-      });
-    }
-  });
-
+export function HomePage(props: { onStart: () => void }) {
   return (
     <div class="page home-page">
       <TopNav meta="v1.0 · 娱乐测试" />
@@ -241,11 +118,31 @@ function HomePage(props: { onStart: () => void }) {
           请勿用于相亲、挽回、分手或发律师函。
         </p>
       </footer>
+    </div>
+  );
+}
 
-      <Show when={previewDetail()} keyed>
-        {(person) => {
-          const modalTheme = getFamilyTheme(person.code);
-          return (
+function PreviewModal() {
+  createEffect(() => {
+    const p = previewDetail();
+    if (p) {
+      document.body.style.overflow = 'hidden';
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') setPreviewDetail(null);
+      };
+      window.addEventListener('keydown', onKey);
+      onCleanup(() => {
+        document.body.style.overflow = '';
+        window.removeEventListener('keydown', onKey);
+      });
+    }
+  });
+
+  return (
+    <Show when={previewDetail()} keyed>
+      {(person) => {
+        const modalTheme = getFamilyTheme(person.code);
+        return (
           <div
             class="preview-modal-backdrop"
             role="presentation"
@@ -317,11 +214,11 @@ function HomePage(props: { onStart: () => void }) {
 
               <div class="preview-modal-section">
                 <div class="preview-modal-section-title">口头禅</div>
-                <div class="preview-modal-phrases">
+                <ul class="preview-modal-phrases">
                   <For each={person.catchphrases}>
-                    {(c) => <div class="preview-modal-phrase">{c}</div>}
+                    {(c) => <li>{c}</li>}
                   </For>
-                </div>
+                </ul>
               </div>
 
               <div class="preview-modal-section">
@@ -350,10 +247,9 @@ function HomePage(props: { onStart: () => void }) {
               </div>
             </div>
           </div>
-          );
-        }}
-      </Show>
-    </div>
+        );
+      }}
+    </Show>
   );
 }
 
@@ -367,7 +263,7 @@ function Tip(props: { title: string; desc: string }) {
 }
 
 /* ===== QUIZ PAGE ===== */
-function QuizPage(props: {
+export function QuizPage(props: {
   totalQ: number;
   progress: number;
   answers: Record<number, number>;
@@ -462,7 +358,7 @@ function QuizPage(props: {
 }
 
 /* ===== RESULT PAGE ===== */
-function ResultPage(props: { result: Result; onRestart: () => void }) {
+export function ResultPage(props: { result: Result; onRestart: () => void }) {
   const r = () => props.result;
   const p = () => r().personality;
   const family = () => getFamily(p().code);
@@ -577,18 +473,46 @@ function ResultPage(props: { result: Result; onRestart: () => void }) {
           <div class="section-eyebrow">配对 · Compatibility</div>
           <h2 class="section-title">缘分图谱</h2>
           <div class="match-grid">
-            <div class="match-card best">
-              <div class="match-label">最佳拍档</div>
-              <div class="match-code">{p().bestMatch}</div>
-              <div class="match-name">{personalities[p().bestMatch]?.name}</div>
-              <div class="match-hint">天造地设，惺惺相惜</div>
-            </div>
-            <div class="match-card worst">
-              <div class="match-label">最怕遇到</div>
-              <div class="match-code">{p().worstMatch}</div>
-              <div class="match-name">{personalities[p().worstMatch]?.name}</div>
-              <div class="match-hint">相爱相杀，避之则吉</div>
-            </div>
+            <button
+              type="button"
+              class="match-card best"
+              onClick={() =>
+                setPreviewDetail(personalities[p().bestMatch] ?? null)
+              }
+              aria-label={`查看 ${personalities[p().bestMatch]?.name} 详情`}
+            >
+              <Portrait
+                code={p().bestMatch}
+                size={120}
+                class="match-card-portrait"
+              />
+              <div class="match-card-body">
+                <div class="match-label">最佳拍档</div>
+                <div class="match-code">{p().bestMatch}</div>
+                <div class="match-name">{personalities[p().bestMatch]?.name}</div>
+                <div class="match-hint">天造地设，惺惺相惜</div>
+              </div>
+            </button>
+            <button
+              type="button"
+              class="match-card worst"
+              onClick={() =>
+                setPreviewDetail(personalities[p().worstMatch] ?? null)
+              }
+              aria-label={`查看 ${personalities[p().worstMatch]?.name} 详情`}
+            >
+              <Portrait
+                code={p().worstMatch}
+                size={120}
+                class="match-card-portrait"
+              />
+              <div class="match-card-body">
+                <div class="match-label">最怕遇到</div>
+                <div class="match-code">{p().worstMatch}</div>
+                <div class="match-name">{personalities[p().worstMatch]?.name}</div>
+                <div class="match-hint">相爱相杀，避之则吉</div>
+              </div>
+            </button>
           </div>
         </section>
 
@@ -1323,19 +1247,23 @@ const globalStyles = `
   }
 
   .preview-modal-phrases {
+    list-style: none;
+    padding: 0;
+    margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
   }
-  .preview-modal-phrase {
-    padding: 2px 0 2px 14px;
-    border-left: 2px solid #e4e4e7;
-    background: transparent;
-    border-radius: 0;
+  .preview-modal-phrases li {
     font-size: 14px;
-    line-height: 1.65;
+    line-height: 1.75;
     color: #52525b;
     font-style: italic;
+  }
+  .preview-modal-phrases li::before {
+    content: "— ";
+    color: #a1a1aa;
+    font-style: normal;
   }
 
   .preview-modal-matches {
@@ -1900,18 +1828,47 @@ const globalStyles = `
     gap: 20px;
   }
   .match-card {
+    appearance: none;
+    -webkit-appearance: none;
+    font: inherit;
+    color: inherit;
+    width: 100%;
     background: var(--fwti-bg);
     border: 1px solid var(--fwti-border);
     border-radius: 16px;
-    padding: 28px 26px;
+    padding: 24px 24px 24px 12px;
     text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .match-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+  }
+  .match-card:focus-visible {
+    outline: 2px solid var(--fwti-accent);
+    outline-offset: 3px;
   }
   .match-card.best {
     background: var(--fwti-accent-tint);
     border-color: var(--fwti-accent);
   }
+  .match-card.best:hover {
+    border-color: var(--fwti-accent);
+  }
   .match-card.worst {
     background: var(--fwti-bg-soft);
+  }
+  .match-card-portrait {
+    flex: 0 0 auto;
+    width: 120px;
+  }
+  .match-card-body {
+    flex: 1 1 auto;
+    min-width: 0;
   }
   .match-label {
     font-size: 11px;
