@@ -153,16 +153,18 @@ export const hiddenPersonalityTriggers: HiddenPersonalityTrigger[] = [
       a.ratio.YF >= 0.9,
   },
 
-  // RAT · 鼠鼠恋人 — 沿用 v0.3 语义：solo + D废 + Z废 + N废 + Y至顶。
-  // 鼠鼠的典型画像是"不敢主动（D）+ 抱怨外放（Z）+ 渴望贴近（N）+ 焦虑满格（Y）"。
+  // RAT · 鼠鼠恋人 — solo + D + R + L + Y（退缩、抑制、拉远、焦虑）
+  // 人格文案核心："不敢按赞 / 默默锁屏 / 鼠鼠我啊 不配"——此乃 deactivating 退避
+  // 策略 + 高焦虑的混合依恋型，非"抱怨外放"。Shaver/Mikulincer 直接支持。
+  // 旧 v0.4 初版 ZR/NL 两维写反（误作 Z + N），与文案与 DRAFT 皆脱节，今改。
   {
     code: 'RAT',
     test: (a) =>
       a.status === 'solo' &&
-      a.ratio.GD < 0 &&
-      a.ratio.ZR > 0 &&
-      a.ratio.NL > 0 &&
-      a.ratio.YF >= 0.85,
+      a.ratio.GD <= -0.6 &&
+      a.ratio.ZR <= -0.4 &&
+      a.ratio.NL <= -0.4 &&
+      a.ratio.YF >= 0.8,
   },
 
   // PURE · 纯爱战士 — solo / crush + G/N 至顶 + F 至顶（信念型，而非跪舔型）
@@ -207,15 +209,18 @@ export const hiddenPersonalityTriggers: HiddenPersonalityTrigger[] = [
       a.polarityAt('POST_DATE_TEXT') > 0,
   },
 
-  // BENCH · 备胎之王 — ambiguous + 显性 GRLF + 害怕被嫌烦 + 查岗异性点赞
+  // BENCH · 备胎之王 — ambiguous + 主动不低（G）+ 情绪压抑（R）+ 拉远距离（L）+
+  // **隐性焦虑 Y**（文案核心："表面云淡风轻，内心默默数着上一次被回应是多久以前"
+  // 属 hyperactivating 反刍，非 deactivating 佛系）+ 异性点赞触发嫉妒锚。
+  // 旧 v0.4 初版此处 YF < 0 系极性写反，把佛系者误判进 BENCH、把真焦虑型排除。
   {
     code: 'BENCH',
     test: (a) =>
       a.status === 'ambiguous' &&
-      a.ratio.GD > 0 &&
-      a.ratio.ZR < 0 &&
-      a.ratio.NL < 0 &&
-      a.ratio.YF < 0 &&
+      a.ratio.GD >= 0.2 &&
+      a.ratio.ZR <= -0.4 &&
+      a.ratio.NL <= -0.2 &&
+      a.ratio.YF >= 0.4 &&
       a.polarityAt('LIKE_OTHER_GENDER') > 0,
   },
 
