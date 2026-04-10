@@ -1394,6 +1394,11 @@ body {
   margin-top: 8px;
   font-style: italic;
 }
+.result-tied-closest {
+  color: var(--fwti-accent, var(--fwti-text));
+  font-weight: 600;
+  font-style: normal;
+}
 
 /* Sections */
 .section-eyebrow {

@@ -1,11 +1,20 @@
 import { navigate } from 'vike/client/router'
-import { QuizPage, answers, setAnswers, totalQ } from '../../src/App'
-import { questions } from '../../src/data/questions'
-import { applyAnswerSelection } from '../../src/logic/answers'
+import { QuizPage, answers, setAnswers, mainQ } from '../../src/App'
+import { questions, questionIds } from '../../src/data/questions'
+import { metaQuestionId, applyAnswerSelection } from '../../src/logic/answers'
 import { encodeAnswers } from '../../src/logic/codec'
 
 export default function Page() {
-  const progress = () => Object.keys(answers()).length
+  const metaAnswered = () => answers()[metaQuestionId] !== undefined
+  const mainProgress = () => {
+    const cur = answers()
+    let n = 0
+    for (const q of questions) {
+      if (q.dimension === 'META') continue
+      if (cur[q.id] !== undefined) n += 1
+    }
+    return n
+  }
 
   function selectOption(qId: number, optionIdx: number) {
     setAnswers((prev) => applyAnswerSelection(prev, qId, optionIdx))
@@ -14,19 +23,11 @@ export default function Page() {
 
   function scrollToNextUnanswered(fromId: number) {
     const cur = answers()
-    // 找到当前题在数组中的位置，然后向后（按 array 顺序）找第一道未答题
+    // 从当前题的下一题开始、环形扫描一圈找第一道未答题
+    const n = questions.length
     const fromIdx = questions.findIndex((q) => q.id === fromId)
-    for (let i = fromIdx + 1; i < questions.length; i++) {
-      const q = questions[i]
-      if (cur[q.id] === undefined) {
-        const el = document.getElementById(`q-${q.id}`)
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        return
-      }
-    }
-    // 向后都答完了，再从头扫一遍兜底
-    for (let i = 0; i < questions.length; i++) {
-      const q = questions[i]
+    for (let step = 1; step <= n; step++) {
+      const q = questions[(fromIdx + step) % n]
       if (cur[q.id] === undefined) {
         const el = document.getElementById(`q-${q.id}`)
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -38,18 +39,19 @@ export default function Page() {
   }
 
   function submitQuiz() {
-    const encoded = encodeAnswers(answers(), totalQ)
+    const encoded = encodeAnswers(answers(), questionIds)
     void navigate(`/result/${encoded}`)
   }
 
   return (
     <QuizPage
-      totalQ={totalQ}
-      progress={progress()}
+      mainTotal={mainQ}
+      mainProgress={mainProgress()}
+      metaAnswered={metaAnswered()}
       answers={answers()}
       onSelect={selectOption}
       onSubmit={submitQuiz}
-      canSubmit={progress() >= totalQ}
+      canSubmit={metaAnswered() && mainProgress() >= mainQ}
     />
   )
 }

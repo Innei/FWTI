@@ -129,6 +129,17 @@ export const questions: Question[] = [
       { label: 'B', text: '疯狂暗示，希望 TA 能领悟', score: 0 },
       { label: 'C', text: '表什么白，TA 不说我就把这份爱带进坟墓', score: -2 },
     ],
+    variants: {
+      dating: {
+        text: '回忆一下你和对象还在暧昧的那会儿，你是主动表白的那一方吗？',
+      },
+      crush: {
+        text: '想象你和心里藏着的那个人发展到暧昧阶段，你会主动表白吗？',
+      },
+      solo: {
+        text: '想象你正在暧昧期，你会主动表白吗？',
+      },
+    },
   },
   {
     id: 5,
@@ -191,6 +202,17 @@ export const questions: Question[] = [
       { label: 'B', text: '就事论事，吵完拉倒', score: 0 },
       { label: 'C', text: '沉默是金，你吵你的，我的嘴是缝上的', score: -2 },
     ],
+    variants: {
+      ambiguous: {
+        text: '暧昧中的你们因为小事起了摩擦，你的反应是？',
+      },
+      crush: {
+        text: '想象你和心里藏着的那个人在一起后因为小事吵架，你的吵架风格是？',
+      },
+      solo: {
+        text: '想象你谈恋爱了，和对象因为小事吵架，你的吵架风格是？',
+      },
+    },
   },
   {
     id: 11,
@@ -201,6 +223,17 @@ export const questions: Question[] = [
       { label: 'B', text: '有点失望，找个机会委婉提醒', score: 0 },
       { label: 'C', text: '默默记了一笔账，不说，但永远不忘', score: -2 },
     ],
+    variants: {
+      ambiguous: {
+        text: '暧昧中的 TA 忘了一个对你有意义的日子（约好的电话 / 第一次见面的纪念 / 你特意打扮给 TA 看那天），你会？',
+      },
+      crush: {
+        text: '想象你们在一起了，TA 忘了一个对你很重要的日子（生日 / 纪念日 / 你新裙子第一次穿给 TA 看），你会？',
+      },
+      solo: {
+        text: '想象你恋爱了，对象忘了一个对你很重要的日子（生日 / 纪念日 / 你新裙子第一次穿给 TA 看），你会？',
+      },
+    },
   },
   {
     id: 12,
@@ -211,6 +244,11 @@ export const questions: Question[] = [
       { label: 'B', text: '找朋友倾诉一下就好了', score: 0 },
       { label: 'C', text: '自己消化，谁也不告诉，假装没事', score: -2 },
     ],
+    variants: {
+      solo: {
+        text: '想象你在一段恋爱里受了委屈（或者回忆过去任何一次），你通常会？',
+      },
+    },
   },
   {
     id: 13,
@@ -241,6 +279,17 @@ export const questions: Question[] = [
       { label: 'B', text: '当时忍住，回家关起门来算账', score: 0 },
       { label: 'C', text: '吞了，可能 TA 是无心的吧（但我记住了）', score: -2 },
     ],
+    variants: {
+      ambiguous: {
+        text: '暧昧中的 TA 当着朋友的面说了让你没面子的话，你会？',
+      },
+      crush: {
+        text: '想象你和心里藏着的那个人在一起了，TA 当着朋友的面说了让你没面子的话，你会？',
+      },
+      solo: {
+        text: '想象你对象当着朋友的面说了让你没面子的话，你会？',
+      },
+    },
   },
 
   // ===== 维度三：N/L — 亲密需求（8 题）=====
@@ -416,6 +465,11 @@ export const questions: Question[] = [
       { label: 'B', text: '开心但有一点点疑惑', score: 0 },
       { label: 'C', text: '收礼物嘛，开心就好，想那么多干嘛', score: -2 },
     ],
+    variants: {
+      solo: {
+        text: '想象你对象突然对你特别好、送了你一个礼物，你会想什么？',
+      },
+    },
   },
   {
     id: 26,
@@ -426,6 +480,11 @@ export const questions: Question[] = [
       { label: 'B', text: '偶尔无意间看到会在意一下', score: 0 },
       { label: 'C', text: '从来没有，也没兴趣', score: -2 },
     ],
+    variants: {
+      solo: {
+        text: '想象你恋爱了，你会翻对象的聊天记录 / 朋友圈考古吗？',
+      },
+    },
   },
   {
     id: 27,
@@ -451,6 +510,11 @@ export const questions: Question[] = [
       { label: 'B', text: '怎么了？有点紧张', score: 0 },
       { label: 'C', text: '嗯，你说', score: -2 },
     ],
+    variants: {
+      solo: {
+        text: '想象你对象说"我有个事想跟你说"，你的第一反应是？',
+      },
+    },
   },
   {
     id: 29,
@@ -491,3 +555,15 @@ export const questions: Question[] = [
     ],
   },
 ];
+
+/**
+ * 编解码用的稳定题目顺序：按 ID 升序。
+ *
+ * 不直接用 questions.map(q => q.id) 是因为题库数组顺序（META 放最前）
+ * 跟 v1 URL 的字节布局（位置 i = 答案 id = i+1）不一致；
+ * 排序后 [1, 2, ..., 30, 31, 32] 正好与旧 URL 兼容，并且将来如果插入
+ * 跳号 ID 也不会破坏现有分享链接。
+ */
+export const questionIds: readonly number[] = questions
+  .map((q) => q.id)
+  .sort((a, b) => a - b);

@@ -1,2 +1,4 @@
 .vercel
 .superpowers
+node_modules
+dist

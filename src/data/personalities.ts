@@ -51,7 +51,7 @@ export const personalities: Record<string, Personality> = {
     traits: [
       '恋爱后朋友圈画风突变，全是撒狗粮',
       'TA 放个屁你都觉得是爱的信号',
-      '为 TA 可以取消任何计划，包括但不限于亲爹生日',
+      '为 TA 可以取消任何计划，包括但不限于家里人的生日',
     ],
     catchphrases: ['"你开心就好！"', '"宝宝今天想吃什么？我去买！"', '"我没有朋友了？有你就够了啊"'],
     bestMatch: 'DZLF',
@@ -179,8 +179,8 @@ export const personalities: Record<string, Personality> = {
       '恋爱之外有完整的自我和社交',
       '能跟 TA 好好沟通，不用猜，不用作',
     ],
-    catchphrases: ['"有什么事我们聊聊？"', '"我需要一些自己的时间，不是不爱你"', '"（真没有什么金句，正常人不需要金句）"'],
-    bestMatch: 'GRLF',
+    catchphrases: ['"有什么事我们聊聊？"', '"我需要一些自己的时间，不是不爱你"', '"我也会生气，但咱们不靠猜。"'],
+    bestMatch: 'DRNF',
     worstMatch: 'GZNY',
     advice: '你已经很好了。唯一的建议是偶尔允许自己犯一点傻，恋爱嘛，太理性了也少了点味道。',
   },
@@ -245,7 +245,7 @@ export const personalities: Record<string, Personality> = {
     ],
     catchphrases: ['"随便你"（求你别随便）', '"我不需要任何人"（需要，很需要）', '"你走啊"（别走别走别走）'],
     bestMatch: 'GRNF',
-    worstMatch: 'DZLY',
+    worstMatch: 'DRLY',
     advice: '那些被你推开的人，不一定都会转身离开。但他们需要你告诉他们："我其实很害怕。"',
   },
   DZLF: {

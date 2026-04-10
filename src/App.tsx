@@ -33,7 +33,15 @@ import './global.css'
 
 const GITHUB_REPO_URL = 'https://github.com/Innei/fwti'
 
-export const totalQ = questions.length
+/**
+ * 正题题库数量（排除 META 前置题，但**包含**彩蛋题 id=31）。
+ * 对外文案与进度条统一以这个数字为准——DRAFT 里承诺的是"三十一道灵魂拷问"
+ * （= 30 道主线题 + 1 道隐藏彩蛋题 = 31），前置题只是语境路由，不计入题目计数。
+ *
+ * 注意：scoring.ts 里做"空想家"极端答题统计时，会再从这 31 题里剔除彩蛋得到 30，
+ * 那是 DRAFT 中"主线题"的定义，跟这里的 mainQ 是两个不同口径，别弄混。
+ */
+export const mainQ = questions.filter((q) => q.dimension !== 'META').length
 export const [answers, setAnswers] = createSignal<Record<number, number>>({})
 const [previewDetail, setPreviewDetail] = createSignal<Personality | null>(null)
 
@@ -309,31 +317,53 @@ function ResultCodeLine(props: { text: string }) {
 
 /* ===== QUIZ PAGE ===== */
 export function QuizPage(props: {
-  totalQ: number
-  progress: number
+  /** 正题题库总数（不含前置题） */
+  mainTotal: number
+  /** 已作答的正题数量 */
+  mainProgress: number
+  /** 前置题是否已作答 */
+  metaAnswered: boolean
   answers: Record<number, number>
   onSelect: (qId: number, optionIdx: number) => void
   onSubmit: () => void
   canSubmit: boolean
 }) {
-  const pct = () => Math.round((props.progress / props.totalQ) * 100)
+  const pct = () => Math.round((props.mainProgress / props.mainTotal) * 100)
   // 根据前置题结果，派生当前的关系语境；未选时为 null（使用默认题干）
   const status = (): RelationshipStatus => getRelationshipStatus(props.answers)
+  // 把正题在数组里的位置映射成 1..mainTotal 的连续序号（跳过前置题）
+  const mainIndexMap = new Map<number, number>()
+  let runningIdx = 0
+  for (const q of questions) {
+    if (q.dimension === 'META') continue
+    runningIdx += 1
+    mainIndexMap.set(q.id, runningIdx)
+  }
+  const mainLeft = () => Math.max(0, props.mainTotal - props.mainProgress)
+  const submitLabel = () => {
+    if (props.canSubmit) return '查看结果'
+    if (!props.metaAnswered) return '请先完成前置题'
+    return `还差 ${mainLeft()} 题`
+  }
 
   return (
     <div class="page quiz-page">
-      <TopNav meta={`进行中 · ${props.progress} / ${props.totalQ}`} />
+      <TopNav
+        meta={`进行中 · ${props.mainProgress} / ${props.mainTotal}`}
+      />
 
       <section class="quiz-hero">
         <div class="quiz-hero-inner">
           <h1 class="quiz-hero-title">恋爱废物人格测试</h1>
-          <p class="quiz-hero-sub">据实作答，勿过虑，题题必选</p>
+          <p class="quiz-hero-sub">
+            据实作答，勿过虑，题题必选；若场景不适用，请按前置题所选语境代入想象。
+          </p>
         </div>
       </section>
 
       <div class="quiz-list">
         <For each={questions}>
-          {(q, idx) => (
+          {(q) => (
             <article id={`q-${q.id}`} class="quiz-item">
               <div class="quiz-item-head">
                 <Show
@@ -341,7 +371,7 @@ export function QuizPage(props: {
                   fallback={<span class="quiz-item-num quiz-item-num-meta">前置</span>}
                 >
                   <span class="quiz-item-num">
-                    Q{String(q.id).padStart(2, '0')}
+                    Q{String(mainIndexMap.get(q.id) ?? 0).padStart(2, '0')}
                   </span>
                 </Show>
                 <Show when={q.tag && q.dimension !== 'META'}>
@@ -350,7 +380,9 @@ export function QuizPage(props: {
               </div>
               <p class="quiz-item-text">{resolveQuestionText(q, status())}</p>
               <Show when={q.dimension === 'META'}>
-                <p class="quiz-item-note">若稍后更改此前置项，后续答案会自动重置。</p>
+                <p class="quiz-item-note">
+                  前置题只用于语境路由，不计分；若稍后更改此项，后续答案会自动重置。
+                </p>
               </Show>
 
               <div class="quiz-options" role="group" aria-label="选项">
@@ -383,11 +415,13 @@ export function QuizPage(props: {
                 </For>
               </div>
 
-              <div class="quiz-item-meter">
-                <span>
-                  {idx() + 1} / {props.totalQ}
-                </span>
-              </div>
+              <Show when={q.dimension !== 'META'}>
+                <div class="quiz-item-meter">
+                  <span>
+                    {mainIndexMap.get(q.id) ?? 0} / {props.mainTotal}
+                  </span>
+                </div>
+              </Show>
             </article>
           )}
         </For>
@@ -409,11 +443,7 @@ export function QuizPage(props: {
             onClick={props.onSubmit}
             disabled={!props.canSubmit}
           >
-            <span>
-              {props.canSubmit
-                ? '查看结果'
-                : `还差 ${props.totalQ - props.progress} 题`}
-            </span>
+            <span>{submitLabel()}</span>
             <Show when={props.canSubmit}>
               <span class="btn-arrow" aria-hidden="true">
                 →
@@ -457,9 +487,18 @@ export function ResultPage(props: { result: Result; onRestart: () => void }) {
               <p class="result-slang">{p().cnSlang}</p>
             </Show>
             <ResultCodeLine text={r().displayCode} />
-            <Show when={!r().isLimbo && r().tiedDimensions.length > 0}>
+            <Show when={!r().isLimbo && r().tiedDimensions.length === 1}>
               <p class="result-tied-note">
-                有 {r().tiedDimensions.length} 个维度打平，已按默认归属人格卡并以 * 标记该维度
+                有一个维度恰好打平，已按默认方向归类并在该维度以 * 标记
+              </p>
+            </Show>
+            <Show when={r().isLimbo && r().closestPersonality}>
+              <p class="result-tied-note">
+                共有 {r().tiedDimensions.length} 个维度打平；若硬要归类，你最接近
+                <span class="result-tied-closest">
+                  {' '}
+                  {r().closestCode} · {r().closestPersonality.name}
+                </span>
               </p>
             </Show>
           </div>
