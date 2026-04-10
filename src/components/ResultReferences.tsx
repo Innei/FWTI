@@ -33,6 +33,18 @@ export function ResultReferences() {
             <em>Journal of Personality and Social Psychology, 78</em>(2),
             350–365.
           </li>
+          <li>
+            Shaver, P. R., &amp; Mikulincer, M. (2006). Attachment theory,
+            individual psychodynamics, and relationship functioning. In A. L.
+            Vangelisti &amp; D. Perlman (Eds.),{' '}
+            <em>The Cambridge handbook of personal relationships</em> (pp.
+            251–271). Cambridge University Press.
+            <span class="refs-note">
+              （"焦虑 = hyperactivating · 警觉黏附反刍" ×
+              "回避 = deactivating · 压抑拉远否认"的分型框架，FWTI 隐藏人格
+              RAT / BENCH / CPU 的极性判定即本于此。）
+            </span>
+          </li>
         </ul>
       </div>
 
