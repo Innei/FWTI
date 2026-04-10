@@ -1,4 +1,12 @@
-import { createSignal, createMemo, Show, For, type JSX } from 'solid-js';
+import {
+  createSignal,
+  createMemo,
+  createEffect,
+  onCleanup,
+  Show,
+  For,
+  type JSX,
+} from 'solid-js';
 import {
   Router,
   Route,
@@ -7,11 +15,15 @@ import {
   useParams,
 } from '@solidjs/router';
 import { questions } from './data/questions';
-import { personalities, hiddenTitle } from './data/personalities';
+import {
+  personalities,
+  hiddenTitle,
+  type Personality,
+} from './data/personalities';
 import { getResult, type Result } from './logic/scoring';
 import { encodeAnswers, decodeAnswers } from './logic/codec';
 import { getFamilyTheme, FAMILY_THEMES, getFamily } from './logic/family';
-import PersonalityIcon from './components/PersonalityIcon';
+import Portrait from './components/Portrait';
 
 const GITHUB_REPO_URL = 'https://github.com/Innei/fwti';
 
@@ -126,6 +138,25 @@ function ResultRoute() {
 
 /* ===== HOME PAGE ===== */
 function HomePage(props: { onStart: () => void }) {
+  const [previewDetail, setPreviewDetail] = createSignal<Personality | null>(
+    null,
+  );
+
+  createEffect(() => {
+    const p = previewDetail();
+    if (p) {
+      document.body.style.overflow = 'hidden';
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') setPreviewDetail(null);
+      };
+      window.addEventListener('keydown', onKey);
+      onCleanup(() => {
+        document.body.style.overflow = '';
+        window.removeEventListener('keydown', onKey);
+      });
+    }
+  });
+
   return (
     <div class="page home-page">
       <TopNav meta="v1.0 · 娱乐测试" />
@@ -159,25 +190,35 @@ function HomePage(props: { onStart: () => void }) {
         <div class="preview-head">
           <div class="preview-eyebrow">16 种废物 · The Waste Gallery</div>
           <h2 class="preview-title">君之归宿，四族十六型</h2>
+          <p class="preview-hint">点击卡片查看类型释义</p>
         </div>
         <div class="preview-grid">
           <For each={Object.values(personalities)}>
             {(p) => {
               const theme = getFamilyTheme(p.code);
               return (
-                <div
+                <button
+                  type="button"
                   class="preview-tile"
                   style={{
                     '--tile-color': theme.color,
                     '--tile-tint': theme.tint,
                   }}
+                  onClick={() => setPreviewDetail(p)}
+                  aria-label={`${p.name}（${p.code}）— 查看释义`}
                 >
-                  <div class="preview-tile-icon">
-                    <PersonalityIcon code={p.code} size={56} />
+                  <Portrait
+                    code={p.code}
+                    size={200}
+                    class="preview-tile-portrait"
+                  />
+                  <div class="preview-tile-meta">
+                    <span class="preview-tile-code">{p.code}</span>
+                    <span class="preview-tile-eng">{p.engName}</span>
                   </div>
-                  <div class="preview-tile-code">{p.code}</div>
                   <div class="preview-tile-name">{p.name}</div>
-                </div>
+                  <div class="preview-tile-tagline">「{p.tagline}」</div>
+                </button>
               );
             }}
           </For>
@@ -200,6 +241,112 @@ function HomePage(props: { onStart: () => void }) {
           请勿用于相亲、挽回、分手或发律师函。
         </p>
       </footer>
+
+      <Show when={previewDetail()} keyed>
+        {(person) => {
+          const modalTheme = getFamilyTheme(person.code);
+          return (
+          <div
+            class="preview-modal-backdrop"
+            role="presentation"
+            onClick={() => setPreviewDetail(null)}
+          >
+            <div
+              class="preview-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="preview-modal-heading"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                '--tile-color': modalTheme.color,
+                '--tile-tint': modalTheme.tint,
+              }}
+            >
+              <button
+                type="button"
+                class="preview-modal-close"
+                onClick={() => setPreviewDetail(null)}
+                aria-label="关闭"
+              >
+                ×
+              </button>
+              <div class="preview-modal-icon">
+                <Portrait code={person.code} size={160} />
+              </div>
+              <div class="preview-modal-code">{person.code}</div>
+              <h3 id="preview-modal-heading" class="preview-modal-name">
+                {person.name}
+              </h3>
+              <p class="preview-modal-eng">{person.engName}</p>
+              <p class="preview-modal-tagline">「{person.tagline}」</p>
+
+              <div class="preview-modal-waste">
+                <span class="preview-modal-waste-label">废物指数</span>
+                <div class="preview-modal-waste-dots">
+                  <For each={Array.from({ length: 5 })}>
+                    {(_, i) => (
+                      <span
+                        class={`preview-modal-waste-dot ${
+                          i() < person.wasteLevel ? 'filled' : ''
+                        }`}
+                      />
+                    )}
+                  </For>
+                </div>
+                <span class="preview-modal-waste-num">
+                  {person.wasteLevel} / 5
+                </span>
+              </div>
+
+              <p class="preview-modal-desc">{person.description}</p>
+
+              <div class="preview-modal-section">
+                <div class="preview-modal-section-title">常见病状</div>
+                <ul class="preview-modal-traits">
+                  <For each={person.traits}>
+                    {(t) => <li>{t}</li>}
+                  </For>
+                </ul>
+              </div>
+
+              <div class="preview-modal-section">
+                <div class="preview-modal-section-title">口头禅</div>
+                <div class="preview-modal-phrases">
+                  <For each={person.catchphrases}>
+                    {(c) => <div class="preview-modal-phrase">{c}</div>}
+                  </For>
+                </div>
+              </div>
+
+              <div class="preview-modal-section">
+                <div class="preview-modal-section-title">配对</div>
+                <div class="preview-modal-matches">
+                  <div class="preview-modal-match best">
+                    <span class="match-lbl">最佳</span>
+                    <span class="match-code">{person.bestMatch}</span>
+                    <span class="match-name">
+                      {personalities[person.bestMatch]?.name}
+                    </span>
+                  </div>
+                  <div class="preview-modal-match worst">
+                    <span class="match-lbl">最糟</span>
+                    <span class="match-code">{person.worstMatch}</span>
+                    <span class="match-name">
+                      {personalities[person.worstMatch]?.name}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="preview-modal-advice">
+                <div class="preview-modal-advice-label">一言以告</div>
+                <p class="preview-modal-advice-text">{person.advice}</p>
+              </div>
+            </div>
+          </div>
+          );
+        }}
+      </Show>
     </div>
   );
 }
@@ -327,12 +474,11 @@ function ResultPage(props: { result: Result; onRestart: () => void }) {
         {/* Hero */}
         <section class="result-hero">
           <div class="hero-eyebrow">测试完成 · 你的废物类型是</div>
-          <div class="result-icon-wrap">
-            <div class="result-icon-glow" />
-            <div class="result-icon-inner">
-              <PersonalityIcon code={p().code} size={132} />
-            </div>
-          </div>
+          <Portrait
+            code={p().code}
+            size={320}
+            class="result-hero-portrait"
+          />
           <div class="result-code">{p().code}</div>
           <h1 class="result-name">{p().name}</h1>
           <p class="result-eng">{p().engName}</p>
@@ -821,11 +967,28 @@ const globalStyles = `
     line-height: 1.6;
   }
 
+  /* ===== PORTRAIT RING ===== */
+  .portrait-ring {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    display: block;
+    margin: 0 auto;
+    -webkit-mask-image: radial-gradient(circle at 50% 48%, #000 45%, transparent 68%);
+    mask-image: radial-gradient(circle at 50% 48%, #000 45%, transparent 68%);
+  }
+  .portrait-ring img {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    display: block;
+  }
+
   /* ===== PREVIEW GRID ===== */
   .home-preview {
-    max-width: 1120px;
+    max-width: 1280px;
     margin: 80px auto 0;
-    padding: 0 32px;
+    padding: 0 40px;
   }
   .preview-head {
     text-align: center;
@@ -846,56 +1009,356 @@ const globalStyles = `
     color: var(--fwti-text-dark);
     letter-spacing: -0.01em;
   }
+  .preview-hint {
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--fwti-text-soft);
+    letter-spacing: 0.02em;
+  }
   .preview-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    gap: 20px;
   }
   .preview-tile {
-    background: var(--fwti-bg);
+    appearance: none;
+    -webkit-appearance: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    width: 100%;
+    margin: 0;
+    background: linear-gradient(180deg, var(--tile-tint) 0%, var(--fwti-bg) 72%);
     border: 1px solid var(--fwti-border);
-    border-radius: 14px;
-    padding: 22px 16px 18px;
+    border-radius: 20px;
+    padding: 26px 18px 22px;
     text-align: center;
     position: relative;
     overflow: hidden;
-    transition: all 0.2s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   }
-  .preview-tile::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--tile-tint);
-    opacity: 0.5;
-    pointer-events: none;
+  .preview-tile:focus-visible {
+    outline: 2px solid var(--tile-color);
+    outline-offset: 3px;
   }
   .preview-tile:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
     border-color: var(--tile-color);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
   }
-  .preview-tile-icon {
-    color: var(--tile-color);
-    display: flex;
-    justify-content: center;
-    margin-bottom: 10px;
+  .preview-tile-portrait {
     position: relative;
+    width: 180px;
+    max-width: 100%;
+    margin-bottom: 12px;
+  }
+  .preview-tile-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    margin-bottom: 6px;
   }
   .preview-tile-code {
     font-family: var(--fwti-font-title);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.24em;
     color: var(--tile-color);
-    margin-bottom: 4px;
-    position: relative;
+  }
+  .preview-tile-eng {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--fwti-text-soft);
+    text-transform: uppercase;
   }
   .preview-tile-name {
-    font-size: 14px;
-    font-weight: 500;
+    font-family: var(--fwti-font-title);
+    font-size: 20px;
+    font-weight: 700;
     color: var(--fwti-text-dark);
+    letter-spacing: -0.01em;
     position: relative;
+    margin-bottom: 6px;
   }
+  .preview-tile-tagline {
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--fwti-text-mid);
+    font-style: italic;
+    position: relative;
+    max-width: 220px;
+    margin: 0 auto;
+  }
+
+  .preview-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(28, 32, 38, 0.48);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: preview-modal-in 0.22s ease;
+  }
+  @keyframes preview-modal-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .preview-modal {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    max-height: min(90vh, 860px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: linear-gradient(180deg, var(--tile-tint) 0%, var(--fwti-bg) 220px);
+    border-radius: 24px;
+    padding: 36px 32px 32px;
+    border: 1px solid var(--fwti-border);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
+  }
+  .preview-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--fwti-text-soft);
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .preview-modal-close:hover {
+    background: var(--fwti-bg-soft);
+    color: var(--fwti-text-dark);
+  }
+  .preview-modal-icon {
+    display: flex;
+    justify-content: center;
+    color: var(--tile-color);
+    margin-bottom: 16px;
+  }
+  .preview-modal-code {
+    font-family: var(--fwti-font-title);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    color: var(--tile-color);
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .preview-modal-name {
+    font-family: var(--fwti-font-title);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--fwti-text-dark);
+    text-align: center;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .preview-modal-eng {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fwti-text-soft);
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .preview-modal-tagline {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--fwti-text-mid);
+    text-align: center;
+    margin-bottom: 22px;
+  }
+  .preview-modal-desc {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--fwti-text-dark);
+    text-align: left;
+    margin-bottom: 28px;
+  }
+
+  .preview-modal-waste {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 18px;
+    margin: 0 auto 24px;
+    width: fit-content;
+    background: var(--fwti-bg);
+    border: 1px solid var(--fwti-border);
+    border-radius: 999px;
+  }
+  .preview-modal-waste-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fwti-text-soft);
+    letter-spacing: 0.1em;
+  }
+  .preview-modal-waste-dots {
+    display: flex;
+    gap: 6px;
+  }
+  .preview-modal-waste-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--fwti-border);
+  }
+  .preview-modal-waste-dot.filled {
+    background: var(--tile-color);
+  }
+  .preview-modal-waste-num {
+    font-family: var(--fwti-font-title);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tile-color);
+    letter-spacing: 0.06em;
+  }
+
+  .preview-modal-section {
+    margin-bottom: 24px;
+  }
+  .preview-modal-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--tile-color);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .preview-modal-section-title::before {
+    content: "";
+    flex: 0 0 18px;
+    height: 2px;
+    background: var(--tile-color);
+    border-radius: 999px;
+  }
+
+  .preview-modal-traits {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .preview-modal-traits li {
+    position: relative;
+    padding: 12px 14px 12px 34px;
+    background: var(--fwti-bg-soft);
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--fwti-text-dark);
+  }
+  .preview-modal-traits li::before {
+    content: "";
+    position: absolute;
+    left: 14px;
+    top: 18px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--tile-color);
+  }
+
+  .preview-modal-phrases {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .preview-modal-phrase {
+    padding: 12px 16px;
+    border-left: 3px solid var(--tile-color);
+    background: var(--fwti-bg-soft);
+    border-radius: 0 10px 10px 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--fwti-text-mid);
+    font-style: italic;
+  }
+
+  .preview-modal-matches {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .preview-modal-match {
+    padding: 14px 14px 12px;
+    border-radius: 14px;
+    background: var(--fwti-bg);
+    border: 1px solid var(--fwti-border);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .preview-modal-match.best {
+    border-color: color-mix(in srgb, var(--tile-color) 45%, transparent);
+  }
+  .match-lbl {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--fwti-text-soft);
+  }
+  .preview-modal-match.best .match-lbl {
+    color: var(--tile-color);
+  }
+  .match-code {
+    font-family: var(--fwti-font-title);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: var(--fwti-text-dark);
+  }
+  .match-name {
+    font-size: 13px;
+    color: var(--fwti-text-mid);
+  }
+
+  .preview-modal-advice {
+    margin-top: 28px;
+    padding: 20px 22px;
+    border-radius: 16px;
+    background: var(--tile-tint);
+    border: 1px dashed color-mix(in srgb, var(--tile-color) 40%, transparent);
+  }
+  .preview-modal-advice-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--tile-color);
+    margin-bottom: 8px;
+  }
+  .preview-modal-advice-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--fwti-text-dark);
+    margin: 0;
+  }
+
   .preview-legend {
     display: flex;
     justify-content: center;
@@ -1142,32 +1605,22 @@ const globalStyles = `
     text-align: center;
     padding: 20px 0 0;
   }
-  .result-icon-wrap {
+  .result-hero-portrait {
     position: relative;
-    width: 180px;
-    height: 180px;
-    margin: 0 auto 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 320px;
+    margin: 0 auto 24px;
   }
-  .result-icon-glow {
+  .result-hero-portrait::before {
+    content: "";
     position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: radial-gradient(circle at center, var(--fwti-accent-tint) 0%, transparent 70%);
-  }
-  .result-icon-inner {
-    position: relative;
-    width: 148px;
-    height: 148px;
-    border-radius: 50%;
-    background: var(--fwti-accent-tint);
-    border: 2px solid var(--fwti-accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--fwti-accent);
+    inset: -12%;
+    background: radial-gradient(
+      circle at 50% 45%,
+      var(--fwti-accent-tint) 0%,
+      transparent 62%
+    );
+    z-index: -1;
+    pointer-events: none;
   }
   .hero-eyebrow {
     font-size: 12px;
@@ -1484,8 +1937,13 @@ const globalStyles = `
   }
 
   /* ===== RESPONSIVE ===== */
+  @media (max-width: 1100px) {
+    .home-preview { padding: 0 28px; }
+    .preview-grid { gap: 16px; }
+    .preview-tile-portrait { width: 160px; }
+  }
   @media (max-width: 900px) {
-    .preview-grid { grid-template-columns: repeat(3, 1fr); }
+    .preview-tile-portrait { width: 140px; }
     .home-title { font-size: 44px; }
   }
   @media (max-width: 720px) {
@@ -1494,7 +1952,11 @@ const globalStyles = `
     .home-title { font-size: 36px; }
     .home-lede { font-size: 16px; }
     .home-tips { grid-template-columns: 1fr; margin-top: -50px; }
-    .preview-grid { grid-template-columns: repeat(2, 1fr); }
+    .home-preview { padding: 0 20px; }
+    .preview-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .preview-tile { padding: 22px 14px 18px; }
+    .preview-tile-portrait { width: 150px; }
+    .preview-tile-name { font-size: 18px; }
     .preview-title { font-size: 28px; }
     .mobile-only { display: block; }
 
@@ -1508,9 +1970,7 @@ const globalStyles = `
     .result-container { padding: 40px 20px 64px; gap: 56px; }
     .result-name { font-size: 40px; }
     .result-tagline { font-size: 17px; }
-    .result-icon-wrap { width: 156px; height: 156px; margin-bottom: 22px; }
-    .result-icon-inner { width: 128px; height: 128px; }
-    .result-icon-inner svg { width: 108px; height: 108px; }
+    .result-hero-portrait { width: 240px; margin-bottom: 20px; }
     .section-title { font-size: 26px; }
     .advice-section { padding: 40px 28px; border-radius: 20px; }
     .advice-text { font-size: 20px; }
@@ -1523,5 +1983,9 @@ const globalStyles = `
     .result-name { font-size: 32px; }
     .quiz-item-text { font-size: 19px; }
     .preview-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .preview-tile { padding: 18px 10px 16px; }
+    .preview-tile-portrait { width: 130px; }
+    .preview-tile-name { font-size: 16px; }
+    .preview-tile-tagline { font-size: 11px; }
   }
 `;

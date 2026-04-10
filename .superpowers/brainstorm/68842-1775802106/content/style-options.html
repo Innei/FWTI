@@ -1,0 +1,189 @@
+<h2>三种画像风格比较</h2>
+<p class="subtitle">以「自爆卡车 GZNY」为样。择其一后，吾将以此风格绘十六型。</p>
+
+<style>
+  .style-card {
+    background: linear-gradient(180deg, #f4eefa 0%, #ffffff 100%);
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    border: 2px solid #eee;
+    cursor: pointer;
+    transition: transform .2s;
+  }
+  .style-card:hover { transform: translateY(-4px); }
+  .style-card.selected { border-color: #88619a; box-shadow: 0 0 0 4px rgba(136,97,154,.15); }
+  .style-svg { width: 220px; height: 220px; margin: 0 auto; display: block; }
+  .style-title { font-size: 18px; font-weight: 800; margin-top: 12px; }
+  .style-desc { font-size: 13px; color: #666; margin-top: 6px; line-height: 1.5; }
+  .style-tag { display:inline-block; font-size:11px; background:#eee; padding:2px 8px; border-radius:10px; margin-top:8px; }
+  .cards-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; margin: 20px auto; }
+</style>
+
+<div class="cards-3">
+
+  <!-- A. 大头表情包 chibi -->
+  <div class="style-card option" data-choice="a" onclick="toggleSelect(this)">
+    <svg class="style-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="bgA" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stop-color="#FFE4E4"/>
+          <stop offset="100%" stop-color="#FFFFFF"/>
+        </radialGradient>
+      </defs>
+      <rect width="400" height="400" fill="url(#bgA)"/>
+      <!-- Explosion burst -->
+      <g fill="#FFB3B3" opacity="0.7">
+        <polygon points="200,30 222,88 282,60 252,118 310,128 254,160 286,220 222,188 200,250 178,188 114,220 146,160 90,128 148,118 118,60 178,88"/>
+      </g>
+      <g fill="#FF6B6B" opacity="0.9">
+        <polygon points="200,55 216,95 262,75 240,118 282,128 238,150 262,198 218,174 200,218 182,174 138,198 162,150 118,128 160,118 138,75 184,95"/>
+      </g>
+      <!-- Small body -->
+      <path d="M 155 310 Q 155 280 170 275 L 230 275 Q 245 280 245 310 L 245 360 L 155 360 Z" fill="#E53935" stroke="#2B2B2B" stroke-width="4"/>
+      <!-- Arms raised in panic -->
+      <path d="M 160 290 Q 130 250 140 215" fill="none" stroke="#2B2B2B" stroke-width="4" stroke-linecap="round"/>
+      <path d="M 140 215 Q 135 205 145 200" fill="#FFE0BD" stroke="#2B2B2B" stroke-width="4"/>
+      <path d="M 240 290 Q 270 260 290 230" fill="none" stroke="#2B2B2B" stroke-width="4" stroke-linecap="round"/>
+      <!-- Big head -->
+      <circle cx="200" cy="195" r="115" fill="#FFE0BD" stroke="#2B2B2B" stroke-width="4"/>
+      <!-- Hair -->
+      <path d="M 90 180 Q 100 85 200 82 Q 300 85 310 180 Q 295 135 245 135 Q 200 150 155 135 Q 105 135 90 180 Z" fill="#3E2723"/>
+      <!-- Eyes -->
+      <ellipse cx="162" cy="205" rx="18" ry="22" fill="white" stroke="#2B2B2B" stroke-width="4"/>
+      <ellipse cx="238" cy="205" rx="18" ry="22" fill="white" stroke="#2B2B2B" stroke-width="4"/>
+      <circle cx="162" cy="212" r="10" fill="#2B2B2B"/>
+      <circle cx="238" cy="212" r="10" fill="#2B2B2B"/>
+      <circle cx="166" cy="207" r="3" fill="white"/>
+      <circle cx="242" cy="207" r="3" fill="white"/>
+      <!-- Eyebrows -->
+      <path d="M 142 175 L 180 185" stroke="#2B2B2B" stroke-width="5" stroke-linecap="round"/>
+      <path d="M 258 175 L 220 185" stroke="#2B2B2B" stroke-width="5" stroke-linecap="round"/>
+      <!-- Tears -->
+      <path d="M 145 240 Q 140 260 145 272 Q 152 260 145 240 Z" fill="#4FC3F7" stroke="#0288D1" stroke-width="2"/>
+      <path d="M 258 240 Q 253 260 258 272 Q 264 260 258 240 Z" fill="#4FC3F7" stroke="#0288D1" stroke-width="2"/>
+      <!-- Mouth -->
+      <ellipse cx="200" cy="262" rx="22" ry="16" fill="#2B2B2B"/>
+      <ellipse cx="200" cy="268" rx="14" ry="7" fill="#E91E63"/>
+      <!-- Blush -->
+      <circle cx="130" cy="240" r="12" fill="#FFB3BA" opacity="0.8"/>
+      <circle cx="270" cy="240" r="12" fill="#FFB3BA" opacity="0.8"/>
+    </svg>
+    <div class="letter" style="display:none">A</div>
+    <div class="content">
+      <div class="style-title">A · 大头表情包</div>
+      <div class="style-desc">头大身小，夸张神色。拟人不拟物，每型一套表情+道具。FWTI 自嘲调性之最契。</div>
+      <div class="style-tag">chibi · 梗感强</div>
+    </div>
+  </div>
+
+  <!-- B. 梗物拟人 Mascot -->
+  <div class="style-card option" data-choice="b" onclick="toggleSelect(this)">
+    <svg class="style-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bgB" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#FFE4E4"/>
+          <stop offset="100%" stop-color="#FFFFFF"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="400" fill="url(#bgB)"/>
+      <!-- Explosion cloud -->
+      <path d="M 80 130 Q 60 90 100 70 Q 120 35 165 55 Q 195 30 230 55 Q 270 35 295 75 Q 345 65 335 115 Q 365 135 330 170 Q 335 205 285 200 Q 265 225 225 205 Q 195 225 160 200 Q 115 210 100 180 Q 65 170 80 130 Z"
+            fill="#FF6B6B" stroke="#2B2B2B" stroke-width="5" stroke-linejoin="round"/>
+      <circle cx="150" cy="110" r="5" fill="#FFEB3B"/>
+      <circle cx="240" cy="95" r="5" fill="#FFEB3B"/>
+      <circle cx="280" cy="140" r="5" fill="#FFEB3B"/>
+      <text x="200" y="145" font-family="Arial Black" font-size="36" fill="#FFEB3B" text-anchor="middle" stroke="#2B2B2B" stroke-width="3">BOOM</text>
+      <!-- Truck body -->
+      <rect x="70" y="235" width="170" height="85" rx="10" fill="#E53935" stroke="#2B2B2B" stroke-width="5"/>
+      <!-- Cab -->
+      <path d="M 240 250 L 240 320 L 325 320 L 325 275 L 310 250 Z" fill="#FFA726" stroke="#2B2B2B" stroke-width="5" stroke-linejoin="round"/>
+      <!-- Window -->
+      <path d="M 255 265 L 300 265 L 315 285 L 255 285 Z" fill="#81D4FA" stroke="#2B2B2B" stroke-width="4"/>
+      <!-- Truck face -->
+      <circle cx="115" cy="270" r="17" fill="white" stroke="#2B2B2B" stroke-width="4"/>
+      <circle cx="175" cy="270" r="17" fill="white" stroke="#2B2B2B" stroke-width="4"/>
+      <circle cx="117" cy="275" r="8" fill="#2B2B2B"/>
+      <circle cx="177" cy="275" r="8" fill="#2B2B2B"/>
+      <path d="M 95 252 L 132 262" stroke="#2B2B2B" stroke-width="5" stroke-linecap="round"/>
+      <path d="M 195 262 L 158 252" stroke="#2B2B2B" stroke-width="5" stroke-linecap="round"/>
+      <path d="M 125 300 Q 145 312 165 300" fill="none" stroke="#2B2B2B" stroke-width="5" stroke-linecap="round"/>
+      <!-- Wheels -->
+      <circle cx="115" cy="335" r="26" fill="#2B2B2B"/>
+      <circle cx="115" cy="335" r="12" fill="#9E9E9E"/>
+      <circle cx="285" cy="335" r="26" fill="#2B2B2B"/>
+      <circle cx="285" cy="335" r="12" fill="#9E9E9E"/>
+      <!-- TNT crates on back -->
+      <rect x="90" y="185" width="28" height="45" rx="2" fill="#B71C1C" stroke="#2B2B2B" stroke-width="4"/>
+      <path d="M 104 185 Q 108 173 104 162 Q 100 173 104 185" fill="#FFC107"/>
+      <rect x="128" y="180" width="28" height="50" rx="2" fill="#B71C1C" stroke="#2B2B2B" stroke-width="4"/>
+      <path d="M 142 180 Q 146 168 142 157 Q 138 168 142 180" fill="#FFC107"/>
+      <rect x="168" y="190" width="28" height="40" rx="2" fill="#B71C1C" stroke="#2B2B2B" stroke-width="4"/>
+      <path d="M 182 190 Q 186 178 182 167 Q 178 178 182 190" fill="#FFC107"/>
+    </svg>
+    <div class="letter" style="display:none">B</div>
+    <div class="content">
+      <div class="style-title">B · 梗物拟人</div>
+      <div class="style-desc">取人格代号本义为主体：自爆卡车 = 真的卡车；仙人掌、刺猬、树懒皆然。名即画，画即名。</div>
+      <div class="style-tag">mascot · 直白梗</div>
+    </div>
+  </div>
+
+  <!-- C. 扁平贴纸 Flat human -->
+  <div class="style-card option" data-choice="c" onclick="toggleSelect(this)">
+    <svg class="style-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bgC" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#FFE4E4"/>
+          <stop offset="100%" stop-color="#FFFFFF"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="400" fill="url(#bgC)"/>
+      <!-- Subtle burst bg -->
+      <g fill="#FF8A80" opacity="0.25">
+        <polygon points="200,50 215,100 265,85 235,125 285,140 240,165 270,215 220,185 200,240 180,185 130,215 160,165 115,140 165,125 135,85 185,100"/>
+      </g>
+      <!-- Body -->
+      <path d="M 130 365 Q 125 270 160 255 L 240 255 Q 275 270 270 365 Z" fill="#E53935"/>
+      <rect x="155" y="245" width="90" height="25" rx="4" fill="#C62828"/>
+      <!-- Neck -->
+      <rect x="185" y="215" width="30" height="35" fill="#F5C6A5"/>
+      <!-- Head -->
+      <ellipse cx="200" cy="170" rx="75" ry="85" fill="#F5C6A5"/>
+      <!-- Hair -->
+      <path d="M 125 160 Q 135 85 200 80 Q 275 85 275 160 Q 275 110 230 115 Q 200 125 170 115 Q 125 110 125 160 Z" fill="#3E2723"/>
+      <path d="M 125 160 Q 118 190 130 210 L 125 160" fill="#3E2723"/>
+      <!-- Ears -->
+      <ellipse cx="125" cy="180" rx="8" ry="14" fill="#F5C6A5"/>
+      <ellipse cx="275" cy="180" rx="8" ry="14" fill="#F5C6A5"/>
+      <!-- Eyebrows angry -->
+      <path d="M 155 155 L 185 165" stroke="#2B2B2B" stroke-width="4" stroke-linecap="round"/>
+      <path d="M 245 155 L 215 165" stroke="#2B2B2B" stroke-width="4" stroke-linecap="round"/>
+      <!-- Eyes -->
+      <ellipse cx="172" cy="180" rx="6" ry="8" fill="#2B2B2B"/>
+      <ellipse cx="228" cy="180" rx="6" ry="8" fill="#2B2B2B"/>
+      <!-- Nose -->
+      <path d="M 200 190 Q 195 205 200 210" fill="none" stroke="#2B2B2B" stroke-width="2" stroke-linecap="round"/>
+      <!-- Mouth open -->
+      <ellipse cx="200" cy="225" rx="14" ry="8" fill="#2B2B2B"/>
+      <!-- Blush -->
+      <circle cx="150" cy="205" r="10" fill="#FF8A80" opacity="0.6"/>
+      <circle cx="250" cy="205" r="10" fill="#FF8A80" opacity="0.6"/>
+      <!-- Detonator in hand -->
+      <rect x="75" y="310" width="40" height="40" rx="3" fill="#6D4C41" stroke="#2B2B2B" stroke-width="3"/>
+      <circle cx="95" cy="305" r="6" fill="#B71C1C" stroke="#2B2B2B" stroke-width="3"/>
+      <path d="M 115 325 Q 140 315 160 320" fill="none" stroke="#2B2B2B" stroke-width="3"/>
+    </svg>
+    <div class="letter" style="display:none">C</div>
+    <div class="content">
+      <div class="style-title">C · 扁平贴纸</div>
+      <div class="style-desc">人物半身像，线简色块平，无描边粗线。近官方 16p 之克制感，但更扁平、更易手绘。</div>
+      <div class="style-tag">flat · 贴近官方</div>
+    </div>
+  </div>
+
+</div>
+
+<p style="text-align:center; color:#888; font-size:13px; margin-top:20px;">
+  点击卡片可选择。背景色将依四大家族（GZ紫 / GR黄 / DZ蓝 / DR绿）自动配色。
+</p>

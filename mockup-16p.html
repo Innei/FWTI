@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FWTI · 16p-style Character Mockup</title>
+<style>
+  :root {
+    --gz-accent: #88619a;
+    --gr-accent: #e4ae3a;
+    --dz-accent: #4298b4;
+    --dr-accent: #33a474;
+    --text-main: #333;
+    --text-sub: #666;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Open Sans', 'Inter', -apple-system, sans-serif;
+    background: #fff;
+    color: var(--text-main);
+    padding: 80px 20px;
+    -webkit-font-smoothing: antialiased;
+  }
+  header { text-align: center; margin-bottom: 80px; }
+  header h1 { font-size: 48px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 10px; }
+  header p { color: #888; font-size: 18px; }
+
+  .family { max-width: 1200px; margin: 0 auto 100px; }
+  .family-head { margin-bottom: 40px; text-align: left; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; }
+  .family-name { font-size: 32px; font-weight: 800; color: var(--text-main); }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px 30px;
+  }
+
+  .type-card {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s cubic-bezier(0.2, 0, 0.2, 1);
+  }
+  .type-card:hover { transform: translateY(-10px); }
+
+  .icon-container {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .icon-container img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    z-index: 1;
+  }
+
+  /* Role specific gradients (inspired by 16p) */
+  .fam-gz .icon-container { background: linear-gradient(180deg, #f4eefa 0%, #ffffff 100%); }
+  .fam-dr .icon-container { background: linear-gradient(180deg, #e8f5ee 0%, #ffffff 100%); }
+  .fam-dz .icon-container { background: linear-gradient(180deg, #e9f2f7 0%, #ffffff 100%); }
+  .fam-gr .icon-container { background: linear-gradient(180deg, #fdf4e3 0%, #ffffff 100%); }
+
+  .type-info { text-align: center; }
+  .type-name { font-size: 20px; font-weight: 800; margin-bottom: 6px; color: #333; }
+  .type-code { font-size: 13px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  @media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { 
+    .grid { grid-template-columns: 1fr; }
+    header h1 { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Personality Types</h1>
+  <p>Discover your character in the FWTI universe.</p>
+</header>
+
+<!-- ============ GZ · Analysts ============ -->
+<section class="family fam-gz">
+  <div class="family-head">
+    <h2 class="family-name">Analysts</h2>
+  </div>
+  <div class="grid">
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/intj-architect-male.svg" alt="GZNY">
+      </div>
+      <div class="type-info">
+        <div class="type-name">自爆卡车</div>
+        <div class="type-code">GZNY (INTJ)</div>
+      </div>
+    </a>
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/intp-logician-female.svg" alt="GZNF">
+      </div>
+      <div class="type-info">
+        <div class="type-name">恋爱脑</div>
+        <div class="type-code">GZNF (INTP)</div>
+      </div>
+    </a>
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/entj-commander-female.svg" alt="GZLY">
+      </div>
+      <div class="type-info">
+        <div class="type-name">醋王</div>
+        <div class="type-code">GZLY (ENTJ)</div>
+      </div>
+    </a>
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/entp-debater-male.svg" alt="GZLF">
+      </div>
+      <div class="type-info">
+        <div class="type-name">浪子/浪女</div>
+        <div class="type-code">GZLF (ENTP)</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ============ DR · Diplomats ============ -->
+<section class="family fam-dr">
+  <div class="family-head">
+    <h2 class="family-name">Diplomats</h2>
+  </div>
+  <div class="grid">
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/infj-advocate-male.svg" alt="DRNY">
+      </div>
+      <div class="type-info">
+        <div class="type-name">透明人</div>
+        <div class="type-code">DRNY (INFJ)</div>
+      </div>
+    </a>
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/infp-mediator-female.svg" alt="DRNF">
+      </div>
+      <div class="type-info">
+        <div class="type-name">树懒</div>
+        <div class="type-code">DRNF (INFP)</div>
+      </div>
+    </a>
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/enfj-protagonist-male.svg" alt="DRLY">
+      </div>
+      <div class="type-info">
+        <div class="type-name">仙人掌</div>
+        <div class="type-code">DRLY (ENFJ)</div>
+      </div>
+    </a>
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/enfp-campaigner-female.svg" alt="DRLF">
+      </div>
+      <div class="type-info">
+        <div class="type-name">已读不回</div>
+        <div class="type-code">DRLF (ENFP)</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ============ DZ · Sentinels ============ -->
+<section class="family fam-dz">
+  <div class="family-head">
+    <h2 class="family-name">Sentinels</h2>
+  </div>
+  <div class="grid">
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/istj-logistician-male.svg" alt="DZNY">
+      </div>
+      <div class="type-info">
+        <div class="type-name">定时炸弹</div>
+        <div class="type-code">DZNY (ISTJ)</div>
+      </div>
+    </a>
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/isfj-defender-female.svg" alt="DZNF">
+      </div>
+      <div class="type-info">
+        <div class="type-name">林黛玉</div>
+        <div class="type-code">DZNF (ISFJ)</div>
+      </div>
+    </a>
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/estj-executive-female.svg" alt="DZLY">
+      </div>
+      <div class="type-info">
+        <div class="type-name">刺猬</div>
+        <div class="type-code">DZLY (ESTJ)</div>
+      </div>
+    </a>
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/esfj-consul-male.svg" alt="DZLF">
+      </div>
+      <div class="type-info">
+        <div class="type-name">猫系恋人</div>
+        <div class="type-code">DZLF (ESFJ)</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ============ GR · Explorers ============ -->
+<section class="family fam-gr">
+  <div class="family-head">
+    <h2 class="family-name">Explorers</h2>
+  </div>
+  <div class="grid">
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/istp-virtuoso-male.svg" alt="GRNY">
+      </div>
+      <div class="type-info">
+        <div class="type-name">卑微战士</div>
+        <div class="type-code">GRNY (ISTP)</div>
+      </div>
+    </a>
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/isfp-adventurer-female.svg" alt="GRNF">
+      </div>
+      <div class="type-info">
+        <div class="type-name">舔狗</div>
+        <div class="type-code">GRNF (ISFP)</div>
+      </div>
+    </a>
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/estp-entrepreneur-male.svg" alt="GRLY">
+      </div>
+      <div class="type-info">
+        <div class="type-name">钓系大师</div>
+        <div class="type-code">GRLY (ESTP)</div>
+      </div>
+    </a>
+    <a href="#" class="type-card">
+      <div class="icon-container">
+        <img src="src/assets/16p/esfp-entertainer-female.svg" alt="GRLF">
+      </div>
+      <div class="type-info">
+        <div class="type-name">正常人</div>
+        <div class="type-code">GRLF (ESFP)</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<footer style="text-align:center; color:#ccc; font-size:14px; margin-top:80px; padding-bottom: 60px;">
+  &copy; 2026 FWTI · 16Personalities Style Reference
+</footer>
+
+</body>
+</html>
