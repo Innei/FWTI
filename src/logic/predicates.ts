@@ -135,7 +135,7 @@ export interface HiddenPersonalityTrigger {
  * Task 7 暂时以 flag off 形式落地 persona 数据（防止 personalities 表内有缺项
  * 被 16 格逻辑意外引用），portrait 就绪后翻开。
  */
-export const ENABLE_NEW_HIDDEN = false;
+export const ENABLE_NEW_HIDDEN = true;
 
 /**
  * 按 DRAFT §5·附 「隐藏人格判定顺序」：
@@ -192,15 +192,15 @@ export const hiddenPersonalityTriggers: HiddenPersonalityTrigger[] = [
       a.polarityAt('BAD_NEWS_PANIC') > 0,
   },
 
-  // CHAOS · 已读乱回 — 显性 F 或 L + 某一维度自相攻伐（≥ 2 道 A 同时 ≥ 2 道 C）
+  // CHAOS · 已读乱回 — 显性 F 或 L + Z/R 维度内自相攻伐（≥ 2 道 A 同时 ≥ 2 道 C）
+  // 收窄到情绪表达维，是为与「已读乱回 / 颠话回复」的文案语义对齐：
+  // 混乱主要落在“怎么回、回成什么样”，而非所有维度的一般性摇摆。
   {
     code: 'CHAOS',
     test: (a) => {
       const surfaceFOrL = a.ratio.YF < 0 || a.ratio.NL < 0;
       if (!surfaceFOrL) return false;
-      return (['GD', 'ZR', 'NL', 'YF'] as const).some(
-        (d) => a.polarityVariance(d) >= 2,
-      );
+      return a.polarityVariance('ZR') >= 2;
     },
   },
 

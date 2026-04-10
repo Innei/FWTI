@@ -10,7 +10,9 @@ export type Family =
   | 'edog'
   | 'chaos'
   | 'cpu'
-  | 'bench';
+  | 'bench'
+  | 'void'
+  | 'limbo';
 
 export interface FamilyTheme {
   key: Family;
@@ -33,6 +35,8 @@ export const FAMILY_THEMES: Record<Family, FamilyTheme> = {
   chaos: { key: 'chaos', name: '已读乱回', color: '#B7A4D1', tint: 'rgba(183, 164, 209, 0.10)' },
   cpu: { key: 'cpu', name: 'CPU 恋人', color: '#E07A2B', tint: 'rgba(224, 122, 43, 0.10)' },
   bench: { key: 'bench', name: '备胎之王', color: '#CBB89A', tint: 'rgba(203, 184, 154, 0.10)' },
+  void: { key: 'void', name: '电子断联户', color: '#3B4252', tint: 'rgba(59, 66, 82, 0.10)' },
+  limbo: { key: 'limbo', name: '意难平学家', color: '#5A3A5E', tint: 'rgba(90, 58, 94, 0.10)' },
 };
 
 /** 隐藏人格代号 → family key 映射 */
@@ -45,6 +49,8 @@ const HIDDEN_FAMILY_MAP: Record<string, Family> = {
   CHAOS: 'chaos',
   CPU: 'cpu',
   BENCH: 'bench',
+  VOID: 'void',
+  LIMBO: 'limbo',
 };
 
 export function getFamily(code: string): Family {
