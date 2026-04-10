@@ -31,7 +31,7 @@ function Tip(props: { title: string; desc: string }) {
 export function HomePage(props: { onStart: () => void }) {
   return (
     <div class="page home-page">
-      <TopNav meta="v1.0 · 娱乐测试" />
+      <TopNav meta="自嘲系列 · 娱乐测试" />
 
       <section class="home-hero">
         <div class="home-hero-inner">

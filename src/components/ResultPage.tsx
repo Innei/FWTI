@@ -67,10 +67,9 @@ export function ResultPage(props: {
       <Show when={props.isLegacy}>
         <div class="legacy-banner" role="status">
           <div class="legacy-banner-inner">
-            <span class="legacy-banner-badge">旧版测试结果 · v0.3</span>
+            <span class="legacy-banner-badge">旧版测试结果</span>
             <span class="legacy-banner-text">
-              此链接来自 v0.3 题库，按当时规则解读。v0.4 已引入分支题库与归一化评分，
-              结果可能不同。
+              此链接来自旧版题库，按当时规则解读。新版已引入分支题库与归一化评分，结果可能不同。
             </span>
             <button
               type="button"
@@ -279,7 +278,7 @@ export function ResultPage(props: {
           <button class="btn btn-accent" onClick={props.onRestart}>
             再测一次 →
           </button>
-          <p class="footer-text">FWTI v1.0 · 自嘲型恋爱人格测试 · 仅供娱乐</p>
+          <p class="footer-text">FWTI · 自嘲型恋爱人格测试 · 仅供娱乐</p>
           <div class="result-site-qr-wrap">
             <p class="result-site-qr-label">扫码打开测试</p>
             <a
