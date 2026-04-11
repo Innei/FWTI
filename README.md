@@ -73,6 +73,55 @@
 不改变四字母结果，满足条件时在结果页叠加显示。**v0.4** 触发条件以语义锚 + 维度 ratio 为主（见 DRAFT §3 简表；题面 ↔ 语义 id 见 `src/logic/semanticIds.ts`）。  
 含：**撤回大师 / 夜谈冠军 / 朋友圈考古学家 / 薛定谔的前任 / 电子乙方 / 人形 ATM / 空想家 / 典中典 / 普信选手 / 退退退**（退退退依赖答题「改答」次数，**不**写入分享 hash）。
 
+## Explain-result skill
+
+仓库自带一个 agent skill，可让支持 skill 协议的 AI 助手在拿到任意一条 FWTI 分享链接（或裸 hash）时，从解码、重算四维 ratio、复跑隐藏人格与叠加标签触发、到对照学术锚一气呵成地回答「我为什么被判成这一种」。脚本本身不做任何 AI 调用，只输出结构化 JSON，真正的叙事由 AI 按 skill 模板完成。
+
+**结果页右上角的「AI 解读」按钮会自动复制分享链接并把你跳到这一节** —— 之后把链接交给 AI，让 AI 按下文调用即可。
+
+### 能做什么
+
+- 把 hash 解码为完整答题路径，逐题展示选项原文与 delta。
+- 按 |ratio| 递降展示四维得分，并标出每维最决定性的证据题。
+- 跑一遍九型隐藏人格的触发条件，告诉你差在哪一步、要改哪道题才能翻盘。
+- 列出 10 条叠加称号的命中 / 未中情况（退退退除外，因其不入 hash）。
+- 对齐 `DRAFT.md` §八 的引文给出构念对应（ECR-R / ERQ / BIS-BAS 等）。
+- 自动处理 v1 旧链：识别后拒绝套用 v0.4 规则，避免误读。
+
+### Skill 存放位置
+
+Skill 定义在 `.claude/skills/explain-result/SKILL.md`，同时在 `.agents/skills` 下做了符号链接——`.claude/`、`.agents/` 两个约定目录下都能被发现，凡是读取这两个目录中任意一个的 agent 运行时（Claude Code、其他支持 skill 规范的 CLI、自建的 agent 框架等）都可自动加载，无需复制。新增其他厂商的约定目录时，再追加一条软链即可。
+
+脚本在 `scripts/explain-result.ts`，依赖 [Bun](https://bun.sh)（`bun` 需在 PATH）。
+
+### 使用方法
+
+在装有 skill 的 agent 会话里，于仓库根目录启动后直接调用：
+
+```
+/explain-result https://fwti.innei.dev/result/v2.c.MTAz...
+/explain-result v2.c.MTAz...
+```
+
+或直接把链接丢给 AI 并要求「用 explain-result skill 解读这条链接」。
+
+### 想手动跑脚本也可以
+
+```bash
+bun scripts/explain-result.ts "<url-or-hash>"
+```
+
+输出为一段 JSON（四维 ratio、perQuestion、hiddenPersonalityEval、hiddenTitleEval、citations 等），可直接塞给任何 LLM 做二次解读，或接到自建工具链里。
+
+### 叙事风格
+
+Skill 的叙事目标读者是「完全不懂心理学、不懂打分逻辑的普通用户」，全程大白话优先、学理作为注脚、引用题目原文作为证据。技术 token（code、英文构念名、作者年份引文）第一次出现时会在旁边给出白话翻译。详见 `.claude/skills/explain-result/SKILL.md` 的 Voice 段落。
+
+### 不适用的场景
+
+- 要新增 / 修改题目或评分逻辑——请直接改 `src/data/` + `src/logic/`。
+- 链接非本仓库产物——skill 只认 FWTI 自家 codec。
+
 ## 技术栈
 
 - **Solid.js** — UI

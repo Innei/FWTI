@@ -2114,6 +2114,86 @@ button.legend-chip:focus-visible {
   margin-bottom: 0;
 }
 
+.result-evidence-summary {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--fwti-text-mid);
+  max-width: 760px;
+  margin: 0 0 22px;
+}
+
+.evidence-trait-list {
+  margin-top: 0;
+}
+
+.evidence-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.evidence-card {
+  background: var(--fwti-bg-soft);
+  border: 1px solid var(--fwti-border);
+  border-radius: 18px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.evidence-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.evidence-card-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--fwti-accent-tint);
+  color: var(--fwti-accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.evidence-card-qid {
+  font-size: 12px;
+  color: var(--fwti-text-soft);
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.evidence-card-question {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--fwti-text-dark);
+  margin: 0;
+}
+
+.evidence-card-answer {
+  margin: 0;
+  padding: 16px 18px;
+  border-left: 3px solid var(--fwti-accent);
+  background: rgba(255, 255, 255, 0.7);
+  font-family: var(--fwti-font-title);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--fwti-text-dark);
+}
+
+.evidence-card-note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--fwti-text-mid);
+}
+
 /* Traits */
 .trait-list {
   list-style: none;
@@ -2297,6 +2377,36 @@ button.legend-chip:focus-visible {
   color: var(--fwti-text-dark);
   max-width: 580px;
   margin: 0 auto;
+}
+
+/* AI explain · 结果页底部 skill 引导 */
+.ai-explain-section {
+  background: var(--fwti-bg-soft);
+  border-radius: 24px;
+  padding: 44px 40px;
+  border: 1px dashed var(--fwti-border-strong);
+  text-align: center;
+}
+.ai-explain-section .section-title {
+  margin-bottom: 16px;
+  font-size: 26px;
+}
+.ai-explain-desc {
+  max-width: 620px;
+  margin: 0 auto 28px;
+  color: var(--fwti-text-soft);
+  font-size: 15px;
+  line-height: 1.75;
+}
+.ai-explain-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 280px;
+  transition: transform 160ms ease, filter 160ms ease;
+}
+.ai-explain-btn:active {
+  transform: translateY(1px);
 }
 
 /* References & Disclaimer */

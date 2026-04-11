@@ -12,7 +12,13 @@
  * tiedDimensions、dimensionLabels、isAll、isHidden 等字段语义不变。
  */
 
-import { metaQuestion } from '../data/questions';
+import {
+  metaQuestion,
+  questionIndex,
+  resolveOptionText,
+  resolveQuestionText,
+  type Question as CurrentQuestion,
+} from '../data/questions';
 import {
   personalities,
   hiddenTitles,
@@ -26,6 +32,10 @@ import {
   type RatioDim,
   type RatioMap,
 } from './predicates';
+import {
+  buildResultNarrative,
+  type ResultNarrative,
+} from './resultNarrative';
 
 export type RelationshipStatus =
   | 'dating'
@@ -71,6 +81,7 @@ export interface Result {
     valueA: number;
     valueB: number;
   }[];
+  narrative: ResultNarrative;
 }
 
 // ───────────────────────────────────────────────────────────────
@@ -269,6 +280,30 @@ export function getResult(
     { dim: '亲密需求', labelA: '黏 Nian', labelB: '离 Li', ...barsFor(scores.NL) },
     { dim: '安全感', labelA: '疑 Yi', labelB: '佛 Fo', ...barsFor(scores.YF) },
   ];
+  const narrative = buildResultNarrative({
+    mode: 'current',
+    answers,
+    status,
+    scores: {
+      GD: scores.GD,
+      ZR: scores.ZR,
+      NL: scores.NL,
+      YF: scores.YF,
+    },
+    path,
+    questionById: questionIndex,
+    resolveQuestionText: (question, currentStatus) =>
+      resolveQuestionText(question as CurrentQuestion, currentStatus),
+    resolveOptionText: (question, optionIdx, currentStatus) =>
+      resolveOptionText(
+        question as CurrentQuestion,
+        optionIdx,
+        currentStatus,
+      ),
+    archetypeTraits: personality.traits,
+    isHidden,
+    isAll,
+  });
 
   return {
     code,
@@ -284,5 +319,6 @@ export function getResult(
     status,
     scores,
     dimensionLabels,
+    narrative,
   };
 }

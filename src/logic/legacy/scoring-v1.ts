@@ -3,8 +3,17 @@
  * 仅在解码 v1 分享链接（无 `v2.` 前缀）时走此路径；v0.4+ 的所有新 runtime 变更
  * 都不得回改本文件。若需变更 v0.3 行为，应在 codec 加版本号而非直接改此处。
  */
-import { questions } from '../../data/legacy/questions-v1';
+import {
+  questions,
+  resolveOptionText,
+  resolveQuestionText,
+  type Question as LegacyQuestion,
+} from '../../data/legacy/questions-v1';
 import { personalities, hiddenTitles, type HiddenTitle } from '../../data/personalities';
+import {
+  buildResultNarrative,
+  type ResultNarrative,
+} from '../resultNarrative';
 
 export interface Scores {
   GD: number; // + = G, - = D
@@ -47,7 +56,12 @@ export interface Result {
   status: RelationshipStatus;
   scores: Scores;
   dimensionLabels: { dim: string; labelA: string; labelB: string; valueA: number; valueB: number }[];
+  narrative: ResultNarrative;
 }
+
+const legacyQuestionIndex = Object.fromEntries(
+  questions.map((question) => [question.id, question]),
+) as Record<number, typeof questions[number]>;
 
 /** 每题答案为选项索引；主线题为 0..2，META 前置题允许 0..3。 */
 export function resolveOptionIndex(value: number): number | null {
@@ -404,6 +418,30 @@ export function getResult(
       valueB: Math.max(0, -scores.YF) / DIM_MAX.YF * 100,
     },
   ];
+  const narrative = buildResultNarrative({
+    mode: 'legacy',
+    answers,
+    status,
+    scores: {
+      GD: scores.GD / DIM_MAX.GD,
+      ZR: scores.ZR / DIM_MAX.ZR,
+      NL: scores.NL / DIM_MAX.NL,
+      YF: scores.YF / DIM_MAX.YF,
+    },
+    path: questions,
+    questionById: legacyQuestionIndex,
+    resolveQuestionText: (question, currentStatus) =>
+      resolveQuestionText(question as LegacyQuestion, currentStatus),
+    resolveOptionText: (question, optionIdx, currentStatus) =>
+      resolveOptionText(
+        question as LegacyQuestion,
+        optionIdx,
+        currentStatus,
+      ),
+    archetypeTraits: personality.traits,
+    isHidden,
+    isAll,
+  });
 
   return {
     code,
@@ -419,6 +457,7 @@ export function getResult(
     status,
     scores,
     dimensionLabels,
+    narrative,
   };
 }
 

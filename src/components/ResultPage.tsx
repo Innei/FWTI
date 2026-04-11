@@ -7,7 +7,24 @@ import Portrait from './Portrait';
 import { ShareImageModal } from './ShareImageModal';
 import { ResultNav } from './Nav';
 import { ResultReferences } from './ResultReferences';
-import { setPreviewDetail, FWTI_SITE_URL } from '../state';
+import { setPreviewDetail, FWTI_SITE_URL, GITHUB_REPO_URL } from '../state';
+
+const EXPLAIN_SKILL_README_ANCHOR = `${GITHUB_REPO_URL}#explain-result-skill`;
+
+function evidenceFacetLabel(facet: string): string {
+  switch (facet) {
+    case 'initiative':
+      return '主动推进';
+    case 'expression':
+      return '情绪表达';
+    case 'closeness':
+      return '亲密节奏';
+    case 'security':
+      return '安全感';
+    default:
+      return '作答证据';
+  }
+}
 
 /** Uppercase English line with each character in a fixed-width cell (visual grid). */
 function ResultEngLine(props: { text: string }) {
@@ -43,7 +60,26 @@ export function ResultPage(props: {
   onRestart: () => void;
 }) {
   const [shareOpen, setShareOpen] = createSignal(false);
+  const [explainCopied, setExplainCopied] = createSignal(false);
   const r = () => props.result;
+
+  const handleExplainWithAi = async () => {
+    const shareUrl = props.hash
+      ? `${FWTI_SITE_URL}/result/${props.hash}`
+      : FWTI_SITE_URL;
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl);
+      }
+    } catch {
+      /* 剪贴板失败不阻断跳转 */
+    }
+    setExplainCopied(true);
+    window.setTimeout(() => setExplainCopied(false), 2400);
+    if (typeof window !== 'undefined') {
+      window.open(EXPLAIN_SKILL_README_ANCHOR, '_blank', 'noopener,noreferrer');
+    }
+  };
   const p = () => r().personality;
   const matches = () => getCompatibilityOutcome(p().code);
   const family = () => getFamily(p().code);
@@ -196,12 +232,56 @@ export function ResultPage(props: {
           </div>
         </section>
 
+        <section class="result-section">
+          <div class="section-eyebrow">作答证据 · Evidence</div>
+          <h2 class="section-title">这次是怎么判到这里的</h2>
+          <p class="result-evidence-summary">{r().narrative.summary}</p>
+          <ul class="trait-list evidence-trait-list">
+            <For each={r().narrative.evidenceTraits}>
+              {(t, i) => (
+                <li class="trait-item">
+                  <span class="trait-num">
+                    {String(i() + 1).padStart(2, '0')}
+                  </span>
+                  <span class="trait-text">{t}</span>
+                </li>
+              )}
+            </For>
+          </ul>
+        </section>
+
+        <Show when={r().narrative.evidenceCards.length > 0}>
+          <section class="result-section">
+            <div class="section-eyebrow">关键题目 · Signals</div>
+            <h2 class="section-title">你亲手交出的证据</h2>
+            <div class="evidence-card-grid">
+              <For each={r().narrative.evidenceCards}>
+                {(card) => (
+                  <article class="evidence-card">
+                    <div class="evidence-card-head">
+                      <span class="evidence-card-badge">
+                        {evidenceFacetLabel(card.facet)}
+                      </span>
+                      <span class="evidence-card-qid">Q{card.questionId}</span>
+                    </div>
+                    <p class="evidence-card-question">{card.question}</p>
+                    <blockquote class="evidence-card-answer">
+                      {card.answer}
+                    </blockquote>
+                    <p class="evidence-card-note">{card.note}</p>
+                  </article>
+                )}
+              </For>
+            </div>
+          </section>
+        </Show>
+
         {/* Traits */}
         <section class="result-section">
-          <div class="section-eyebrow">行为特征 · Traits</div>
-          <h2 class="section-title">恋爱中的你</h2>
+          <div class="section-eyebrow">人格原型 · Archetype</div>
+          <h2 class="section-title">该人格常见表现</h2>
           <ul class="trait-list">
-            <For each={p().traits}>
+            <For each={r().narrative.archetypeTraits}>
               {(t, i) => (
                 <li class="trait-item">
                   <span class="trait-num">
@@ -301,6 +381,25 @@ export function ResultPage(props: {
         <section class="result-section advice-section">
           <div class="section-eyebrow">一句忠告 · Advice</div>
           <p class="advice-text">"{p().advice}"</p>
+        </section>
+
+        {/* AI explain · 复制链接 + 跳转到 README 使用说明 */}
+        <section class="result-section ai-explain-section">
+          <div class="section-eyebrow">AI 解读 · Explain with AI</div>
+          <h2 class="section-title">想问 AI：「我为什么是这个结果？」</h2>
+          <p class="ai-explain-desc">
+            本仓库自带一个 agent skill，可让 AI 根据你的分享链接，逐题拆解你四维得分的来源、告诉你哪几道题决定了这个结果、离哪个隐藏人格差一步。点击下方按钮会把你的分享链接复制到剪贴板，并跳转到 README 的 skill 使用说明；之后把链接交给任意支持 skill 的 AI 助手即可。
+          </p>
+          <button
+            type="button"
+            class="btn btn-accent ai-explain-btn"
+            onClick={() => void handleExplainWithAi()}
+            aria-label="复制分享链接并打开 explain-result skill 的 README 使用说明"
+          >
+            {explainCopied()
+              ? '✓ 链接已复制，正在打开说明…'
+              : '复制链接 · 查看 AI 使用说明 →'}
+          </button>
         </section>
 
         <div class="result-footer">
