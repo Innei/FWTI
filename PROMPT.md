@@ -60,7 +60,7 @@ unread message thread, leaning forward in an unstable pose, torn paper scraps an
 a faint red blast cloud curling behind them
 ```
 
-#### GZNF — 恋爱脑 · DAZE
+#### GZNF — 恋爱脑 · CRUSH
 
 > 脑子空了，全是你
 
@@ -71,7 +71,7 @@ tucked among the stems showing a chat bubble, tilted-head smile of complete devo
 feet barely touching the ground, rose petals drifting upward around them
 ```
 
-#### GZLY — 醋王 · SOUR
+#### GZLY — 醋王 · LEMON
 
 > 我不是在吃醋，我是在喝醋
 
@@ -82,7 +82,7 @@ a social media post with a flagged heart reaction, narrowed suspicious eyes with
 one raised eyebrow, tight smirk, a faint yellow citrus aura around the lemon
 ```
 
-#### GZLF — 海王 / 浪子 · WILD
+#### GZLF — 海王 / 浪子 · HW
 
 > 爱得热烈，走得潇洒，鱼塘永远在扩建
 
@@ -98,7 +98,7 @@ in the background to suggest many simultaneous flirtations
 
 ### 🟡 GR · 隐忍家
 
-#### GRNY — 卑微战士 · DUST
+#### GRNY — 卑微战士 · BEIWEI
 
 > 把自己低到尘埃里，还觉得尘埃嫌弃我
 
@@ -120,7 +120,7 @@ off-frame, heart-shaped highlights in their eyes, wagging body language, an
 invisible tail wag suggested by motion lines
 ```
 
-#### GRLY — 钓系大师 · BAIT
+#### GRLY — 钓系大师 · LVCHA
 
 > 我不是在恋爱，我在下棋
 
@@ -131,7 +131,7 @@ glancing sideways with a knowing half-smile, a single chess piece balanced on
 their knee, dim spotlight from above
 ```
 
-#### GRLF — 正常人 · SANE
+#### GRLF — 正常人 · NPC
 
 > 理论上存在的生物
 
@@ -147,7 +147,7 @@ around the figure as if they were a rare documented species
 
 ### 🔵 DZ · 内爆家
 
-#### DZNY — 定时炸弹 · TICK
+#### DZNY — 定时炸弹 · FUZE
 
 > 表面风平浪静，内心已经核爆十七次了
 
@@ -158,7 +158,7 @@ with a visible countdown timer peeking from inside the shirt collar, faint red
 anger marks floating above the head, eye twitching slightly
 ```
 
-#### DZNF — 林黛玉 · WILT
+#### DZNF — 林黛玉 · LINDDY
 
 > 风吹一下我就能哭半小时
 
@@ -208,7 +208,7 @@ eyes downcast, clutching a phone close to the chest showing an unsent message dr
 soft thin outline only, very restrained palette
 ```
 
-#### DRNF — 树懒 · SLOW
+#### DRNF — 树懒 · BAILAN
 
 > 恋爱这件事急不来的……大概……三年后见？
 
@@ -219,7 +219,7 @@ their hair, a large wall clock in the background showing barely moving hands, so
 dreamy atmosphere
 ```
 
-#### DRLY — 仙人掌 · DRY
+#### DRLY — 仙人掌 · FROST
 
 > 三年浇一次水就够了
 
@@ -230,7 +230,7 @@ eyebrow, faint prickly aura lines radiating from their shoulders, dry sun-bleach
 background
 ```
 
-#### DRLF — 已读不回 · SEEN
+#### DRLF — 已读不回 · GONE
 
 > 看到了。然后呢？
 

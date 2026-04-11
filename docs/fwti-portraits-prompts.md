@@ -164,7 +164,7 @@ serene and composed
 
 ### 🔵 DZ · 内爆家
 
-#### DZNY — 定时炸弹 · TICK
+#### DZNY — 定时炸弹 · FUZE
 > 表面风平浪静，内心已经核爆三次了
 
 ```
@@ -238,7 +238,7 @@ eyebrow, faint prickly aura lines radiating from their shoulders, dry sun-bleach
 background
 ```
 
-#### DRLF — 已读不回 · SEEN
+#### DRLF — 已读不回 · GONE
 > 恋爱？那是能吃的东西吗？
 
 ```

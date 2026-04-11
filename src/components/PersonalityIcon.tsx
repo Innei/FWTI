@@ -33,7 +33,7 @@ const GZNY: IconFn = () => (
   </g>
 );
 
-// GZNF 恋爱脑 SIMP
+// GZNF 恋爱脑 CRUSH
 const GZNF: IconFn = () => (
   <g>
     <path
@@ -46,7 +46,7 @@ const GZNF: IconFn = () => (
   </g>
 );
 
-// GZLY 醋王 SOUR
+// GZLY 醋王 LEMON
 const GZLY: IconFn = () => (
   <g>
     <line x1="44" y1="14" x2="56" y2="14" style={baseStyle} />
@@ -61,7 +61,7 @@ const GZLY: IconFn = () => (
   </g>
 );
 
-// GZLF 浪子/浪女 YOLO
+// GZLF 浪子/浪女 HW
 const GZLF: IconFn = () => (
   <g>
     <path d="M 10 60 Q 22 38 38 50 Q 52 62 62 42 Q 72 22 86 34 Q 94 42 90 58" style={baseStyle} />
@@ -75,7 +75,7 @@ const GZLF: IconFn = () => (
 
 // ========== GR · 冲 + 忍 ==========
 
-// GRNY 卑微战士 SOIL
+// GRNY 卑微战士 BEIWEI
 const GRNY: IconFn = () => (
   <g>
     <line x1="14" y1="84" x2="86" y2="84" style={baseStyle} />
@@ -89,7 +89,7 @@ const GRNY: IconFn = () => (
   </g>
 );
 
-// GRNF 舔狗 WOOF
+// GRNF 舔狗 SIMP
 const GRNF: IconFn = () => (
   <g>
     <circle cx="50" cy="55" r="28" style={baseStyle} />
@@ -105,7 +105,7 @@ const GRNF: IconFn = () => (
   </g>
 );
 
-// GRLY 钓系大师 BAIT
+// GRLY 钓系大师 LVCHA
 const GRLY: IconFn = () => (
   <g>
     <line x1="14" y1="84" x2="78" y2="20" style={baseStyle} />
@@ -117,7 +117,7 @@ const GRLY: IconFn = () => (
   </g>
 );
 
-// GRLF 正常人 SANE
+// GRLF 正常人 NPC
 const GRLF: IconFn = () => (
   <g>
     <circle cx="42" cy="30" r="11" style={baseStyle} />
@@ -133,7 +133,7 @@ const GRLF: IconFn = () => (
 
 // ========== DZ · 蹲 + 炸 ==========
 
-// DZNY 定时炸弹 TICK
+// DZNY 定时炸弹 FUZE
 const DZNY: IconFn = () => (
   <g>
     <circle cx="48" cy="60" r="28" style={baseStyle} />
@@ -151,7 +151,7 @@ const DZNY: IconFn = () => (
   </g>
 );
 
-// DZNF 林黛玉 TEAR
+// DZNF 林黛玉 LINDDY
 const DZNF: IconFn = () => (
   <g>
     <circle cx="50" cy="50" r="30" style={baseStyle} />
@@ -208,7 +208,7 @@ const DZLF: IconFn = () => (
 
 // ========== DR · 蹲 + 忍 ==========
 
-// DRNY 透明人 VOID
+// DRNY 透明人 GHOST
 const DRNY: IconFn = () => (
   <g>
     <path
@@ -221,7 +221,7 @@ const DRNY: IconFn = () => (
   </g>
 );
 
-// DRNF 树懒 SLOW
+// DRNF 树懒 BAILAN
 const DRNF: IconFn = () => (
   <g>
     <line x1="8" y1="20" x2="92" y2="20" style={baseStyle} />
@@ -239,7 +239,7 @@ const DRNF: IconFn = () => (
   </g>
 );
 
-// DRLY 仙人掌 DRY
+// DRLY 仙人掌 FROST
 const DRLY: IconFn = () => (
   <g>
     <path d="M 32 76 L 36 92 L 64 92 L 68 76 Z" style={baseStyle} />
@@ -260,7 +260,7 @@ const DRLY: IconFn = () => (
   </g>
 );
 
-// DRLF 已读不回 SEEN
+// DRLF 已读不回 GONE
 const DRLF: IconFn = () => (
   <g>
     <rect x="26" y="10" width="48" height="80" rx="7" style={baseStyle} />
