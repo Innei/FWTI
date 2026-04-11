@@ -192,6 +192,18 @@ export const hiddenPersonalityTriggers: HiddenPersonalityTrigger[] = [
       a.polarityAt('BAD_NEWS_PANIC') > 0,
   },
 
+  // JOKER · 小丑 — 主动出击 + 表面佛系 + 情绪表达内撕裂
+  // 比色子 CHAOS 更具体：要求 G（主动）+ YF 偏 F（装无所谓）+ ZR 维内自相攻伐
+  // CHAOS 是真混乱，JOKER 是有策略的伪装——"我不是不在意，我只是笑着说"
+  // Vaillant 防御机制层级中的"幽默化"（humor as defense）+ deactivating strategy
+  {
+    code: 'JOKER',
+    test: (a) =>
+      a.ratio.GD > 0.3 &&
+      a.ratio.YF <= -0.4 &&
+      a.polarityVariance('ZR') >= 2,
+  },
+
   // CHAOS · 已读乱回 — 显性 F 或 L + Z/R 维度内自相攻伐（≥ 2 道 A 同时 ≥ 2 道 C）
   // 收窄到情绪表达维，是为与「已读乱回 / 颠话回复」的文案语义对齐：
   // 混乱主要落在“怎么回、回成什么样”，而非所有维度的一般性摇摆。

@@ -31,9 +31,9 @@
 | **亲密需求** | **N（Nian·黏）** — 高度黏合型 | **L（Li·离）** — 独立疏离型    | 成人依恋"回避"维度（Brennan, Clark & Shaver, 1998; Fraley et al., 2000） | 你是黏人精还是独处王？     |
 | **安全感**   | **Y（Yi·疑）** — 患得患失型   | **F（Fo·佛）** — 佛系信任型    | 成人依恋"焦虑"维度（同上）                                             | 你是疑心病还是佛祖？       |
 
-四个字母组合 → 2⁴ = **16 种恋爱废物人格 + 10 种隐藏人格**（ALL + RAT + PURE + MAD + E-DOG + CHAOS + CPU + BENCH + VOID + LIMBO）
+四个字母组合 → 2⁴ = **16 种恋爱废物人格 + 11 种隐藏人格**（ALL + RAT + PURE + MAD + E-DOG + CHAOS + CPU + BENCH + JOKER + VOID + LIMBO）
 
-> 如果你在多个维度得分完全平票，你不会被判为"更废的那一端"——会直接归入隐藏人格「**我全都要（ALL）**」。详见第五节计分规则。v0.3 已新增 7 种独立隐藏人格（RAT / PURE / MAD / E-DOG / CHAOS / CPU / BENCH）；v0.4 再增 2 张状态门禁人格：**VOID · 电子断联户**（仅 solo 可解）与 **LIMBO · 意难平学家**（仅 crush 可解）。各有独立触发条件，优先级高于 16 格判定与 ALL。
+> 如果你在多个维度得分完全平票，你不会被判为"更废的那一端"——会直接归入隐藏人格「**我全都要（ALL）**」。详见第五节计分规则。v0.3 已新增 7 种独立隐藏人格（RAT / PURE / MAD / E-DOG / CHAOS / CPU / BENCH）；v0.4 再增 3 张隐藏人格：**JOKER · 小丑**（全状态可触发）、**VOID · 电子断联户**（仅 solo 可解）与 **LIMBO · 意难平学家**（仅 crush 可解）。各有独立触发条件，优先级高于 16 格判定与 ALL。
 
 ---
 
@@ -706,20 +706,21 @@ v0.4 触发条件均以 **语义锚 + 维度 ratio** 表达，避免与具体题
 2. **RAT · 鼠鼠恋人** — `status === 'solo' && ratio.GD ≤ -0.6 && ratio.ZR ≤ -0.4 && ratio.NL ≤ -0.4 && ratio.YF ≥ 0.8`
 3. **PURE · 纯爱战士** — `(status === 'solo' || status === 'crush') && ratio.GD ≥ 0.8 && ratio.NL ≥ 0.6 && ratio.YF ≤ -0.6`
 4. **CPU · CPU 恋人** — `status === 'ambiguous' && ratio.YF ≥ 0.85 && polarityOf(SEMANTIC.IMAGINE_NOT_LOVED) > 0 && polarityOf(SEMANTIC.BAD_NEWS_PANIC) > 0`（v0.4 改版：加状态门禁。`BAD_NEWS_PANIC` 锚仅存 ambiguous 扩展段，其他状态之高 Y 用户回落 16 型正常归格，以保 override 证据强度严于 16 型）
-5. **CHAOS · 已读乱回** — `(ratio.YF ≤ -0.4 || ratio.NL ≤ -0.4) && lens.polarityVariance('ZR') ≥ 2`（一维内自相攻伐）
-6. **E-DOG · 赛博舔狗** — `Math.abs(ratio.NL) ≤ 0.2 && polarityOf(SEMANTIC.TWO_HOUR_NOREPLY) > 0 && polarityOf(SEMANTIC.POST_DATE_TEXT) > 0`
-7. **BENCH · 备胎之王** — `status === 'ambiguous' && ratio.GD ≥ 0.2 && ratio.ZR ≤ -0.4 && ratio.NL ≤ -0.2 && ratio.YF ≥ 0.4 && polarityOf(SEMANTIC.LIKE_OTHER_GENDER) > 0`
-8. **VOID · 电子断联户** — `status === 'solo' && ratio.GD ≤ -0.8 && ratio.NL ≤ -0.6 && polarityOf(SEMANTIC.OFFLINE_RELIEF) > 0`（v0.4 新增；见 Q35）
-9. **LIMBO · 意难平学家** — `status === 'crush' && ratio.YF ≥ 0.8 && ratio.NL ≥ 0.3 && polarityOf(SEMANTIC.JEALOUSY_EX_STALK) > 0`（v0.4 新增；查岗博士后）
-10. **ALL · 我全都要** — ≥ 2 个维度的 `ratio` 严格等于 0（原 LIMBO 规则，置最末作为兜底）
+5. **JOKER · 小丑** — `ratio.GD > 0.3 && ratio.YF ≤ -0.4 && polarityVariance('ZR') ≥ 2`（v0.4 新增；全状态可触发。主动出击 + 表面佛系 + 情绪表达内撕裂——"小丑竟是我自己"。比 CHAOS 更具体：要求 G（主动）+ YF 偏 F（装无所谓），是有策略的伪装而非无序混乱）
+6. **CHAOS · 已读乱回** — `(ratio.YF ≤ -0.4 || ratio.NL ≤ -0.4) && lens.polarityVariance('ZR') ≥ 2`（一维内自相攻伐）
+7. **E-DOG · 赛博舔狗** — `Math.abs(ratio.NL) ≤ 0.2 && polarityOf(SEMANTIC.TWO_HOUR_NOREPLY) > 0 && polarityOf(SEMANTIC.POST_DATE_TEXT) > 0`
+8. **BENCH · 备胎之王** — `status === 'ambiguous' && ratio.GD ≥ 0.2 && ratio.ZR ≤ -0.4 && ratio.NL ≤ -0.2 && ratio.YF ≥ 0.4 && polarityOf(SEMANTIC.LIKE_OTHER_GENDER) > 0`
+9. **VOID · 电子断联户** — `status === 'solo' && ratio.GD ≤ -0.8 && ratio.NL ≤ -0.6 && polarityOf(SEMANTIC.OFFLINE_RELIEF) > 0`（v0.4 新增；见 Q35）
+10. **LIMBO · 意难平学家** — `status === 'crush' && ratio.YF ≥ 0.8 && ratio.NL ≥ 0.3 && polarityOf(SEMANTIC.JEALOUSY_EX_STALK) > 0`（v0.4 新增；查岗博士后）
+11. **ALL · 我全都要** — ≥ 2 个维度的 `ratio` 严格等于 0（原 LIMBO 规则，置最末作为兜底）
 
 若无任一命中，进入正常 16 型判定流程（§五平票规则）。
 
-> 设计意图：v0.3 之前隐藏人格仅 LIMBO 一张，承载"两端打平"这一种处境；v0.3 把"废得极致"、"废得偏狭"、"废得分裂"等多种处境也分门别类地接住。v0.4 再追加两张 **状态门禁** 人格：VOID 专接"单身且主动彻底熄火、线上失踪"的玩家，LIMBO 专接"暗恋但查岗成瘾、把 TA 的朋友圈考古成论文"的玩家。状态门禁避免与老玩家现存 v0.3 结果冲突。优先级顺序按"越具体越靠前"：MAD 的触发条件最窄，ALL 的最宽（兜底）。
+> 设计意图：v0.3 之前隐藏人格仅 LIMBO 一张，承载"两端打平"这一种处境；v0.3 把"废得极致"、"废得偏狭"、"废得分裂"等多种处境也分门别类地接住。v0.4 再追加 JOKER（全状态·以幽默为防御壳）与两张 **状态门禁** 人格：VOID 专接"单身且主动彻底熄火、线上失踪"的玩家，LIMBO 专接"暗恋但查岗成瘾、把 TA 的朋友圈考古成论文"的玩家。状态门禁避免与老玩家现存 v0.3 结果冲突。优先级顺序按"越具体越靠前"：MAD 的触发条件最窄，ALL 的最宽（兜底）。
 
 ---
 
-## 六、16 + 10 人格详细图鉴（待撰写 · v0.4 新增 VOID + LIMBO）
+## 六、16 + 11 人格详细图鉴（待撰写 · v0.4 新增 JOKER + VOID + LIMBO）
 
 > 以下为每种人格的详细解读框架，审阅通过后再逐一撰写 + 制作卡片图。
 
@@ -733,6 +734,16 @@ v0.4 触发条件均以 **语义锚 + 维度 ratio** 表达，避免与具体题
 6. **废物指数**（1–5 星）
 7. **一句忠告**（认真的那种，收尾用）
 8. **🎓 认真版解读（默认折叠）**：用心理学语言重新描述这个人格，引用对应的依恋 / 情绪调节理论条目，制造"原来你在一本正经地骂我"的反差感
+
+### JOKER · 小丑（v0.4 新增 · 全状态可触发）
+
+- **简介**：你是朋友圈里的气氛组组长，群聊里最响的那个哈哈哈永远是你发的。你主动出击、热情满满，但一旦气氛开始认真——哪怕只有一丁点儿认真——你就条件反射地掏出段子，把场面搅成一锅浆糊。你不是不会严肃，你是不敢；因为严肃意味着暴露，暴露意味着把刀递出去，而你已经递过太多次了。你表面上一副"无所谓啊反正我不在乎"的样子，其实手机一震你就看，对方三个小时没回你就在脑子里排练了一整季脱口秀——笑点全是自嘲，素材全是自己。
+- **典型表现**：①表白的方式是发一个"我喜欢你……的狗"的表情包，然后撤回后半句；②吵架吵到一半突然开始讲笑话，把对方气笑了之后自己偷偷生闷气；③被问"你到底怎么想的"永远回答"我没什么想法啊哈哈哈"；④深夜删掉的朋友圈比发的还多，每一条都是真心话的半成品。
+- **口头禅**：「哈哈哈随便啦」「你认真的？那我也认真的——认真觉得你好看」「我没生气啊，我笑还来不及呢」「说出来多没意思，你猜」。
+- **最佳拍档**：恋爱脑 DAZE（TA 的热情和直白能融化你的壳，你负责笑 TA 负责 push）/ 纯爱战士 PURE。**最怕遇到**：自爆卡车 BOOM（两个情绪管理失控的人凑一块，你的段子拦不住 TA 的 TNT）/ 备胎之王 BENCH（互相猜、互相装，最后谁都不先开口）。
+- **废物指数**：★★★★☆
+- **一句忠告**：幽默是一种天赋，但把它当盔甲穿一辈子会捂出痱子的。偶尔把段子收一收，说一句"我其实挺在意"——世界不会因此塌。
+- **🎓 认真版解读**：对应 Vaillant 防御机制层级中的"幽默化"（Vaillant, 1992, defense mechanism hierarchy）——幽默被用作回避负面情感体验的高级防御策略。叠加成人依恋中的"去激活策略"（deactivating strategy，Mikulincer & Shaver, 2007）：通过情感疏离来维持表面安全距离，但与典型回避型不同，JOKER 的 BAS drive（Carver & White, 1994）并未熄火——主动接近的动机很强，只是在情感暴露的临界点上用笑话做了防火墙。Gross & John (2003) 的情绪调节研究中，"表达抑制"（suppression）策略的高频使用者常呈现此种外显模式：表面社交活跃，内在情绪体验被系统性压抑。
 
 ### VOID · 电子断联户（v0.4 新增 · 仅 solo 可解）
 
