@@ -1214,6 +1214,17 @@ function assertInvariants(): void {
   }
 }
 
-if (import.meta.env.DEV) {
+const maybeImportMetaEnv =
+  typeof import.meta !== 'undefined'
+    ? (Reflect.get(import.meta, 'env') as
+        | {
+            DEV?: boolean;
+          }
+        | undefined)
+    : undefined;
+
+const isDevRuntime = !!maybeImportMetaEnv?.DEV;
+
+if (isDevRuntime) {
   assertInvariants();
 }

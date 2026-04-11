@@ -6,6 +6,7 @@ import { decodeAnswers } from '../../src/logic/codec'
 import { getResult, type Result } from '../../src/logic/scoring'
 import { getLegacyResultV1 } from '../../src/logic/legacy/scoring-v1'
 import { saveToHistory } from '../../src/logic/history'
+import { resetTelemetryQuizRun, trackPageView, trackResultView } from '../../src/telemetry/client'
 
 interface RenderedResult {
   result: Result
@@ -42,6 +43,12 @@ export default function Page() {
     if (r && !saved) {
       saved = true
       saveToHistory(r.result, r.hash)
+      trackPageView('result')
+      trackResultView({
+        hash: r.hash,
+        result: r.result,
+        isLegacy: r.isLegacy,
+      })
     }
   })
 
@@ -54,6 +61,7 @@ export default function Page() {
         onRestart={() => {
           setAnswers({})
           setRetreatCount(0)
+          resetTelemetryQuizRun()
           void navigate('/quiz')
         }}
       />

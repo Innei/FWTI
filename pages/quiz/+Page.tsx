@@ -1,14 +1,22 @@
+import { createEffect, onMount } from 'solid-js'
 import { navigate } from 'vike/client/router'
 import {
   QuizPage,
   answers,
+  retreatCount,
   setAnswers,
   setRetreatCount,
 } from '../../src/App'
 import { metaQuestionId, applyAnswerSelection } from '../../src/logic/answers'
 import { encodeAnswersV2 } from '../../src/logic/codec'
-import { getRelationshipStatus } from '../../src/logic/scoring'
+import { getRelationshipStatus, getResult } from '../../src/logic/scoring'
 import { buildQuestionPath, isPathComplete } from '../../src/logic/flow'
+import {
+  beginQuizRun,
+  trackPageView,
+  trackQuizComplete,
+  trackQuizProgress,
+} from '../../src/telemetry/client'
 
 export default function Page() {
   const metaAnswered = () => answers()[metaQuestionId] !== undefined
@@ -61,9 +69,43 @@ export default function Page() {
   function submitQuiz() {
     const s = status()
     if (s === null) return // META 未答，按钮也 disabled，双保险
+    const result = getResult(answers(), retreatCount(), s)
     const encoded = encodeAnswersV2(answers(), s)
+    trackQuizComplete({
+      hash: encoded,
+      status: s,
+      result,
+      retreatCount: retreatCount(),
+      answeredCount: mainProgress(),
+      mainTotal: mainTotal(),
+      answers: path()
+        .filter((q) => q.dimension !== 'META')
+        .flatMap((q) => {
+          const optionIndex = answers()[q.id]
+          return optionIndex === undefined
+            ? []
+            : [{ questionId: q.id, optionIndex }]
+        }),
+    })
     void navigate(`/result/${encoded}`)
   }
+
+  onMount(() => {
+    trackPageView('quiz')
+    beginQuizRun(status())
+  })
+
+  createEffect(() => {
+    beginQuizRun(status())
+    trackQuizProgress(
+      mainTotal() === 0 ? 0 : Math.round((mainProgress() / mainTotal()) * 100),
+      {
+        relationshipStatus: status(),
+        mainProgress: mainProgress(),
+        mainTotal: mainTotal(),
+      },
+    )
+  })
 
   return (
     <QuizPage

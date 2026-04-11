@@ -10,6 +10,7 @@ import { ShareImageModal } from './ShareImageModal';
 import { ResultNav } from './Nav';
 import { ResultReferences } from './ResultReferences';
 import { setPreviewDetail, FWTI_SITE_URL, GITHUB_REPO_URL } from '../state';
+import { trackExplainAiClick, trackShareImageOpen } from '../telemetry/client';
 
 const EXPLAIN_SKILL_README_ANCHOR = `${GITHUB_REPO_URL}#explain-result-skill`;
 
@@ -69,6 +70,7 @@ export function ResultPage(props: {
     const shareUrl = props.hash
       ? `${FWTI_SITE_URL}/result/${props.hash}`
       : FWTI_SITE_URL;
+    trackExplainAiClick(props.result, props.hash);
     try {
       if (typeof navigator !== 'undefined' && navigator.clipboard) {
         await navigator.clipboard.writeText(shareUrl);
@@ -104,7 +106,10 @@ export function ResultPage(props: {
       />
       <ResultNav
         onRestart={props.onRestart}
-        onShareImage={() => setShareOpen(true)}
+        onShareImage={() => {
+          trackShareImageOpen(props.result);
+          setShareOpen(true);
+        }}
       />
 
       <Show when={props.isLegacy}>
