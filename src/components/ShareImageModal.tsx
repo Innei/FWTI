@@ -8,6 +8,7 @@ import {
   type JSX,
 } from 'solid-js'
 import { toPng } from 'html-to-image'
+import QRCode from 'qrcode'
 import type { Result } from '../logic/scoring'
 import Portrait from './Portrait'
 import { getFamilyTheme, getFamily } from '../logic/family'
@@ -42,16 +43,36 @@ export function ShareImageModal(props: {
   open: boolean
   onClose: () => void
   result: Result
+  hash?: string
 }): JSX.Element {
   let captureHost: HTMLDivElement | undefined
   const [preview, setPreview] = createSignal<string | null>(null)
   const [busy, setBusy] = createSignal(false)
   const [hint, setHint] = createSignal<string | null>(null)
+  const [qrDataUrl, setQrDataUrl] = createSignal<string | null>(null)
 
   const r = () => props.result
   const p = () => r().personality
   const theme = () => getFamilyTheme(p().code)
   const family = () => getFamily(p().code)
+
+  // 动态生成当前结果页 QR 码
+  createEffect(() => {
+    if (!props.open) {
+      setQrDataUrl(null)
+      return
+    }
+    const hash = props.hash
+    const origin = getSiteOrigin()
+    const targetUrl = hash ? `${origin}/result/${hash}` : origin
+    QRCode.toDataURL(targetUrl, {
+      width: 144,
+      margin: 1,
+      color: { dark: '#000000', light: '#ffffff' },
+    })
+      .then((url) => setQrDataUrl(url))
+      .catch(() => setQrDataUrl(null))
+  })
 
   createEffect(() => {
     if (!props.open) return
@@ -80,6 +101,7 @@ export function ShareImageModal(props: {
     setHint(null)
 
     const run = async () => {
+      // 等 QR 码生成完毕再加一帧，确保 DOM 就绪
       await sleepRaf()
       if (!captureHost) await sleepRaf()
       if (cancelled || !captureHost) {
@@ -286,6 +308,40 @@ export function ShareImageModal(props: {
                 {p().wasteLevel} / 5
               </span>
             </div>
+
+            {/* 四维坐标条形图 */}
+            <div class="share-image-card-dims">
+              <For each={r().dimensionLabels}>
+                {(d) => (
+                  <div class="share-dim-row">
+                    <div class="share-dim-label">{d.dim}</div>
+                    <div class="share-dim-bar-container">
+                      <span class="share-dim-side share-dim-side--a">
+                        {d.labelA}
+                      </span>
+                      <div class="share-dim-bar-track">
+                        <Show when={d.valueA > 0}>
+                          <div
+                            class="share-dim-bar-fill share-dim-bar-fill--a"
+                            style={{ width: `${Math.min(d.valueA, 100)}%` }}
+                          />
+                        </Show>
+                        <Show when={d.valueB > 0}>
+                          <div
+                            class="share-dim-bar-fill share-dim-bar-fill--b"
+                            style={{ width: `${Math.min(d.valueB, 100)}%` }}
+                          />
+                        </Show>
+                      </div>
+                      <span class="share-dim-side share-dim-side--b">
+                        {d.labelB}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </For>
+            </div>
+
             <Show when={r().unlockedHiddenTitles.length > 0}>
               <div class="share-image-card-achv">
                 <span class="share-image-card-achv-label">隐藏标签</span>
@@ -297,13 +353,26 @@ export function ShareImageModal(props: {
               </div>
             </Show>
             <div class="share-image-card-footer">
-              <img
-                src="/fwti-site-qr.png"
-                width={72}
-                height={72}
-                alt=""
-                decoding="async"
-              />
+              <Show
+                when={qrDataUrl()}
+                fallback={
+                  <img
+                    src="/fwti-site-qr.png"
+                    width={72}
+                    height={72}
+                    alt=""
+                    decoding="async"
+                  />
+                }
+              >
+                <img
+                  src={qrDataUrl()!}
+                  width={72}
+                  height={72}
+                  alt=""
+                  decoding="async"
+                />
+              </Show>
               <span class="share-image-card-url">{siteLabel()}</span>
             </div>
           </div>

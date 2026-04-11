@@ -38,6 +38,8 @@ export function ResultPage(props: {
   result: Result;
   /** 此结果是否走 v0.3 legacy scoring（旧分享链接）。渲染一条提示条并引导重测新版。 */
   isLegacy?: boolean;
+  /** 分享链接 hash，用于动态 QR 码生成。 */
+  hash?: string;
   onRestart: () => void;
 }) {
   const [shareOpen, setShareOpen] = createSignal(false);
@@ -60,6 +62,7 @@ export function ResultPage(props: {
         open={shareOpen()}
         onClose={() => setShareOpen(false)}
         result={props.result}
+        hash={props.hash}
       />
       <ResultNav
         onRestart={props.onRestart}

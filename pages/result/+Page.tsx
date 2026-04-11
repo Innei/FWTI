@@ -50,6 +50,7 @@ export default function Page() {
       <ResultPage
         result={rendered()!.result}
         isLegacy={rendered()!.isLegacy}
+        hash={rendered()!.hash}
         onRestart={() => {
           setAnswers({})
           setRetreatCount(0)

@@ -1334,6 +1334,75 @@ a.nav-logo:focus-visible {
   word-break: keep-all;
   vertical-align: top;
 }
+/* share card 内的四维条形图（紧凑版，复用 ResultPage 的 dim-bar 视觉） */
+.share-image-card-dims {
+  margin-bottom: 16px;
+  text-align: left;
+}
+.share-dim-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.share-dim-row:last-child {
+  margin-bottom: 0;
+}
+.share-dim-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--fwti-text-mid);
+  min-width: 42px;
+  letter-spacing: 0.02em;
+}
+.share-dim-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+.share-dim-side {
+  font-size: 9px;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+  font-weight: 500;
+}
+.share-dim-side--a {
+  text-align: right;
+  min-width: 48px;
+  color: var(--fwti-accent);
+}
+.share-dim-side--b {
+  text-align: left;
+  min-width: 48px;
+  color: var(--fwti-text-soft);
+}
+.share-dim-bar-track {
+  flex: 1;
+  height: 6px;
+  background: var(--fwti-border);
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+}
+.share-dim-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+.share-dim-bar-fill--a {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: var(--fwti-accent);
+}
+.share-dim-bar-fill--b {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: var(--fwti-text-soft);
+  opacity: 0.5;
+}
+
 .share-image-card-footer {
   display: flex;
   flex-direction: column;
