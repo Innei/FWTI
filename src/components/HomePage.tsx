@@ -21,6 +21,7 @@ const HIDDEN_CODES_EXCLUDED_FROM_PREVIEW = new Set([
   'CHAOS',
   'CPU',
   'BENCH',
+  'JOKER',
   'VOID',
   'LIMBO',
 ]);
