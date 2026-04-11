@@ -1,6 +1,7 @@
-import { Show } from 'solid-js';
+import { Show, createSignal, onMount } from 'solid-js';
 import { navigate } from 'vike/client/router';
 import { GITHUB_REPO_URL } from '../state';
+import { getHistory } from '../logic/history';
 
 export function NavLogo() {
   return (
@@ -40,6 +41,11 @@ export function GithubNavLink() {
 }
 
 export function TopNav(props: { meta?: string }) {
+  const [hasHistory, setHasHistory] = createSignal(false);
+  onMount(() => {
+    setHasHistory(getHistory().length > 0);
+  });
+
   return (
     <nav class="top-nav">
       <div class="nav-inner">
@@ -47,6 +53,16 @@ export function TopNav(props: { meta?: string }) {
         <div class="nav-right">
           <Show when={props.meta}>
             <div class="nav-meta">{props.meta}</div>
+          </Show>
+          <Show when={hasHistory()}>
+            <button
+              class="nav-history"
+              type="button"
+              onClick={() => void navigate('/history')}
+              aria-label="测试记录"
+            >
+              <span>记录</span>
+            </button>
           </Show>
           <GithubNavLink />
         </div>
