@@ -451,37 +451,7 @@ async function loadDashboardData(db: D1Database, days: number): Promise<Dashboar
     answerRows,
   ] = await Promise.all([
     fetchOverview(db, fromTs),
-    fetchRows(
-      db,
-      `SELECT 'home_view' AS key, COUNT(DISTINCT session_id) AS value
-         FROM telemetry_events
-        WHERE occurred_at >= ? AND event_type = 'page_view' AND page_key = 'home'
-       UNION ALL
-       SELECT 'quiz_start' AS key, COUNT(DISTINCT session_id) AS value
-         FROM telemetry_events
-        WHERE occurred_at >= ? AND event_type = 'quiz_start'
-       UNION ALL
-       SELECT 'quiz_25' AS key, COUNT(DISTINCT session_id) AS value
-         FROM telemetry_events
-        WHERE occurred_at >= ? AND event_type = 'quiz_progress' AND progress_pct = 25
-       UNION ALL
-       SELECT 'quiz_50' AS key, COUNT(DISTINCT session_id) AS value
-         FROM telemetry_events
-        WHERE occurred_at >= ? AND event_type = 'quiz_progress' AND progress_pct = 50
-       UNION ALL
-       SELECT 'quiz_75' AS key, COUNT(DISTINCT session_id) AS value
-         FROM telemetry_events
-        WHERE occurred_at >= ? AND event_type = 'quiz_progress' AND progress_pct = 75
-       UNION ALL
-       SELECT 'quiz_complete' AS key, COUNT(DISTINCT session_id) AS value
-         FROM telemetry_events
-        WHERE occurred_at >= ? AND event_type = 'quiz_complete'
-       UNION ALL
-       SELECT 'result_view' AS key, COUNT(DISTINCT session_id) AS value
-         FROM telemetry_events
-        WHERE occurred_at >= ? AND event_type = 'result_view'`,
-      [fromTs, fromTs, fromTs, fromTs, fromTs, fromTs, fromTs],
-    ),
+    fetchFunnelRows(db, fromTs),
     fetchRows(
       db,
       `SELECT COALESCE(page_key, '(unknown)') AS key, COUNT(*) AS value
@@ -658,6 +628,52 @@ async function fetchOverview(db: D1Database, fromTs: number) {
     completionRate: quizStarts > 0 ? quizCompletes / quizStarts : 0,
     avgCompletionMs: Math.round(row.avg_completion_ms ?? 0),
   };
+}
+
+async function fetchFunnelRows(db: D1Database, fromTs: number): Promise<KVRow[]> {
+  const row =
+    (await db
+      .prepare(
+        `SELECT
+          COUNT(DISTINCT CASE
+            WHEN event_type = 'page_view' AND page_key = 'home' THEN session_id
+          END) AS home_view,
+          COUNT(DISTINCT CASE
+            WHEN event_type = 'quiz_start' THEN session_id
+          END) AS quiz_start,
+          COUNT(DISTINCT CASE
+            WHEN event_type = 'quiz_progress' AND progress_pct = 25 THEN session_id
+          END) AS quiz_25,
+          COUNT(DISTINCT CASE
+            WHEN event_type = 'quiz_progress' AND progress_pct = 50 THEN session_id
+          END) AS quiz_50,
+          COUNT(DISTINCT CASE
+            WHEN event_type = 'quiz_progress' AND progress_pct = 75 THEN session_id
+          END) AS quiz_75,
+          COUNT(DISTINCT CASE
+            WHEN event_type = 'quiz_complete' THEN session_id
+          END) AS quiz_complete,
+          COUNT(DISTINCT CASE
+            WHEN event_type = 'result_view' THEN session_id
+          END) AS result_view
+         FROM telemetry_events
+        WHERE occurred_at >= ?`,
+      )
+      .bind(fromTs)
+      .first<Record<string, number | null>>()) ?? {};
+
+  return [
+    'home_view',
+    'quiz_start',
+    'quiz_25',
+    'quiz_50',
+    'quiz_75',
+    'quiz_complete',
+    'result_view',
+  ].map((key) => ({
+    key,
+    value: row[key] ?? 0,
+  }));
 }
 
 async function fetchScoreAverages(db: D1Database, fromTs: number) {
