@@ -2083,15 +2083,15 @@ button.legend-chip:focus-visible {
   border-radius: 999px;
   transition: width 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
-/*  bipolar：分数落在 labelA 一侧时从左向右填；落在 labelB 一侧时从右向左填 */
+/*  bipolar：分数落在 labelA 一侧时从中轴向左展开；落在 labelB 一侧时从中轴向右展开 */
 .dim-bar-fill--pole-a {
   position: absolute;
-  left: 0;
+  right: 50%;
   top: 0;
 }
 .dim-bar-fill--pole-b {
   position: absolute;
-  right: 0;
+  left: 50%;
   top: 0;
 }
 
