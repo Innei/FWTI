@@ -10,7 +10,12 @@
  * 同 v2 同名接口，便于 UI 复用：`buildQuestionPathV3` / `nextQuestionV3` / `isPathCompleteV3`。
  */
 
-import { metaQuestionV3, questionsV3 } from '../../copy/v3/questions';
+import {
+  metaQuestionV3,
+  questionsV3,
+  SOLO_EXCLUDED_IDS_V3,
+  SOLO_ONLY_IDS_V3,
+} from '../../copy/v3/questions';
 import type { QuestionV3 } from '../../copy/v3/types';
 import type { RelationshipStatusV3 } from './codec';
 
@@ -27,7 +32,14 @@ export function buildQuestionPathV3(
   status: RelationshipStatusV3OrNull,
 ): QuestionV3[] {
   if (status === null) return [metaQuestionV3];
-  return [metaQuestionV3, ...questionsV3];
+  // solo 路径：剔除 5 道以"假设恋爱 / 暗恋 / 前任"为锚的题，保留 solo-only 补题。
+  // 非 solo：保留原 32 题，剔除 solo-only 补题。
+  // 两支皆 32 道非 META，且每维 8 题（4+/4- A 极性），见 questions.ts §五 注。
+  const filtered =
+    status === 'solo'
+      ? questionsV3.filter((q) => !SOLO_EXCLUDED_IDS_V3.has(q.id))
+      : questionsV3.filter((q) => !SOLO_ONLY_IDS_V3.has(q.id));
+  return [metaQuestionV3, ...filtered];
 }
 
 export function nextQuestionV3(

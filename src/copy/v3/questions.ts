@@ -735,7 +735,97 @@ const S_QUESTIONS: QuestionV3[] = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════
-// §五 · 合并 · questionsV3 / questionIdsV3 / questionByIdV3
+// §五 · solo-only 题（替换 5 道以"假设正在恋爱 / 暗恋 / 前任"为锚的 variants）
+//
+// META Q0 D = "纯单身，没有任何心动对象" 的用户原本需答 Q13/Q21/Q26/Q27/Q30 的
+// solo variant，其措辞仍假设"你正在恋爱 / 暗恋 / 前任"，纯单身作答违和。
+// 此五题在 solo 路径被替换为同维同极性的 solo-native 题（Q33-Q37），以保
+// 每 status 四维 8/8/8/8 + 4+/4- A 极性。
+//
+// 极性映射：
+//   Q13 (R, A=+2, 5-scale) → Q33 (R, A=+2, 5-scale)
+//   Q21 (A, A=+2, 5-scale) → Q35 (A, A=+2, 5-scale)
+//   Q26 (S, A=-2, 3-scale) → Q34 (S, A=-2, 3-scale)
+//   Q27 (S, A=+2, 3-scale) → Q37 (S, A=+2, 3-scale)
+//   Q30 (S, A=-2, 3-scale) → Q36 (S, A=-2, 3-scale)
+//
+// 非 solo 用户不答此 5 题；solo 用户不答被替题——两组于 codec 中相当于
+// 互斥补位，位点皆为 `-`，不破坏既往 v3 链接（`decodeAnswersV3` 尾部
+// 右 pad `-`）。
+// ═══════════════════════════════════════════════════════════════════
+
+export const SOLO_EXCLUDED_IDS_V3: ReadonlySet<number> = new Set([
+  13, 21, 26, 27, 30,
+]);
+
+const SOLO_ONLY_QUESTIONS: QuestionV3[] = [
+  {
+    id: 33,
+    dimension: 'R',
+    scale: 5,
+    text: '独处时突然想起一件多年前让你很难受的往事——',
+    options: [
+      { label: 'A', text: '立刻找个人倾诉（朋友 / 家人 / 树洞都行）', score: 2 },
+      { label: 'B', text: '写出来，发一条小作文 / 朋友圈', score: 1 },
+      { label: 'C', text: '叹口气，继续手头事', score: 0 },
+      { label: 'D', text: '心里翻一遍，一个字不说', score: -1 },
+      { label: 'E', text: '早翻篇了，无感', score: -2 },
+    ],
+  },
+  {
+    id: 34,
+    dimension: 'S',
+    scale: 3,
+    text: '身边重要的朋友突然有了新的"知己"，你好像被冷落——',
+    options: [
+      { label: 'A', text: '挺好，各有各的圈子', score: -2 },
+      { label: 'B', text: '有点酸，但不说', score: 0 },
+      { label: 'C', text: '忍不住去查 TA 最近跟谁走得近', score: 2 },
+    ],
+  },
+  {
+    id: 35,
+    dimension: 'A',
+    scale: 5,
+    text: '你主动联系亲密好友 / 家人的频率——',
+    options: [
+      { label: 'A', text: '几乎每天，至少有一两个人要讲话', score: 2 },
+      { label: 'B', text: '一周三四次', score: 1 },
+      { label: 'C', text: '想到才联系', score: 0 },
+      { label: 'D', text: '两周一次都算频繁', score: -1 },
+      { label: 'E', text: '有事才找，没事各过各的', score: -2 },
+    ],
+  },
+  {
+    id: 36,
+    dimension: 'S',
+    scale: 3,
+    text: '想到自己过往被辜负 / 心意落空的某段经历——',
+    options: [
+      { label: 'A', text: '早翻篇了，不会再想', score: -2 },
+      { label: 'B', text: '偶尔想起，叹口气就过', score: 0 },
+      { label: 'C', text: '反复想，有时还会气到', score: 2 },
+    ],
+  },
+  {
+    id: 37,
+    dimension: 'S',
+    scale: 3,
+    text: '一个重要的朋友最近变神秘（朋圈三天可见 / 问什么都说"忙"）——',
+    options: [
+      { label: 'A', text: '第一反应：是不是我哪里做错了', score: 2 },
+      { label: 'B', text: '可能 TA 自己有事，等等看', score: 0 },
+      { label: 'C', text: 'TA 有自己的节奏，我不管', score: -2 },
+    ],
+  },
+];
+
+export const SOLO_ONLY_IDS_V3: ReadonlySet<number> = new Set(
+  SOLO_ONLY_QUESTIONS.map((q) => q.id),
+);
+
+// ═══════════════════════════════════════════════════════════════════
+// §六 · 合并 · questionsV3 / questionIdsV3 / questionByIdV3
 // ═══════════════════════════════════════════════════════════════════
 
 export const questionsV3: QuestionV3[] = [
@@ -743,6 +833,7 @@ export const questionsV3: QuestionV3[] = [
   ...R_QUESTIONS,
   ...A_QUESTIONS,
   ...S_QUESTIONS,
+  ...SOLO_ONLY_QUESTIONS,
 ];
 
 /** codec 编码顺序 · append-only。未来若增题一律追加至尾部，勿插入中段。 */
