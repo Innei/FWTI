@@ -35,6 +35,9 @@ export function Head() {
       />
       <meta name="theme-color" content="#FFF8F0" />
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1D1217" />
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      <link rel="apple-touch-icon" href="/favicon.svg" />
+      <link rel="mask-icon" href="/favicon.svg" color="#ff4d6d" />
       <meta
         name="keywords"
         content="FWTI,恋爱测试,性格测试,趣味测试,自嘲型恋爱人格,娱乐测试"

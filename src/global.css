@@ -237,18 +237,11 @@ a.nav-logo:focus-visible {
   border-radius: 8px;
 }
 .logo-mark {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: var(--fwti-green);
-  position: relative;
-}
-.logo-mark::after {
-  content: '';
-  position: absolute;
-  inset: 6px;
-  border-radius: 2px;
-  background: #fff;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: block;
+  filter: drop-shadow(2.5px 2.5px 0 var(--shadow-ink));
 }
 .logo-text {
   font-family: var(--fwti-font-title);
@@ -1472,9 +1465,11 @@ a.nav-logo:focus-visible {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+  padding-inline: 16px;
 }
 .preview-legend-row--quadrants {
   gap: 14px 28px;
+  padding-inline: 24px;
 }
 .preview-legend-row--chips {
   gap: 10px 10px;
@@ -1484,6 +1479,7 @@ a.nav-logo:focus-visible {
   display: flex;
   align-items: center;
   gap: 8px;
+  padding-inline: 8px;
   font-family: inherit;
   font-size: 13px;
   color: var(--fwti-text-mid);
@@ -3149,18 +3145,9 @@ body {
   border-bottom: 2px dashed var(--fwti-ink);
 }
 .logo-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--fwti-accent);
-  border: 2px solid var(--fwti-ink);
-  box-shadow: 3px 3px 0 var(--shadow-ink);
-}
-.logo-mark::after {
-  inset: 5px;
-  border-radius: 2px;
-  background: var(--fwti-surface);
-  border: 1.5px solid var(--fwti-ink);
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(3px 3px 0 var(--shadow-ink));
 }
 .logo-text {
   font-family: var(--fwti-font-title);

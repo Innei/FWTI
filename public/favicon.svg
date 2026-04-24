@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="FWTI">
+  <title>FWTI</title>
+  <rect width="64" height="64" rx="14" fill="#fff8f0"/>
+  <g>
+    <rect x="8" y="8" width="24" height="24" fill="#ffb4b8"/>
+    <rect x="32" y="8" width="24" height="24" fill="#ffe08a"/>
+    <rect x="8" y="32" width="24" height="24" fill="#d4b8e8"/>
+    <rect x="32" y="32" width="24" height="24" fill="#a8e6c9"/>
+  </g>
+  <g fill="none" stroke="#1a1a1a" stroke-linejoin="round">
+    <rect x="8" y="8" width="48" height="48" rx="3" stroke-width="4"/>
+    <path d="M32 8 V56 M8 32 H56" stroke-width="2.5"/>
+  </g>
+  <g transform="translate(32 33) rotate(-6)">
+    <path d="M0 -3 C -3 -9 -12 -7 -12 0 C -12 7 -5 12 0 16 C 5 12 12 7 12 0 C 12 -7 3 -9 0 -3 Z"
+          fill="#ff4d6d" stroke="#1a1a1a" stroke-width="2.5" stroke-linejoin="round"/>
+  </g>
+</svg>

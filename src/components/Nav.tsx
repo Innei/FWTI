@@ -5,6 +5,36 @@ import { navCopy } from '../copy/ui';
 import { GITHUB_REPO_URL } from '../state';
 import { getHistory } from '../logic/history';
 
+function LogoMark() {
+  return (
+    <svg
+      class="logo-mark"
+      viewBox="0 0 64 64"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect width="64" height="64" rx="14" fill="var(--fwti-bg)" />
+      <rect x="8" y="8" width="24" height="24" fill="var(--fwti-gz)" />
+      <rect x="32" y="8" width="24" height="24" fill="var(--fwti-gr)" />
+      <rect x="8" y="32" width="24" height="24" fill="var(--fwti-dz)" />
+      <rect x="32" y="32" width="24" height="24" fill="var(--fwti-dr)" />
+      <g fill="none" stroke="var(--fwti-ink)" stroke-linejoin="round">
+        <rect x="8" y="8" width="48" height="48" rx="3" stroke-width="4" />
+        <path d="M32 8 V56 M8 32 H56" stroke-width="2.5" />
+      </g>
+      <g transform="translate(32 33) rotate(-6)">
+        <path
+          d="M0 -3 C -3 -9 -12 -7 -12 0 C -12 7 -5 12 0 16 C 5 12 12 7 12 0 C 12 -7 3 -9 0 -3 Z"
+          fill="var(--fwti-green)"
+          stroke="var(--fwti-ink)"
+          stroke-width="2.5"
+          stroke-linejoin="round"
+        />
+      </g>
+    </svg>
+  );
+}
+
 export function NavLogo() {
   return (
     <a
@@ -16,7 +46,7 @@ export function NavLogo() {
         void navigate('/');
       }}
     >
-      <span class="logo-mark" aria-hidden="true" />
+      <LogoMark />
       <span class="logo-text">FWTI</span>
     </a>
   );
