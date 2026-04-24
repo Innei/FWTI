@@ -6,9 +6,9 @@ import {
   type Question,
 } from '../copy/questions'
 import {
-  getRelationshipStatus,
-  type RelationshipStatus,
-} from '../logic/scoring'
+  getRelationshipStatusV3 as getRelationshipStatus,
+  type RelationshipStatusV3OrNull as RelationshipStatus,
+} from '../logic/v3/flow'
 import { quizPageCopy } from '../copy/ui'
 import { TopNav } from './Nav'
 
