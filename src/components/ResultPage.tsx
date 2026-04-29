@@ -29,6 +29,16 @@ function evidenceFacetLabel(facet: string): string {
   }
 }
 
+function axisPercent(value: number): string {
+  return `${Math.round(Math.abs(value) * 100)}%`;
+}
+
+function axisPole(value: number, positive: string, negative: string): string {
+  if (value >= 0.15) return positive;
+  if (value <= -0.15) return negative;
+  return '中';
+}
+
 /** Uppercase English line with each character in a fixed-width cell (visual grid). */
 function ResultEngLine(props: { text: string }) {
   return (
@@ -228,6 +238,49 @@ export function ResultPage(props: {
             </For>
           </div>
         </section>
+
+        <Show when={r().attachmentApproximation}>
+          {(attachment) => (
+            <section class="result-section attachment-section">
+              <div class="section-eyebrow">{resultPageCopy.attachmentEyebrow}</div>
+              <h2 class="section-title">{resultPageCopy.attachmentTitle}</h2>
+              <div class="attachment-summary">
+                <div class="attachment-type">
+                  <span class="attachment-type-label">{attachment().label}</span>
+                  <span class="attachment-rule">{attachment().rule}</span>
+                </div>
+                <p class="attachment-copy">{attachment().summary}</p>
+              </div>
+              <div class="attachment-axis-list">
+                <div class="attachment-axis">
+                  <span class="attachment-axis-name">
+                    {resultPageCopy.attachmentAxisAttachment}
+                  </span>
+                  <span class="attachment-axis-value">
+                    {axisPercent(attachment().axis.attachment)}
+                  </span>
+                  <span class="attachment-axis-pole">
+                    {axisPole(attachment().axis.attachment, '黏', '离')}
+                  </span>
+                </div>
+                <div class="attachment-axis">
+                  <span class="attachment-axis-name">
+                    {resultPageCopy.attachmentAxisSecurity}
+                  </span>
+                  <span class="attachment-axis-value">
+                    {axisPercent(attachment().axis.security)}
+                  </span>
+                  <span class="attachment-axis-pole">
+                    {axisPole(attachment().axis.security, '疑', '佛')}
+                  </span>
+                </div>
+              </div>
+              <p class="attachment-disclaimer">
+                {resultPageCopy.attachmentDisclaimer}
+              </p>
+            </section>
+          )}
+        </Show>
 
         {/* Dynamic profile */}
         <section class="result-section">

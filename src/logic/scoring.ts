@@ -60,6 +60,16 @@ export interface Scores {
   hidden: number;
 }
 
+export interface AttachmentApproximation {
+  label: string;
+  summary: string;
+  rule: string;
+  axis: {
+    attachment: number;
+    security: number;
+  };
+}
+
 export interface Result {
   code: string;
   /** v0.3 起与 code 一致，字段仅为兼容旧 ShareImageModal。 */
@@ -82,6 +92,7 @@ export interface Result {
     valueB: number;
   }[];
   narrative: ResultNarrative;
+  attachmentApproximation?: AttachmentApproximation;
 }
 
 // ───────────────────────────────────────────────────────────────

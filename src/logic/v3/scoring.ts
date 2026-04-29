@@ -24,6 +24,7 @@ import type { QuestionV3, StatusKey } from '../../copy/v3/types';
 import { personalitiesV3 } from '../../copy/v3/personalities';
 import { hiddenTitlesV3 } from '../../copy/v3/tags';
 import type { Personality, HiddenTitle } from '../../copy/personalities';
+import type { AttachmentApproximation } from '../scoring';
 import {
   makeAnswerLensV3,
   hiddenPersonalityTriggersV3,
@@ -80,6 +81,7 @@ export interface ResultV3 {
     valueB: number;
   }[];
   narrative: ResultNarrative;
+  attachmentApproximation: AttachmentApproximation;
 }
 
 const EMPTY_SCORES = (): ScoresV3 => ({
@@ -146,6 +148,55 @@ function collectTies(ratio: RatioMapV3): RatioDimV3[] {
   if (ratio.A === 0) tied.push('A');
   if (ratio.S === 0) tied.push('S');
   return tied;
+}
+
+function buildAttachmentApproximation(
+  ratio: RatioMapV3,
+): AttachmentApproximation {
+  const anxious = ratio.S >= TIER_THRESHOLD;
+  const avoidant = ratio.A <= -TIER_THRESHOLD;
+  const axis = {
+    attachment: ratio.A,
+    security: ratio.S,
+  };
+
+  if (anxious && avoidant) {
+    return {
+      label: '焦虑-回避混合型',
+      summary:
+        '安全感偏疑，同时黏附需求偏离；既会警觉关系风险，也会用拉开距离来保护自己。',
+      rule: 'S >= 0.33 且 A <= -0.33',
+      axis,
+    };
+  }
+
+  if (anxious) {
+    return {
+      label: '焦虑型',
+      summary:
+        '安全感偏疑，但并未明显抗拒亲密；更容易需要确认、回应和关系仍然稳定的证据。',
+      rule: 'S >= 0.33 且 A > -0.33',
+      axis,
+    };
+  }
+
+  if (avoidant) {
+    return {
+      label: '回避型',
+      summary:
+        '黏附需求偏离，安全警觉未明显升高；更需要个人空间，亲密过密时容易感到负荷。',
+      rule: 'S < 0.33 且 A <= -0.33',
+      axis,
+    };
+  }
+
+  return {
+    label: '安全型',
+    summary:
+      '安全警觉未明显升高，也未明显抗拒亲密；整体更接近能信任关系、也能保留边界的模式。',
+    rule: 'S < 0.33 且 A > -0.33',
+    axis,
+  };
 }
 
 const TIER_THRESHOLD = 0.33;
@@ -346,6 +397,7 @@ export function getResultV3(
     isHidden,
     isAll,
   );
+  const attachmentApproximation = buildAttachmentApproximation(ratio);
 
   return {
     code,
@@ -362,5 +414,6 @@ export function getResultV3(
     scores,
     dimensionLabels,
     narrative,
+    attachmentApproximation,
   };
 }
