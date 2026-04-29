@@ -13,20 +13,38 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { decodeAnswers } from '../src/logic/codec';
-import { getResult } from '../src/logic/scoring';
-import { buildQuestionPath } from '../src/logic/flow';
+import { getResult as getResultV2 } from '../src/logic/scoring';
+import { buildQuestionPath as buildQuestionPathV2 } from '../src/logic/flow';
 import {
-  resolveOptionText,
-  resolveQuestionText,
+  resolveOptionText as resolveOptionTextV2,
+  resolveQuestionText as resolveQuestionTextV2,
   type Question,
 } from '../src/copy/questions';
-import { personalities, hiddenTitles } from '../src/copy/personalities';
+import {
+  personalities as personalitiesV2,
+  hiddenTitles as hiddenTitlesV2,
+} from '../src/copy/personalities';
 import {
   hiddenPersonalityTriggers,
   hiddenTitleTriggers,
   makeAnswerLens,
 } from '../src/logic/predicates';
 import { SEMANTIC } from '../src/logic/semanticIds';
+import { getResultV3 } from '../src/logic/v3/scoring';
+import { buildQuestionPathV3 } from '../src/logic/v3/flow';
+import {
+  hiddenPersonalityTriggersV3,
+  hiddenTagTriggersV3,
+  makeAnswerLensV3,
+  type RatioMapV3,
+} from '../src/logic/v3/predicates';
+import { personalitiesV3 } from '../src/copy/v3/personalities';
+import { hiddenTitlesV3 } from '../src/copy/v3/tags';
+import {
+  resolveOptionText as resolveOptionTextV3,
+  resolveQuestionText as resolveQuestionTextV3,
+  type QuestionV3,
+} from '../src/copy/v3/types';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -68,124 +86,281 @@ if (decoded.version === 1) {
 }
 
 const { answers, status } = decoded;
-const result = getResult(answers, 0, status);
-const path = buildQuestionPath(answers, status);
 
-const anchorByQid = new Map<number, string>();
-for (const [anchor, id] of Object.entries(SEMANTIC)) {
-  anchorByQid.set(id as number, anchor);
+if (decoded.version === 3) {
+  printV3Report(hash, answers, status);
+  process.exit(0);
 }
 
-const perQuestion = path
-  .filter((q) => answers[q.id] !== undefined)
-  .map((q: Question) => {
-    const idx = answers[q.id];
-    const opt = q.options[idx];
-    if (!opt) return null;
-    return {
-      id: q.id,
-      dimension: q.dimension,
-      tag: q.tag ?? null,
-      semanticAnchor: anchorByQid.get(q.id) ?? null,
-      text: resolveQuestionText(q, status),
-      selected: {
-        index: idx,
-        label: opt.label,
-        text: resolveOptionText(q, idx, status),
-        score: opt.score,
-        delta:
-          q.tag === '彩蛋' || q.dimension === 'META' ? null : opt.score / 2,
-        hidden: opt.hidden ?? null,
-        secondary: opt.secondary ?? null,
-      },
-    };
-  })
-  .filter(Boolean);
+printV2Report(hash, answers, status);
 
-const ratio = {
-  GD: result.scores.GD,
-  ZR: result.scores.ZR,
-  NL: result.scores.NL,
-  YF: result.scores.YF,
-};
+function printV3Report(
+  hash: string,
+  answers: Record<number, number>,
+  status: ActiveStatus,
+): void {
+  const result = getResultV3(answers, 0, status);
+  const path = buildQuestionPathV3(answers, status);
+  const ratio: RatioMapV3 = {
+    C: result.scores.GD,
+    R: result.scores.ZR,
+    A: result.scores.NL,
+    S: result.scores.YF,
+  };
 
-const lens = makeAnswerLens({
-  answers,
-  ratio,
-  status,
-  retreatCount: 0,
-  hiddenCount: result.scores.hidden,
-  tiedDimensions: result.tiedDimensions,
-  path,
-});
+  const perQuestion = path
+    .filter((q) => q.dimension !== 'META' && answers[q.id] !== undefined)
+    .map((q: QuestionV3) => {
+      const idx = answers[q.id];
+      const opt = q.options[idx];
+      if (!opt) return null;
+      return {
+        id: q.id,
+        dimension: q.dimension,
+        tag: opt.tag ?? null,
+        semanticAnchor: null,
+        text: resolveQuestionTextV3(q, status),
+        selected: {
+          index: idx,
+          label: opt.label,
+          text: resolveOptionTextV3(q, idx, status),
+          score: opt.score,
+          delta: opt.score / 2,
+          optionTag: opt.tag ?? null,
+        },
+      };
+    })
+    .filter(Boolean);
 
-const hiddenEval = hiddenPersonalityTriggers.map((t) => ({
-  code: t.code,
-  hit: safeTest(() => t.test(lens)),
-}));
-const firstHiddenHit = hiddenEval.find((e) => e.hit === true);
-
-const titleEval = hiddenTitleTriggers.map((t) => ({
-  key: t.key,
-  hit: safeTest(() => t.test(lens)),
-  title: (hiddenTitles as Record<string, { name?: string }>)[t.key]?.name ?? null,
-}));
-
-const output = {
-  hash,
-  version: 2,
-  status,
-  result: {
-    code: result.code,
-    personality: personalities[result.code]?.name ?? result.code,
-    closest16: result.closestCode,
-    closestPersonality:
-      personalities[result.closestCode]?.name ?? result.closestCode,
-    isHidden: result.isHidden,
-    isAll: result.isAll,
+  const lens = makeAnswerLensV3({
+    answers,
+    ratio,
+    status,
+    retreatCount: 0,
     tiedDimensions: result.tiedDimensions,
-    ratios: {
-      GD: round(ratio.GD),
-      ZR: round(ratio.ZR),
-      NL: round(ratio.NL),
-      YF: round(ratio.YF),
-    },
-    breakdown: {
-      GD: { raw: round(result.scores.rawGD), n: result.scores.nGD },
-      ZR: { raw: round(result.scores.rawZR), n: result.scores.nZR },
-      NL: { raw: round(result.scores.rawNL), n: result.scores.nNL },
-      YF: { raw: round(result.scores.rawYF), n: result.scores.nYF },
-    },
-    hiddenCount: result.scores.hidden,
-  },
-  sixteenGrid: {
-    G: ratio.GD > 0 ? 'G' : 'D',
-    Z: ratio.ZR < 0 ? 'R' : 'Z',
-    N: ratio.NL < 0 ? 'L' : 'N',
-    Y: ratio.YF < 0 ? 'F' : 'Y',
-    note: 'default losing side per dimension: GD→D, ZR→Z, NL→N, YF→Y',
-  },
-  perQuestion,
-  hiddenPersonalityEval: hiddenEval,
-  hiddenPersonalityHit: firstHiddenHit?.code ?? null,
-  hiddenTitleEval: titleEval,
-  unlockedTitles: result.unlockedHiddenTitles.map(
-    (t) => (t as { name?: string; key?: string }).name ?? (t as { key?: string }).key ?? t,
-  ),
-  caveats: {
-    retreatCount:
-      'always 0 — retreat counter is session-only and never encoded into the share hash.',
-    hiddenCount:
-      'only non-zero if the sharer answered an egg question with a hidden weight (Q31/Q33/Q34/Q35).',
-  },
-  citations: loadCitations(),
-};
+  });
 
-console.log(JSON.stringify(output, null, 2));
+  const hiddenEval = hiddenPersonalityTriggersV3.map((t) => ({
+    code: t.code,
+    hit: safeTest(() => t.test(lens)),
+  }));
+  const firstHiddenHit = hiddenEval.find((e) => e.hit === true);
+
+  const titleEval = hiddenTagTriggersV3.map((t) => ({
+    key: t.key,
+    hit: safeTest(() => t.test(lens)),
+    title: hiddenTitlesV3[t.key]?.name ?? null,
+  }));
+
+  const output = {
+    hash,
+    version: 3,
+    status,
+    result: {
+      code: result.code,
+      personality: personalitiesV3[result.code]?.name ?? result.code,
+      closest12: result.closestCode,
+      closestPersonality:
+        personalitiesV3[result.closestCode]?.name ?? result.closestCode,
+      isHidden: result.isHidden,
+      isAll: result.isAll,
+      tiedDimensions: result.tiedDimensions,
+      ratios: {
+        C: round(ratio.C),
+        R: round(ratio.R),
+        A: round(ratio.A),
+        S: round(ratio.S),
+      },
+      breakdown: {
+        C: { raw: round(result.scores.rawC), n: result.scores.nC },
+        R: { raw: round(result.scores.rawR), n: result.scores.nR },
+        A: { raw: round(result.scores.rawA), n: result.scores.nA },
+        S: { raw: round(result.scores.rawS), n: result.scores.nS },
+      },
+      attachmentApproximation: classifyAttachmentApproximation(ratio),
+    },
+    currentGrid: {
+      C: ratio.C >= 0.33 ? '追' : ratio.C <= -0.33 ? '避' : '中',
+      R: ratio.R >= 0.33 ? '暴' : ratio.R <= -0.33 ? '闷' : '中',
+      A: ratio.A >= 0.33 ? '黏' : ratio.A <= -0.33 ? '离' : '中',
+      S: ratio.S >= 0.33 ? '疑' : ratio.S <= -0.33 ? '佛' : '中',
+      note: 'v3 uses C/R/A/S, not the legacy GD/ZR/NL/YF question space.',
+    },
+    perQuestion,
+    hiddenPersonalityEval: hiddenEval,
+    hiddenPersonalityHit: firstHiddenHit?.code ?? null,
+    hiddenTitleEval: titleEval,
+    unlockedTitles: result.unlockedHiddenTitles.map(
+      (t) => (t as { name?: string; key?: string }).name ?? (t as { key?: string }).key ?? t,
+    ),
+    caveats: {
+      retreatCount:
+        'always 0 — flipFlopper depends on session-only answer changes and is never encoded into the share hash.',
+      legacy:
+        'v3 links must not be interpreted with v1/v2 question ids or legacy hidden-personality predicates.',
+    },
+    citations: loadCitations(),
+  };
+
+  console.log(JSON.stringify(output, null, 2));
+}
+
+function printV2Report(
+  hash: string,
+  answers: Record<number, number>,
+  status: ActiveStatus,
+): void {
+  const result = getResultV2(answers, 0, status);
+  const path = buildQuestionPathV2(answers, status);
+
+  const anchorByQid = new Map<number, string>();
+  for (const [anchor, id] of Object.entries(SEMANTIC)) {
+    anchorByQid.set(id as number, anchor);
+  }
+
+  const perQuestion = path
+    .filter((q) => answers[q.id] !== undefined)
+    .map((q: Question) => {
+      const idx = answers[q.id];
+      const opt = q.options[idx];
+      if (!opt) return null;
+      return {
+        id: q.id,
+        dimension: q.dimension,
+        tag: q.tag ?? null,
+        semanticAnchor: anchorByQid.get(q.id) ?? null,
+        text: resolveQuestionTextV2(q, status),
+        selected: {
+          index: idx,
+          label: opt.label,
+          text: resolveOptionTextV2(q, idx, status),
+          score: opt.score,
+          delta:
+            q.tag === '彩蛋' || q.dimension === 'META' ? null : opt.score / 2,
+          hidden: opt.hidden ?? null,
+          secondary: opt.secondary ?? null,
+        },
+      };
+    })
+    .filter(Boolean);
+
+  const ratio = {
+    GD: result.scores.GD,
+    ZR: result.scores.ZR,
+    NL: result.scores.NL,
+    YF: result.scores.YF,
+  };
+
+  const lens = makeAnswerLens({
+    answers,
+    ratio,
+    status,
+    retreatCount: 0,
+    hiddenCount: result.scores.hidden,
+    tiedDimensions: result.tiedDimensions,
+    path,
+  });
+
+  const hiddenEval = hiddenPersonalityTriggers.map((t) => ({
+    code: t.code,
+    hit: safeTest(() => t.test(lens)),
+  }));
+  const firstHiddenHit = hiddenEval.find((e) => e.hit === true);
+
+  const titleEval = hiddenTitleTriggers.map((t) => ({
+    key: t.key,
+    hit: safeTest(() => t.test(lens)),
+    title: (hiddenTitlesV2 as Record<string, { name?: string }>)[t.key]?.name ?? null,
+  }));
+
+  const output = {
+    hash,
+    version: 2,
+    status,
+    result: {
+      code: result.code,
+      personality: personalitiesV2[result.code]?.name ?? result.code,
+      closest16: result.closestCode,
+      closestPersonality:
+        personalitiesV2[result.closestCode]?.name ?? result.closestCode,
+      isHidden: result.isHidden,
+      isAll: result.isAll,
+      tiedDimensions: result.tiedDimensions,
+      ratios: {
+        GD: round(ratio.GD),
+        ZR: round(ratio.ZR),
+        NL: round(ratio.NL),
+        YF: round(ratio.YF),
+      },
+      breakdown: {
+        GD: { raw: round(result.scores.rawGD), n: result.scores.nGD },
+        ZR: { raw: round(result.scores.rawZR), n: result.scores.nZR },
+        NL: { raw: round(result.scores.rawNL), n: result.scores.nNL },
+        YF: { raw: round(result.scores.rawYF), n: result.scores.nYF },
+      },
+      hiddenCount: result.scores.hidden,
+    },
+    sixteenGrid: {
+      G: ratio.GD > 0 ? 'G' : 'D',
+      Z: ratio.ZR < 0 ? 'R' : 'Z',
+      N: ratio.NL < 0 ? 'L' : 'N',
+      Y: ratio.YF < 0 ? 'F' : 'Y',
+      note: 'default losing side per dimension: GD→D, ZR→Z, NL→N, YF→Y',
+    },
+    perQuestion,
+    hiddenPersonalityEval: hiddenEval,
+    hiddenPersonalityHit: firstHiddenHit?.code ?? null,
+    hiddenTitleEval: titleEval,
+    unlockedTitles: result.unlockedHiddenTitles.map(
+      (t) => (t as { name?: string; key?: string }).name ?? (t as { key?: string }).key ?? t,
+    ),
+    caveats: {
+      retreatCount:
+        'always 0 — retreat counter is session-only and never encoded into the share hash.',
+      hiddenCount:
+        'only non-zero if the sharer answered an egg question with a hidden weight (Q31/Q33/Q34/Q35).',
+    },
+    citations: loadCitations(),
+  };
+
+  console.log(JSON.stringify(output, null, 2));
+}
+
+type ActiveStatus = 'dating' | 'ambiguous' | 'crush' | 'solo';
 
 function round(n: number): number {
   if (typeof n !== 'number' || Number.isNaN(n)) return n;
   return Math.round(n * 1000) / 1000;
+}
+
+function classifyAttachmentApproximation(ratio: RatioMapV3): {
+  label: string;
+  rule: string;
+} {
+  const anxious = ratio.S >= 0.33;
+  const avoidant = ratio.A <= -0.33;
+  if (anxious && avoidant) {
+    return {
+      label: '焦虑-回避混合型',
+      rule: 'S >= 0.33 and A <= -0.33',
+    };
+  }
+  if (anxious) {
+    return {
+      label: '焦虑型',
+      rule: 'S >= 0.33 and A > -0.33',
+    };
+  }
+  if (avoidant) {
+    return {
+      label: '回避型',
+      rule: 'S < 0.33 and A <= -0.33',
+    };
+  }
+  return {
+    label: '安全型',
+    rule: 'S < 0.33 and A > -0.33',
+  };
 }
 
 function safeTest(fn: () => boolean): boolean | { error: string } {
