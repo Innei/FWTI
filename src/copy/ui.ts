@@ -69,6 +69,7 @@ export const historyPageCopy = {
 export const previewModalCopy = {
   closeAria: '关闭',
   wasteLabel: '废物指数',
+  attachmentHintLabel: '依恋型 · 粗估',
   traitsTitle: '常见病状',
   catchphrasesTitle: '口头禅',
   compatibilityTitle: '配对',

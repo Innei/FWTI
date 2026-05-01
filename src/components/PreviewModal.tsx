@@ -72,20 +72,32 @@ export function PreviewModal() {
 
               <hr class="preview-modal-divider" />
 
-              <div class="preview-modal-waste">
-                <span class="preview-modal-waste-label">{previewModalCopy.wasteLabel}</span>
-                <div class="preview-modal-waste-dots">
-                  <For each={Array.from({ length: 5 })}>
-                    {(_, i) => (
-                      <span
-                        class={`preview-modal-waste-dot ${
-                          i() < person.wasteLevel ? 'filled' : ''
-                        }`}
-                      />
-                    )}
-                  </For>
+              <div class="preview-modal-meta-row">
+                <div class="preview-modal-waste">
+                  <span class="preview-modal-waste-label">{previewModalCopy.wasteLabel}</span>
+                  <div class="preview-modal-waste-dots">
+                    <For each={Array.from({ length: 5 })}>
+                      {(_, i) => (
+                        <span
+                          class={`preview-modal-waste-dot ${
+                            i() < person.wasteLevel ? 'filled' : ''
+                          }`}
+                        />
+                      )}
+                    </For>
+                  </div>
+                  <span class="preview-modal-waste-num">{person.wasteLevel}/5</span>
                 </div>
-                <span class="preview-modal-waste-num">{person.wasteLevel}/5</span>
+                <Show when={person.attachmentHint}>
+                  {(hint) => (
+                    <div class="preview-modal-attachment" data-hint={hint()}>
+                      <span class="preview-modal-attachment-label">
+                        {previewModalCopy.attachmentHintLabel}
+                      </span>
+                      <span class="preview-modal-attachment-value">{hint()}</span>
+                    </div>
+                  )}
+                </Show>
               </div>
 
               <div class="preview-modal-desc">

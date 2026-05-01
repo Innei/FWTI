@@ -1,3 +1,14 @@
+/**
+ * 粗估依恋型 · 与 result 页 `attachmentApproximation`（动态由 A/S 二轴算出）并置展示。
+ * "粗估"二字必须显于 UI，免与动态版混淆。
+ */
+export type AttachmentHint =
+  | '安全型'
+  | '焦虑型'
+  | '回避型'
+  | '焦虑-回避混合型'
+  | '不定';
+
 export interface Personality {
   code: string;
   name: string;
@@ -11,6 +22,8 @@ export interface Personality {
   traits: string[];
   catchphrases: string[];
   advice: string;
+  /** 静态 · 由人格语义内核粗估之依恋型，与动态 attachmentApproximation 区分。 */
+  attachmentHint?: AttachmentHint;
 }
 
 export const personalities: Record<string, Personality> = {
