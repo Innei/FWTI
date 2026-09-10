@@ -32,7 +32,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260411.1",
     "@types/qrcode": "1.5.6",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.4",
     "wrangler": "^4.81.1"
   }
 }
